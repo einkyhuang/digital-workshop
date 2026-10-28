@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>超级工作台 · 改版视觉 Mockup</title>
+<style>
+:root {
+  --sw-page-bg: #F6F7F8;
+  --sw-card-bg: #FFFFFF;
+  --sw-sidebar-bg: #F0F1F3;
+  --sw-overlay: rgba(15, 17, 21, 0.45);
+  --sw-border: rgba(0, 0, 0, 0.08);
+  --sw-border-soft: rgba(0, 0, 0, 0.06);
+  --sw-border-group: rgba(0, 0, 0, 0.10);
+  --sw-text: #111111;
+  --sw-text-secondary: #737373;
+  --sw-text-muted: #8A8A8E;
+  --sw-accent: #111111;
+  --sw-focus: #3B82F6;
+  --sw-status-online: #22C55E;
+  --sw-proj-progress-bg: #DBEAFE;
+  --sw-proj-progress-fg: #1D4ED8;
+  --sw-proj-done-bg: #DCFCE7;
+  --sw-proj-done-fg: #15803D;
+  --sw-proj-build-bg: #EDE9FE;
+  --sw-proj-build-fg: #6D28D9;
+  --sw-proj-hold-bg: #FFEDD5;
+  --sw-proj-hold-fg: #C2410C;
+  --sw-radius-card: 28px;
+  --sw-radius-group: 20px;
+  --sw-radius-panel: 16px;
+  --sw-radius-modal: 20px;
+  --sw-radius-badge: 8px;
+  --sw-radius-pill: 999px;
+  --sw-shadow-card: 0 8px 20px rgba(0, 0, 0, 0.06);
+  --sw-shadow-card-hover: 0 16px 28px rgba(0, 0, 0, 0.12);
+  --sw-shadow-avatar: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --sw-shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.18);
+  --sw-font: system-ui, -apple-system, "SF Pro Text", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--sw-font);
+  background: var(--sw-page-bg);
+  color: var(--sw-text);
+  line-height: 1.45;
+}
+.app {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+.sidebar {
+  background: var(--sw-sidebar-bg);
+  border-right: 1px solid var(--sw-border);
+  padding: 16px 12px;
+}
+.brand {
+  font-size: 13px; font-weight: 700;
+  padding: 8px 10px 16px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 10px;
+  font-size: 13px; color: #444; margin-bottom: 2px;
+}
+.nav-item.active { background: #fff; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.nav-sec { font-size: 11px; color: var(--sw-text-muted); padding: 14px 10px 6px; text-transform: none; }
+
+.main { padding: 28px 32px 48px; max-width: 1220px; }
+.page-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 18px; gap: 16px;
+}
+.page-head h1 { margin: 0; font-size: 28px; font-weight: 700; }
+.page-head .sub { color: var(--sw-text-muted); font-size: 13px; margin-top: 4px; }
+.actions { display: flex; gap: 8px; align-items: center; }
+.search {
+  background: #fff; border: 1px solid var(--sw-border); border-radius: 10px;
+  padding: 8px 12px; font-size: 13px; color: var(--sw-text-muted); min-width: 160px;
+}
+.btn {
+  font-size: 13px; font-weight: 600; padding: 8px 14px;
+  border-radius: 10px; border: 1px solid var(--sw-border);
+  background: #fff; cursor: pointer;
+}
+.btn-primary { background: var(--sw-accent); color: #fff; border-color: var(--sw-accent); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.chip {
+  padding: 6px 12px; border-radius: 999px; border: 1px solid var(--sw-border);
+  background: #fff; font-size: 13px;
+}
+.chip.active { background: #111; color: #fff; border-color: #111; }
+
+.section-label {
+  font-size: 12px; font-weight: 700; color: var(--sw-text-muted);
+  letter-spacing: .04em; margin: 28px 0 12px; text-transform: uppercase;
+}
+
+/* —— 员工组 —— */
+.roster-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.group-shell {
+  background: #fff;
+  border: 1px solid var(--sw-border-group);
+  border-radius: var(--sw-radius-group);
+  padding: 12px 12px 16px;
+}
+.group-shell__head {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px; padding: 0 4px;
+}
+.group-shell__title { margin: 0; font-size: 15px; font-weight: 600; }
+.group-shell__count {
+  font-size: 11px; font-weight: 700; padding: 2px 8px;
+  border-radius: 999px; background: rgba(0,0,0,.06); color: var(--sw-text-muted);
+}
+.group-shell__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.emp-card {
+  background: #fff;
+  border: 1px solid var(--sw-border-soft);
+  border-radius: var(--sw-radius-card);
+  box-shadow: var(--sw-shadow-card);
+  padding: 12px 14px 14px;
+  min-height: 236px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.emp-avatar-wrap {
+  width: 92px; height: 92px; border-radius: 50%;
+  background: #fff; display: grid; place-items: center;
+  box-shadow: var(--sw-shadow-avatar);
+}
+.emp-avatar {
+  width: 84px; height: 84px; border-radius: 50%;
+  display: grid; place-items: center;
+  color: #fff; font-size: 28px; font-weight: 700;
+  border: 3px solid #fff;
+}
+.emp-code { margin-top: 10px; color: var(--sw-text-muted); font-size: 13px; font-weight: 500; letter-spacing: .04em; }
+.emp-dots { display: flex; gap: 4px; margin-top: 6px; }
+.emp-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(0,0,0,.12); }
+.emp-dots .dot.ok { background: var(--sw-status-online); }
+.emp-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; margin-top: auto; padding-top: 18px; gap: 6px;
+}
+.emp-pill {
+  background: #111; color: #fff; font-size: 11px; font-weight: 700;
+  padding: 5px 10px; border-radius: 8px;
+}
+.emp-layer { color: var(--sw-text-muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.emp-name { width: 100%; text-align: left; font-size: 18px; font-weight: 700; margin-top: 10px; }
+.emp-role { width: 100%; text-align: left; font-size: 12px; color: var(--sw-text-secondary); margin-top: 4px; }
+
+/* —— 项目卡 —— */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.proj-card {
+  background: #fff;
+  border: 1px solid var(--sw-border-soft);
+  border-radius: var(--sw-radius-card);
+  box-shadow: var(--sw-shadow-card);
+  padding: 18px 16px 16px;
+  min-height: 210px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.proj-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 22px; font-weight: 700; color: #fff;
+  box-shadow: var(--sw-shadow-avatar);
+}
+.proj-code { margin-top: 10px; font-size: 13px; font-weight: 500; color: var(--sw-text-muted); letter-spacing: .04em; }
+.proj-meta-row {
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; margin-top: auto; padding-top: 16px; gap: 8px;
+}
+.proj-badge {
+  background: #111; color: #fff; font-size: 11px; font-weight: 700;
+  padding: 5px 10px; border-radius: 8px; flex-shrink: 0;
+}
+.status-pill {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+}
+.status-pill--progress { background: var(--sw-proj-progress-bg); color: var(--sw-proj-progress-fg); }
+.status-pill--done { background: var(--sw-proj-done-bg); color: var(--sw-proj-done-fg); }
+.status-pill--build { background: var(--sw-proj-build-bg); color: var(--sw-proj-build-fg); }
+.status-pill--hold { background: var(--sw-proj-hold-bg); color: var(--sw-proj-hold-fg); }
+.proj-name { width: 100%; text-align: left; font-size: 18px; font-weight: 700; margin-top: 10px; }
+.proj-sub { width: 100%; text-align: left; font-size: 12px; color: var(--sw-text-secondary); margin-top: 4px; }
+
+/* —— 弹窗 —— */
+.modal-demo-wrap {
+  margin-top: 36px;
+  position: relative;
+  height: 520px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px dashed rgba(0,0,0,.12);
+}
+.modal-overlay {
+  position: absolute; inset: 0;
+  background: var(--sw-overlay);
+  backdrop-filter: blur(4px);
+  display: grid; place-items: center;
+  padding: 24px;
+}
+.modal {
+  width: min(860px, 100%);
+  max-height: 100%;
+  background: var(--sw-page-bg);
+  border-radius: var(--sw-radius-modal);
+  box-shadow: var(--sw-shadow-modal);
+  border: 1px solid var(--sw-border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.modal__header {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 20px 24px; background: #fff;
+  border-bottom: 1px solid var(--sw-border-soft);
+}
+.modal__avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 22px;
+  box-shadow: var(--sw-shadow-avatar); flex-shrink: 0;
+}
+.modal__title { font-size: 20px; font-weight: 700; margin: 0; }
+.modal__subtitle { font-size: 12px; color: var(--sw-text-muted); margin-top: 4px; }
+.modal__tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.tag {
+  font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px;
+  background: #DBEAFE; color: #1D4ED8;
+}
+.modal__close {
+  margin-left: auto; width: 32px; height: 32px; border-radius: 8px;
+  border: 1px solid var(--sw-border); background: #fff; color: var(--sw-text-muted);
+  font-size: 18px; cursor: pointer; display: grid; place-items: center;
+}
+.modal__body {
+  flex: 1; overflow: auto; padding: 20px 24px;
+  display: grid; grid-template-columns: 1fr 280px; gap: 14px;
+}
+.modal__section {
+  background: #fff; border: 1px solid var(--sw-border-soft);
+  border-radius: var(--sw-radius-panel); padding: 16px;
+}
+.modal__section h4 { margin: 0 0 10px; font-size: 13px; font-weight: 700; }
+.kv { display: grid; gap: 10px; }
+.kv .k { font-size: 11px; color: var(--sw-text-muted); }
+.kv .v { font-size: 13px; margin-top: 2px; }
+.modal__footer {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 14px 24px; background: #fff;
+  border-top: 1px solid var(--sw-border-soft);
+}
+
+.anno {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  background: #111; color: #fff; padding: 2px 8px; border-radius: 6px;
+  margin-left: 8px; vertical-align: middle;
+}
+.footer-note {
+  margin-top: 24px; font-size: 12px; color: var(--sw-text-muted);
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">超级工作台 v1.0</div>
+    <div class="nav-sec">工作台</div>
+    <div class="nav-item">总览</div>
+    <div class="nav-item active">员工档案</div>
+    <div class="nav-item">任务看板</div>
+    <div class="nav-sec">项目</div>
+    <div class="nav-item">网站项目</div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>员工档案</h1>
+        <div class="sub">改版 Mockup · 组容器紧凑排列 · 共 8 位示意</div>
+      </div>
+      <div class="actions">
+        <div class="search">搜索 ⌘K</div>
+        <button class="btn">同步</button>
+        <button class="btn btn-primary">+ 新建</button>
+      </div>
+    </div>
+
+    <div class="chips">
+      <span class="chip active">全部 8</span>
+      <span class="chip">管理中枢 2</span>
+      <span class="chip">网站项目 3</span>
+      <span class="chip">视觉设计 1</span>
+      <span class="chip">外贸营销 2</span>
+    </div>
+
+    <div class="section-label">① 员工组 · auto-fill minmax(340px) <span class="anno">管理中枢第一</span></div>
+
+    <div class="roster-groups">
+      <!-- 管理中枢 -->
+      <section class="group-shell">
+        <div class="group-shell__head">
+          <h3 class="group-shell__title">管理中枢</h3>
+          <span class="group-shell__count">2</span>
+        </div>
+        <div class="group-shell__grid">
+          <article class="emp-card">
+            <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#6366F1,#8B5CF6)">可</div></div>
+            <div class="emp-code">P 1</div>
+            <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="emp-meta"><span class="emp-pill">00</span><span class="emp-layer">管理中枢</span></div>
+            <div class="emp-name">大可可</div>
+            <div class="emp-role">最强大脑</div>
+          </article>
+          <article class="emp-card">
+            <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#0EA5E9,#6366F1)">巡</div></div>
+            <div class="emp-code">P 2</div>
+            <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="emp-meta"><span class="emp-pill">P2</span><span class="emp-layer">管理中枢</span></div>
+            <div class="emp-name">巡逻官</div>
+            <div class="emp-role">心跳巡检</div>
+          </article>
+        </div>
+      </section>
+
+      <!-- 网站项目 -->
+      <section class="group-shell">
+        <div class="group-shell__head">
+          <h3 class="group-shell__title">网站项目</h3>
+          <span class="group-shell__count">3</span>
+        </div>
+        <div class="group-shell__grid">
+          <article class="emp-card">
+            <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#3B82F6,#06B6D4)">S</div></div>
+            <div class="emp-code">A 11</div>
+            <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="emp-meta"><span class="emp-pill">A11</span><span class="emp-layer">网站项目</span></div>
+            <div class="emp-name">SEO 官</div>
+            <div class="emp-role">SEO 专家</div>
+          </article>
+          <article class="emp-card">
+            <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#10B981,#059669)">邮</div></div>
+            <div class="emp-code">A 12</div>
+            <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="emp-meta"><span class="emp-pill">A12</span><span class="emp-layer">网站项目</span></div>
+            <div class="emp-name">邮件助手</div>
+            <div class="emp-role">开发信</div>
+          </article>
+          <article class="emp-card">
+            <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">H</div></div>
+            <div class="emp-code">A 13</div>
+            <div class="emp-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="emp-meta"><span class="emp-pill">A13</span><span class="emp-layer">网站项目</span></div>
+            <div class="emp-name">Hoppi</div>
+            <div class="emp-role">小红书助理</div>
+          </article>
+        </div>
+      </section>
+
+      <!-- 视觉设计 -->
+      <section class="group-shell">
+        <div class="group-shell__head">
+          <h3 class="group-shell__title">视觉设计</h3>
+          <span class="group-shell__count">1</span>
+        </div>
+        <div class="group-shell__grid">
+          <article class="emp-card">
+            <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#EC4899,#8B5CF6)">眉</div></div>
+            <div class="emp-code">A 3</div>
+            <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="emp-meta"><span class="emp-pill">A3</span><span class="emp-layer">视觉设计</span></div>
+            <div class="emp-name">画眉</div>
+            <div class="emp-role">设计师</div>
+          </article>
+        </div>
+      </section>
+
+      <!-- 外贸营销 -->
+      <section class="group-shell">
+        <div class="group-shell__head">
+          <h3 class="group-shell__title">外贸营销</h3>
+          <span class="group-shell__count">2</span>
+        </div>
+        <div class="group-shell__grid">
+          <article class="emp-card">
+            <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#14B8A6,#0EA5E9)">挖</div></div>
+            <div class="emp-code">B 1</div>
+            <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="emp-meta"><span class="emp-pill">B1</span><span class="emp-layer">外贸营销</span></div>
+            <div class="emp-name">客户挖掘</div>
+            <div class="emp-role">外贸客户挖掘</div>
+          </article>
+          <article class="emp-card">
+            <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)">T</div></div>
+            <div class="emp-code">B 2</div>
+            <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="emp-meta"><span class="emp-pill">B2</span><span class="emp-layer">外贸营销</span></div>
+            <div class="emp-name">Threadway</div>
+            <div class="emp-role">分层与开发信</div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <div class="section-label">② 网站项目卡片 · 与员工卡统一</div>
+    <div class="project-grid">
+      <article class="proj-card">
+        <div class="proj-icon" style="background:linear-gradient(135deg,#3B82F6,#8B5CF6)">T</div>
+        <div class="proj-code">W 12</div>
+        <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="proj-meta-row">
+          <span class="proj-badge">W12</span>
+          <span class="status-pill status-pill--progress">进行中 · 55%</span>
+        </div>
+        <div class="proj-name">Trailnxt</div>
+        <div class="proj-sub">客户 A · React</div>
+      </article>
+      <article class="proj-card">
+        <div class="proj-icon" style="background:linear-gradient(135deg,#06B6D4,#3B82F6)">F</div>
+        <div class="proj-code">W 08</div>
+        <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="proj-meta-row">
+          <span class="proj-badge">W08</span>
+          <span class="status-pill status-pill--done">已交付 · 100%</span>
+        </div>
+        <div class="proj-name">FOMOSA</div>
+        <div class="proj-sub">客户 B · Next.js</div>
+      </article>
+      <article class="proj-card">
+        <div class="proj-icon" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">S</div>
+        <div class="proj-code">W 21</div>
+        <div class="emp-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="proj-meta-row">
+          <span class="proj-badge">W21</span>
+          <span class="status-pill status-pill--build">筹建中 · 25%</span>
+        </div>
+        <div class="proj-name">ShopFlow</div>
+        <div class="proj-sub">功能基础建设</div>
+      </article>
+      <article class="proj-card">
+        <div class="proj-icon" style="background:linear-gradient(135deg,#10B981,#059669)">N</div>
+        <div class="proj-code">W 03</div>
+        <div class="emp-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="proj-meta-row">
+          <span class="proj-badge">W03</span>
+          <span class="status-pill status-pill--hold">挂起 · 0%</span>
+        </div>
+        <div class="proj-name">NordicHome</div>
+        <div class="proj-sub">已暂停</div>
+      </article>
+      <article class="proj-card">
+        <div class="proj-icon" style="background:linear-gradient(135deg,#EC4899,#8B5CF6)">L</div>
+        <div class="proj-code">W 15</div>
+        <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="proj-meta-row">
+          <span class="proj-badge">W15</span>
+          <span class="status-pill status-pill--progress">进行中 · 40%</span>
+        </div>
+        <div class="proj-name">LumenSEO</div>
+        <div class="proj-sub">SEO 长期包</div>
+      </article>
+    </div>
+
+    <div class="section-label">③ 详情弹窗版式</div>
+    <div class="modal-demo-wrap">
+      <div class="modal-overlay">
+        <div class="modal">
+          <div class="modal__header">
+            <div class="modal__avatar" style="background:linear-gradient(135deg,#3B82F6,#8B5CF6)">T</div>
+            <div>
+              <h2 class="modal__title">Trailnxt</h2>
+              <div class="modal__subtitle">W12 · 网站项目 · React</div>
+              <div class="modal__tags">
+                <span class="tag">进行中</span>
+                <span class="tag" style="background:#DCFCE7;color:#15803D">已付清</span>
+              </div>
+            </div>
+            <button class="modal__close" aria-label="关闭">×</button>
+          </div>
+          <div class="modal__body">
+            <div class="modal__section">
+              <h4>客户与商务</h4>
+              <div class="kv">
+                <div><div class="k">客户</div><div class="v">Alex Chen · Acme Ltd</div></div>
+                <div><div class="k">金额</div><div class="v">$4,800 · fully_paid</div></div>
+                <div><div class="k">服务期</div><div class="v">2026-08-01 → 2026-12-31</div></div>
+              </div>
+            </div>
+            <div class="modal__section">
+              <h4>快捷改状态</h4>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <span class="status-pill status-pill--progress">进行中</span>
+                <span class="status-pill status-pill--done">已交付</span>
+                <span class="status-pill status-pill--build">筹建中</span>
+                <span class="status-pill status-pill--hold">挂起</span>
+              </div>
+              <h4 style="margin-top:16px">负责人</h4>
+              <div class="v">SEO 官 · 未指定第二负责人</div>
+            </div>
+            <div class="modal__section" style="grid-column:1/-1">
+              <h4>技术</h4>
+              <div class="kv" style="grid-template-columns:1fr 1fr 1fr">
+                <div><div class="k">框架</div><div class="v">React</div></div>
+                <div><div class="k">URL</div><div class="v">trailnxt.example</div></div>
+                <div><div class="k">本地路径</div><div class="v">~/Sites/trailnxt</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal__footer">
+            <button class="btn">在 Finder 中显示</button>
+            <button class="btn btn-primary">保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="footer-note">画眉 · workbench-ui mockup · 对齐 Theme.swift / EmployeeCard compact · 2026-10-29</p>
+  </main>
+</div>
+</body>
+</html>
