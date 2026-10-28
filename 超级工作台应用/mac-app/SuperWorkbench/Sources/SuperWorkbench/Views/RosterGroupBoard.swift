@@ -28,9 +28,7 @@ struct RosterGroupBoard: View {
                     .background(Color.black.opacity(0.06))
                     .foregroundStyle(SWTheme.textMuted)
                     .clipShape(Capsule())
-                Spacer(minLength: 0)
             }
-            .padding(.horizontal, 4)
 
             HStack(alignment: .top, spacing: 10) {
                 ForEach(items) { bot in
@@ -38,14 +36,15 @@ struct RosterGroupBoard: View {
                         EmployeeCard(bot: bot, compact: true)
                     }
                     .buttonStyle(.plain)
-                    .frame(width: cardWidth, alignment: .top)
+                    .frame(width: cardWidth, height: SWTheme.Roster.cardMinHeight, alignment: .top)
                 }
             }
         }
         .padding(.horizontal, SWTheme.Roster.groupPadding)
         .padding(.top, SWTheme.Roster.groupPadding)
         .padding(.bottom, 16)
-        .fixedSize(horizontal: true, vertical: false)
+        // Intrinsic size both axes — avoids Spacer-driven infinite height inside Layout/ScrollView
+        .fixedSize(horizontal: true, vertical: true)
         .background(SWTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: SWTheme.Radius.group, style: .continuous))
         .overlay(

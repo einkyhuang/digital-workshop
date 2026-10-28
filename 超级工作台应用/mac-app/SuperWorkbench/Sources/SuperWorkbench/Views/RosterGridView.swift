@@ -1,9 +1,15 @@
 import SwiftUI
 import AppKit
 
+private struct RosterWidthKey: PreferenceKey {
+    static var defaultValue: CGFloat = 1200
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
+}
+
 struct RosterGridView: View {
     @EnvironmentObject var store: WorkspaceStore
     @State private var groupFilter: String = "全部"
+    @State private var contentWidth: CGFloat = 1200
 
     private var groupOrder: [String] {
         if let o = store.data.groupsOrder, !o.isEmpty { return o }
@@ -51,8 +57,19 @@ struct RosterGridView: View {
                 store.selectedBotId = bot.id
                 store.showingBotDetail = true
             }
+            // Keep layout aware of measured width (parity with OverviewView)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .id(contentWidth)
+
             Spacer(minLength: 80)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(key: RosterWidthKey.self, value: geo.size.width)
+            }
+        )
+        .onPreferenceChange(RosterWidthKey.self) { contentWidth = max($0, 320) }
     }
 }
 
