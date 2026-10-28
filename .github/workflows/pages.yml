@@ -19,10 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Sync data into app
-        run: cp -f data/workspace.json app/data/workspace.json
+        run: |
+          mkdir -p "超级工作台应用/app/data"
+          cp -f "超级工作台应用/data/workspace.json" "超级工作台应用/app/data/workspace.json"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: app
+          path: 超级工作台应用/app
       - id: deployment
         uses: actions/deploy-pages@v4

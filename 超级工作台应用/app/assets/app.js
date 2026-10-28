@@ -49,7 +49,7 @@
 
   async function loadData() {
     const cached = loadLocal();
-    const paths = ["./data/workspace.json", "../data/workspace.json", "data/workspace.json"];
+    const paths = ["./data/workspace.json", "../data/workspace.json", "../../data/workspace.json", "data/workspace.json"];
     for (const p of paths) {
       try {
         const res = await fetch(p, { cache: "no-store" });

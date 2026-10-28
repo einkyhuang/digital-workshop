@@ -1,0 +1,38 @@
+#!/bin/bash
+# 数字工坊.app — 打开「超级工作台应用」本地网页
+set -euo pipefail
+
+CANDIDATES=(
+  "$HOME/Library/Mobile Documents/com~apple~CloudDocs/超级工作台/超级工作台应用/app/index.html"
+  "$HOME/Desktop/超级工作台/超级工作台应用/app/index.html"
+  "$HOME/数字工坊/超级工作台应用/app/index.html"
+  "$HOME/digital-workshop/超级工作台应用/app/index.html"
+)
+
+APP_BUNDLE="$(cd "$(dirname "$0")/../.." && pwd)"
+# mac-app/数字工坊.app → 超级工作台应用/
+APP_ROOT="$(cd "$APP_BUNDLE/.." && pwd)"
+CANDIDATES+=("$APP_ROOT/app/index.html")
+# 若 App 被拷到「超级工作台」根旁
+CANDIDATES+=("$(cd "$APP_BUNDLE/../.." 2>/dev/null && pwd)/超级工作台应用/app/index.html")
+
+TARGET=""
+for f in "${CANDIDATES[@]}"; do
+  if [[ -f "$f" ]]; then TARGET="$f"; break; fi
+done
+
+if [[ -z "$TARGET" ]]; then
+  osascript -e 'display alert "找不到工作台" message "请把仓库放到「iCloud/超级工作台」或「桌面/超级工作台」，并确保存在 超级工作台应用/app/index.html。" as critical' 2>/dev/null || \
+    echo "找不到 超级工作台应用/app/index.html" >&2
+  exit 1
+fi
+
+ABS="$(cd "$(dirname "$TARGET")" && pwd)/$(basename "$TARGET")"
+
+if [[ "${1:-}" == "--app" ]] || [[ "${DIGITAL_WORKSHOP_CHROME_APP:-}" == "1" ]]; then
+  if [[ -d "/Applications/Google Chrome.app" ]]; then
+    open -na "Google Chrome" --args --app="file://$ABS"
+    exit 0
+  fi
+fi
+open "$ABS"
