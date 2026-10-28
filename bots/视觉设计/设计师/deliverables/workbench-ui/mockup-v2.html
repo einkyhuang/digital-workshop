@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>超级工作台 · 总览 v2 Mockup</title>
+<style>
+:root {
+  --sw-page-bg: #F6F7F8;
+  --sw-card-bg: #FFFFFF;
+  --sw-sidebar-bg: #F0F1F3;
+  --sw-border: rgba(0,0,0,.08);
+  --sw-border-soft: rgba(0,0,0,.06);
+  --sw-border-group: rgba(0,0,0,.10);
+  --sw-text: #111111;
+  --sw-text-secondary: #737373;
+  --sw-text-muted: #8A8A8E;
+  --sw-accent: #111111;
+  --sw-shadow-elevated: 0 12px 40px rgba(17,17,17,.06), 0 2px 8px rgba(17,17,17,.04);
+  --sw-shadow-kpi: 0 4px 16px rgba(17,17,17,.04);
+  --sw-shadow-card: 0 8px 20px rgba(0,0,0,.06);
+  --sw-radius-section: 24px;
+  --sw-radius-kpi: 18px;
+  --sw-radius-card: 28px;
+  --sw-radius-group: 20px;
+  --sw-grad-blue: linear-gradient(145deg,#fff 0%,#F0F6FF 100%);
+  --sw-grad-green: linear-gradient(145deg,#fff 0%,#F0FDF6 100%);
+  --sw-grad-amber: linear-gradient(145deg,#fff 0%,#FFF8ED 100%);
+  --sw-grad-rose: linear-gradient(145deg,#fff 0%,#FFF1F2 100%);
+  --sw-grad-violet: linear-gradient(145deg,#fff 0%,#F5F3FF 100%);
+  --sw-urgency-high: #EF4444;
+  --sw-urgency-mid: #F59E0B;
+  --sw-urgency-low: #94A3B8;
+  --sw-ring-track: #E8ECF0;
+  --sw-font: system-ui,-apple-system,"SF Pro Text","Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--sw-font); background: var(--sw-page-bg); color: var(--sw-text); }
+.app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+.sidebar {
+  background: var(--sw-sidebar-bg); border-right: 1px solid var(--sw-border);
+  padding: 18px 12px; position: sticky; top: 0; height: 100vh;
+}
+.brand { font-size: 13px; font-weight: 700; padding: 6px 10px 18px; }
+.nav-sec { font-size: 11px; color: var(--sw-text-muted); padding: 12px 10px 4px; }
+.nav-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 10px; border-radius: 10px; font-size: 13px; color: #444; margin-bottom: 2px;
+}
+.nav-item.active { background: #fff; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.nav-item .n { font-size: 11px; color: var(--sw-text-muted); background: rgba(0,0,0,.05); padding: 1px 7px; border-radius: 999px; }
+
+.main { padding: 28px 32px 72px; }
+.page-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; gap: 16px; }
+.page-head h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -.02em; }
+.crumb { font-size: 12px; color: var(--sw-text-muted); margin-top: 6px; }
+.crumb b { color: var(--sw-text-secondary); font-weight: 600; }
+.actions { display: flex; gap: 8px; align-items: center; }
+.search {
+  background: #fff; border: 1px solid var(--sw-border); border-radius: 10px;
+  padding: 8px 12px; font-size: 13px; color: var(--sw-text-muted); min-width: 150px;
+}
+.btn {
+  font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 10px;
+  border: 1px solid var(--sw-border); background: #fff; cursor: pointer;
+}
+.btn-primary { background: #111; color: #fff; border-color: #111; }
+
+.overview-stack { display: flex; flex-direction: column; gap: 24px; }
+
+.section-shell {
+  background: #fff; border: 1px solid var(--sw-border-group);
+  border-radius: var(--sw-radius-section); padding: 20px 22px 22px;
+  box-shadow: var(--sw-shadow-elevated);
+}
+.section-shell__head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.section-shell__title { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
+.section-shell__badge {
+  font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+  background: rgba(0,0,0,.06); color: var(--sw-text-muted);
+}
+.section-shell__meta { font-size: 12px; color: var(--sw-text-muted); margin-bottom: 14px; }
+.section-subhead { font-size: 12px; font-weight: 600; color: var(--sw-text-secondary); margin: 14px 0 10px; }
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px;
+}
+.kpi-card {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--sw-border-soft); border-radius: var(--sw-radius-kpi);
+  padding: 16px 16px 14px; box-shadow: var(--sw-shadow-kpi); min-height: 118px;
+  background: var(--sw-grad-blue);
+}
+.kpi-card::after {
+  content: ""; position: absolute; top: -40%; right: -18%;
+  width: 110px; height: 110px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,130,246,.09), transparent 70%);
+  pointer-events: none;
+}
+.kpi-card--paid { background: var(--sw-grad-green); }
+.kpi-card--paid::after { background: radial-gradient(circle, rgba(16,185,129,.1), transparent 70%); }
+.kpi-card--unpaid { background: var(--sw-grad-amber); }
+.kpi-card--unpaid::after { background: radial-gradient(circle, rgba(245,158,11,.1), transparent 70%); }
+.kpi-card--overdue { background: var(--sw-grad-rose); }
+.kpi-card--overdue::after { background: radial-gradient(circle, rgba(239,68,68,.08), transparent 70%); }
+.kpi-card--count { background: var(--sw-grad-violet); }
+.kpi-card--count::after { background: radial-gradient(circle, rgba(124,58,237,.08), transparent 70%); }
+
+.kpi-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.kpi-icon {
+  width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center;
+  font-size: 13px; font-weight: 700; background: #EFF6FF; color: #2563EB; position: relative; z-index: 1;
+}
+.kpi-card--paid .kpi-icon { background: #ECFDF5; color: #059669; }
+.kpi-card--unpaid .kpi-icon { background: #FFFBEB; color: #D97706; }
+.kpi-card--overdue .kpi-icon { background: #FFF1F2; color: #E11D48; }
+.kpi-card--count .kpi-icon { background: #F5F3FF; color: #7C3AED; }
+
+.spark { display: flex; align-items: flex-end; gap: 2px; height: 22px; position: relative; z-index: 1; }
+.spark i { display: block; width: 4px; border-radius: 2px; background: currentColor; opacity: .35; }
+.kpi-value {
+  font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em; line-height: 1.1; position: relative; z-index: 1;
+}
+.kpi-label { font-size: 12px; font-weight: 600; margin-top: 6px; position: relative; z-index: 1; }
+.kpi-detail { font-size: 11px; color: var(--sw-text-muted); margin-top: 4px; position: relative; z-index: 1; }
+
+.goal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.goal-card {
+  display: flex; align-items: center; gap: 14px;
+  border: 1px solid var(--sw-border-soft); border-radius: var(--sw-radius-kpi);
+  padding: 14px 16px; box-shadow: var(--sw-shadow-kpi);
+  background: var(--sw-grad-blue);
+}
+.goal-card--paid { background: var(--sw-grad-green); }
+.ring-wrap { position: relative; width: 56px; height: 56px; flex-shrink: 0; }
+.ring {
+  width: 56px; height: 56px; border-radius: 50%;
+  display: grid; place-items: center;
+}
+.ring::before {
+  content: ""; width: 44px; height: 44px; border-radius: 50%; background: #fff;
+  grid-area: 1/1;
+}
+.ring-label {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.goal-text .v { font-size: 15px; font-weight: 700; }
+.goal-text .l { font-size: 12px; font-weight: 600; margin-top: 2px; }
+.goal-text .d { font-size: 11px; color: var(--sw-text-muted); margin-top: 4px; }
+
+.quality {
+  margin-top: 14px; padding: 10px 12px; border-radius: 10px;
+  background: #FFEDD5; color: #C2410C; font-size: 12px; font-weight: 500;
+}
+
+.dist-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.dist-box {
+  background: var(--sw-page-bg); border-radius: 14px; padding: 12px 14px;
+  border: 1px solid var(--sw-border-soft);
+}
+.dist-box h4 { margin: 0 0 10px; font-size: 12px; font-weight: 600; color: var(--sw-text-secondary); }
+.dist-row-item { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 6px; }
+.dist-row-item .dot { width: 8px; height: 8px; border-radius: 50%; }
+.dist-row-item .cnt { margin-left: auto; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.prio-list { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+.prio-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; background: #fff; border: 1px solid var(--sw-border-soft);
+  border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.03);
+}
+.pill {
+  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+}
+.pill-prog { background: #DBEAFE; color: #1D4ED8; }
+.pill-build { background: #EDE9FE; color: #6D28D9; }
+.prio-name { font-size: 13px; font-weight: 600; }
+.prio-pct { margin-left: auto; font-size: 12px; color: var(--sw-text-muted); font-variant-numeric: tabular-nums; }
+
+.kanban-row {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;
+}
+.kanban-col {
+  background: var(--sw-page-bg); border: 1px solid var(--sw-border-soft);
+  border-radius: 14px; padding: 12px; min-height: 200px;
+}
+.kanban-col__head { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; font-size: 12px; font-weight: 600; }
+.kanban-col__head .n { color: var(--sw-text-muted); font-weight: 500; font-size: 11px; }
+.kdot { width: 8px; height: 8px; border-radius: 50%; }
+.kdot-todo { background: #3B82F6; }
+.kdot-doing { background: #F59E0B; }
+.kdot-review { background: #8B5CF6; }
+.kdot-done { background: #22C55E; }
+.task-chip {
+  background: #fff; border: 1px solid var(--sw-border-soft); border-radius: 12px;
+  padding: 10px; box-shadow: 0 2px 6px rgba(0,0,0,.03); margin-bottom: 8px;
+}
+.task-chip__title { font-size: 12px; font-weight: 600; line-height: 1.35; }
+.task-chip__meta { font-size: 10px; color: var(--sw-text-muted); margin-top: 4px; }
+
+.email-day {
+  border: 1px solid var(--sw-border-soft); border-radius: 14px; padding: 12px 14px;
+  background: #fff; margin-bottom: 12px;
+}
+.email-day__head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.email-day__date { font-size: 13px; font-weight: 700; }
+.ecap {
+  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+}
+.ecap-new { background: #DBEAFE; color: #1D4ED8; }
+.ecap-clean { background: rgba(0,0,0,.05); color: var(--sw-text-muted); }
+.ecap-pend { background: #FFEDD5; color: #C2410C; }
+
+.email-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 12px; }
+.email-card {
+  display: grid; grid-template-columns: 4px 1fr;
+  border: 1px solid var(--sw-border-soft); border-radius: 14px;
+  overflow: hidden; box-shadow: var(--sw-shadow-kpi); background: #fff;
+}
+.email-card--high { background: linear-gradient(90deg, #FEF2F2, #fff 32%); }
+.email-card--mid { background: linear-gradient(90deg, #FFFBEB, #fff 32%); }
+.email-card--low { background: linear-gradient(90deg, #F8FAFC, #fff 32%); }
+.email-card__bar { background: var(--sw-urgency-mid); }
+.email-card--high .email-card__bar { background: var(--sw-urgency-high); }
+.email-card--mid .email-card__bar { background: var(--sw-urgency-mid); }
+.email-card--low .email-card__bar { background: var(--sw-urgency-low); }
+.email-card__body { padding: 12px 14px; }
+.email-card__top { display: flex; justify-content: space-between; gap: 8px; }
+.email-card__company { font-size: 12px; font-weight: 700; }
+.email-card__urgency { font-size: 11px; font-weight: 700; }
+.email-card--high .email-card__urgency { color: var(--sw-urgency-high); }
+.email-card--mid .email-card__urgency { color: var(--sw-urgency-mid); }
+.email-card--low .email-card__urgency { color: var(--sw-urgency-low); }
+.email-card__subject { font-size: 13px; font-weight: 600; margin-top: 4px; }
+.email-card__summary { font-size: 12px; color: var(--sw-text-secondary); margin-top: 4px; line-height: 1.4; }
+.email-card__todo { font-size: 11px; color: #1D4ED8; margin-top: 6px; font-weight: 500; }
+
+.roster-groups {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px;
+}
+.group-shell {
+  background: #fff; border: 1px solid var(--sw-border-group);
+  border-radius: var(--sw-radius-group); padding: 12px 12px 16px;
+}
+.group-shell__head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 0 4px; }
+.group-shell__title { margin: 0; font-size: 15px; font-weight: 600; }
+.group-shell__count {
+  font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+  background: rgba(0,0,0,.06); color: var(--sw-text-muted);
+}
+.group-shell__grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;
+}
+.emp-card {
+  background: #fff; border: 1px solid var(--sw-border-soft); border-radius: var(--sw-radius-card);
+  box-shadow: var(--sw-shadow-card); padding: 12px 14px 14px; min-height: 236px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.emp-avatar-wrap {
+  width: 92px; height: 92px; border-radius: 50%; background: #fff;
+  display: grid; place-items: center; box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+.emp-avatar {
+  width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center;
+  color: #fff; font-size: 28px; font-weight: 700; border: 3px solid #fff;
+}
+.emp-code { margin-top: 10px; color: var(--sw-text-muted); font-size: 13px; font-weight: 500; letter-spacing: .04em; }
+.emp-dots { display: flex; gap: 4px; margin-top: 6px; }
+.emp-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(0,0,0,.12); }
+.emp-dots .dot.ok { background: #22C55E; }
+.emp-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; margin-top: auto; padding-top: 18px; gap: 6px;
+}
+.emp-pill { background: #111; color: #fff; font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 8px; }
+.emp-layer { color: var(--sw-text-muted); font-size: 11px; }
+.emp-name { width: 100%; text-align: left; font-size: 18px; font-weight: 700; margin-top: 10px; }
+.emp-role { width: 100%; text-align: left; font-size: 12px; color: var(--sw-text-secondary); margin-top: 4px; }
+
+.footer-note { margin-top: 28px; font-size: 12px; color: var(--sw-text-muted); }
+
+@media (min-width: 1920px) {
+  .main { padding: 32px 40px 72px; }
+  .overview-stack { gap: 28px; }
+  .kpi-grid { grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .goal-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .email-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .kanban-row { gap: 16px; }
+  .roster-groups { grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px; }
+}
+@media (min-width: 2560px) {
+  .main { padding: 40px 48px 80px; max-width: calc(1680px + 96px); margin-inline: auto; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">超级工作台 v1.0</div>
+    <div class="nav-sec">工作台</div>
+    <div class="nav-item active"><span>总览</span></div>
+    <div class="nav-item"><span>员工档案</span><span class="n">22</span></div>
+    <div class="nav-item"><span>任务看板</span><span class="n">4</span></div>
+    <div class="nav-sec">项目</div>
+    <div class="nav-item"><span>网站项目</span><span class="n">53</span></div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>工作台总览</h1>
+        <div class="crumb"><b>网站业绩</b> · 日程 · 邮件 · 员工　<span style="opacity:.7">v2 视觉方案</span></div>
+      </div>
+      <div class="actions">
+        <div class="search">搜索 ⌘K</div>
+        <button class="btn">同步</button>
+        <button class="btn btn-primary">+ 新建</button>
+      </div>
+    </div>
+
+    <div class="overview-stack">
+
+      <!-- 1 网站项目 -->
+      <section class="section-shell">
+        <div class="section-shell__head">
+          <h2 class="section-shell__title">网站项目看板</h2>
+          <span class="section-shell__badge">53</span>
+        </div>
+        <div class="section-shell__meta">口径：金算盘 · 基准 2026-10-29 · CNY</div>
+
+        <div class="section-subhead" style="margin-top:0">存量健康</div>
+        <div class="kpi-grid">
+          <article class="kpi-card">
+            <div class="kpi-top">
+              <div class="kpi-icon">¥</div>
+              <div class="spark" style="color:#2563EB">
+                <i style="height:8px"></i><i style="height:12px"></i><i style="height:10px"></i>
+                <i style="height:16px"></i><i style="height:14px"></i><i style="height:20px"></i><i style="height:18px"></i>
+              </div>
+            </div>
+            <div class="kpi-value">¥67,600</div>
+            <div class="kpi-label">合同总额</div>
+            <div class="kpi-detail">全库 Σ totalAmount</div>
+          </article>
+          <article class="kpi-card kpi-card--paid">
+            <div class="kpi-top">
+              <div class="kpi-icon">收</div>
+              <div class="spark" style="color:#059669">
+                <i style="height:6px"></i><i style="height:10px"></i><i style="height:14px"></i>
+                <i style="height:12px"></i><i style="height:18px"></i><i style="height:16px"></i><i style="height:22px"></i>
+              </div>
+            </div>
+            <div class="kpi-value">¥60,600</div>
+            <div class="kpi-label">已收</div>
+            <div class="kpi-detail">全库 Σ paidAmount</div>
+          </article>
+          <article class="kpi-card kpi-card--unpaid">
+            <div class="kpi-top">
+              <div class="kpi-icon">待</div>
+              <div class="spark" style="color:#D97706">
+                <i style="height:14px"></i><i style="height:12px"></i><i style="height:16px"></i>
+                <i style="height:10px"></i><i style="height:8px"></i><i style="height:12px"></i><i style="height:9px"></i>
+              </div>
+            </div>
+            <div class="kpi-value">¥7,000</div>
+            <div class="kpi-label">待收</div>
+            <div class="kpi-detail">存量 · 主卡</div>
+          </article>
+          <article class="kpi-card kpi-card--overdue">
+            <div class="kpi-top">
+              <div class="kpi-icon">逾</div>
+            </div>
+            <div class="kpi-value">¥0</div>
+            <div class="kpi-label">逾期</div>
+            <div class="kpi-detail">有截止日且待收</div>
+          </article>
+          <article class="kpi-card kpi-card--count">
+            <div class="kpi-top">
+              <div class="kpi-icon">#</div>
+            </div>
+            <div class="kpi-value">18</div>
+            <div class="kpi-label">有金额项目</div>
+            <div class="kpi-detail">totalAmount &gt; 0</div>
+          </article>
+        </div>
+
+        <div class="section-subhead">本年目标完成率</div>
+        <div class="goal-grid">
+          <article class="goal-card">
+            <div class="ring-wrap">
+              <div class="ring" style="background:conic-gradient(#3B82F6 13.5%, #E8ECF0 0)"></div>
+              <div class="ring-label">13.5%</div>
+            </div>
+            <div class="goal-text">
+              <div class="v">合同目标</div>
+              <div class="l">完成率</div>
+              <div class="d">本年合同 ¥67,600 / ¥500,000</div>
+            </div>
+          </article>
+          <article class="goal-card goal-card--paid">
+            <div class="ring-wrap">
+              <div class="ring" style="background:conic-gradient(#10B981 12.1%, #E8ECF0 0)"></div>
+              <div class="ring-label">12.1%</div>
+            </div>
+            <div class="goal-text">
+              <div class="v">回款目标</div>
+              <div class="l">完成率</div>
+              <div class="d">本年已收 ¥60,600 / ¥500,000</div>
+            </div>
+          </article>
+          <article class="goal-card">
+            <div class="ring-wrap">
+              <div class="ring" style="background:conic-gradient(#8B5CF6 100%, #E8ECF0 0)"></div>
+              <div class="ring-label">¥67k</div>
+            </div>
+            <div class="goal-text">
+              <div class="v">本年合同额</div>
+              <div class="l">合同归属年</div>
+              <div class="d">按 service / 签约日切年</div>
+            </div>
+          </article>
+          <article class="goal-card">
+            <div class="ring-wrap">
+              <div class="ring" style="background:conic-gradient(#F59E0B 40%, #E8ECF0 0)"></div>
+              <div class="ring-label">本月</div>
+            </div>
+            <div class="goal-text">
+              <div class="v">本月合同额</div>
+              <div class="l">合同归属月</div>
+              <div class="d">示意 · 按实际数据填</div>
+            </div>
+          </article>
+        </div>
+
+        <div class="quality">数据质量：缺截止日 6 · 金额为 0 占位 12 · 收款状态空 3</div>
+
+        <div class="dist-row">
+          <div class="dist-box">
+            <h4>状态分布</h4>
+            <div class="dist-row-item"><span class="dot" style="background:#1D4ED8"></span>进行中<span class="cnt">14</span></div>
+            <div class="dist-row-item"><span class="dot" style="background:#15803D"></span>已交付<span class="cnt">28</span></div>
+            <div class="dist-row-item"><span class="dot" style="background:#6D28D9"></span>筹建<span class="cnt">7</span></div>
+            <div class="dist-row-item"><span class="dot" style="background:#C2410C"></span>挂起<span class="cnt">4</span></div>
+          </div>
+          <div class="dist-box">
+            <h4>收款状态</h4>
+            <div class="dist-row-item">已结清<span class="cnt">31</span></div>
+            <div class="dist-row-item">已付定金<span class="cnt">9</span></div>
+            <div class="dist-row-item">待收款<span class="cnt">8</span></div>
+            <div class="dist-row-item">逾期风险(无截止)<span class="cnt">5</span></div>
+          </div>
+        </div>
+
+        <div class="section-subhead">进行中优先</div>
+        <div class="prio-list">
+          <div class="prio-item"><span class="pill pill-prog">进行中 · 55%</span><span class="prio-name">Trailnxt</span><span class="prio-pct">55%</span></div>
+          <div class="prio-item"><span class="pill pill-prog">进行中 · 40%</span><span class="prio-name">LumenSEO</span><span class="prio-pct">40%</span></div>
+          <div class="prio-item"><span class="pill pill-build">筹建中 · 25%</span><span class="prio-name">ShopFlow</span><span class="prio-pct">25%</span></div>
+        </div>
+      </section>
+
+      <!-- 2 任务 -->
+      <section class="section-shell">
+        <div class="section-shell__head">
+          <h2 class="section-shell__title">日程管理 · 任务看板</h2>
+          <span class="section-shell__badge">9</span>
+        </div>
+        <div class="section-shell__meta">只读 · 工作台任务 + SmartPlan</div>
+        <div class="kanban-row">
+          <div class="kanban-col">
+            <div class="kanban-col__head"><span class="kdot kdot-todo"></span>待办 <span class="n">3</span></div>
+            <div class="task-chip"><div class="task-chip__title">补全开发信 MOQ / 交期 / 面料</div><div class="task-chip__meta">工作台 · Threadway</div></div>
+            <div class="task-chip"><div class="task-chip__title">查找 Shop 17 采购联系人</div><div class="task-chip__meta">工作台</div></div>
+            <div class="task-chip"><div class="task-chip__title">创建反调官 Bot</div><div class="task-chip__meta">工作台 · 最强大脑</div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col__head"><span class="kdot kdot-doing"></span>进行中 <span class="n">2</span></div>
+            <div class="task-chip"><div class="task-chip__title">总览页 v2 视觉落地</div><div class="task-chip__meta">工作台 · 画眉</div></div>
+            <div class="task-chip"><div class="task-chip__title">网站 KPI 口径对齐金算盘</div><div class="task-chip__meta">SmartPlan</div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col__head"><span class="kdot kdot-review"></span>验收 <span class="n">1</span></div>
+            <div class="task-chip"><div class="task-chip__title">员工卡紧凑组布局验收</div><div class="task-chip__meta">工作台</div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col__head"><span class="kdot kdot-done"></span>完成 <span class="n">3</span></div>
+            <div class="task-chip"><div class="task-chip__title">完成 SmartPlan 同步脚本</div><div class="task-chip__meta">工作台</div></div>
+            <div class="task-chip"><div class="task-chip__title">字段规范交付</div><div class="task-chip__meta">网站项目</div></div>
+            <div class="task-chip"><div class="task-chip__title">邮件日报首次整理</div><div class="task-chip__meta">信鸽</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 邮件 -->
+      <section class="section-shell">
+        <div class="section-shell__head">
+          <h2 class="section-shell__title">邮件看板</h2>
+          <span class="section-shell__badge">1</span>
+        </div>
+        <div class="section-shell__meta">信鸽-邮件助手 · email-daily</div>
+        <div class="email-day">
+          <div class="email-day__head">
+            <span class="email-day__date">2026-10-29</span>
+            <span class="ecap ecap-new">新 193</span>
+            <span class="ecap ecap-clean">清理 180</span>
+            <span class="ecap ecap-pend">待回 1</span>
+          </div>
+          <div class="email-grid">
+            <article class="email-card email-card--high">
+              <div class="email-card__bar"></div>
+              <div class="email-card__body">
+                <div class="email-card__top">
+                  <span class="email-card__company">Railway</span>
+                  <span class="email-card__urgency">高</span>
+                </div>
+                <div class="email-card__subject">凭据轮换提醒</div>
+                <div class="email-card__summary">平台要求轮换访问凭据</div>
+                <div class="email-card__todo">待办：尽快轮换相关密钥</div>
+              </div>
+            </article>
+            <article class="email-card email-card--high">
+              <div class="email-card__bar"></div>
+              <div class="email-card__body">
+                <div class="email-card__top">
+                  <span class="email-card__company">MUYE（店铺订单）</span>
+                  <span class="email-card__urgency">高</span>
+                </div>
+                <div class="email-card__subject">订单 #398–#400 待发货</div>
+                <div class="email-card__summary">3 笔订单合计约 $698 等待发货</div>
+                <div class="email-card__todo">待办：安排发货</div>
+              </div>
+            </article>
+            <article class="email-card email-card--mid">
+              <div class="email-card__bar"></div>
+              <div class="email-card__body">
+                <div class="email-card__top">
+                  <span class="email-card__company">Hostinger</span>
+                  <span class="email-card__urgency">中</span>
+                </div>
+                <div class="email-card__subject">主机续费 / 域名到期</div>
+                <div class="email-card__summary">dlxnails.com 11-04 自动续费；iloveoverland.com 11-18 到期</div>
+                <div class="email-card__todo">待办：确认是否续费</div>
+              </div>
+            </article>
+            <article class="email-card email-card--low">
+              <div class="email-card__bar"></div>
+              <div class="email-card__body">
+                <div class="email-card__top">
+                  <span class="email-card__company">Newsletter</span>
+                  <span class="email-card__urgency">低</span>
+                </div>
+                <div class="email-card__subject">产品周报订阅</div>
+                <div class="email-card__summary">可归档，无需回复</div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 员工 -->
+      <section class="section-shell" style="background:transparent;border:none;box-shadow:none;padding:0">
+        <div class="section-shell__head" style="margin-bottom:14px">
+          <h2 class="section-shell__title">员工看板</h2>
+          <span class="section-shell__badge">6</span>
+        </div>
+        <div class="roster-groups">
+          <div class="group-shell">
+            <div class="group-shell__head"><h3 class="group-shell__title">管理中枢</h3><span class="group-shell__count">2</span></div>
+            <div class="group-shell__grid">
+              <article class="emp-card">
+                <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#6366F1,#8B5CF6)">可</div></div>
+                <div class="emp-code">P 1</div>
+                <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="emp-meta"><span class="emp-pill">00</span><span class="emp-layer">管理中枢</span></div>
+                <div class="emp-name">大可可</div>
+                <div class="emp-role">最强大脑</div>
+              </article>
+              <article class="emp-card">
+                <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#0EA5E9,#6366F1)">巡</div></div>
+                <div class="emp-code">P 2</div>
+                <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="emp-meta"><span class="emp-pill">P2</span><span class="emp-layer">管理中枢</span></div>
+                <div class="emp-name">巡逻官</div>
+                <div class="emp-role">心跳巡检</div>
+              </article>
+            </div>
+          </div>
+          <div class="group-shell">
+            <div class="group-shell__head"><h3 class="group-shell__title">视觉设计</h3><span class="group-shell__count">1</span></div>
+            <div class="group-shell__grid">
+              <article class="emp-card">
+                <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#EC4899,#8B5CF6)">眉</div></div>
+                <div class="emp-code">A 3</div>
+                <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="emp-meta"><span class="emp-pill">A3</span><span class="emp-layer">视觉设计</span></div>
+                <div class="emp-name">画眉</div>
+                <div class="emp-role">设计师</div>
+              </article>
+            </div>
+          </div>
+          <div class="group-shell">
+            <div class="group-shell__head"><h3 class="group-shell__title">网站项目</h3><span class="group-shell__count">2</span></div>
+            <div class="group-shell__grid">
+              <article class="emp-card">
+                <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#3B82F6,#06B6D4)">S</div></div>
+                <div class="emp-code">A 11</div>
+                <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="emp-meta"><span class="emp-pill">A11</span><span class="emp-layer">网站项目</span></div>
+                <div class="emp-name">SEO 官</div>
+                <div class="emp-role">SEO 专家</div>
+              </article>
+              <article class="emp-card">
+                <div class="emp-avatar-wrap"><div class="emp-avatar" style="background:linear-gradient(135deg,#10B981,#059669)">邮</div></div>
+                <div class="emp-code">A 12</div>
+                <div class="emp-dots"><span class="dot ok"></span><span class="dot"></span><span class="dot"></span></div>
+                <div class="emp-meta"><span class="emp-pill">A12</span><span class="emp-layer">网站项目</span></div>
+                <div class="emp-name">邮件助手</div>
+                <div class="emp-role">开发信</div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <p class="footer-note">画眉 · overview v2 · 继承 workbench-ui token · 2026-10-29</p>
+  </main>
+</div>
+</body>
+</html>
