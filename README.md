@@ -1,26 +1,40 @@
 # 数字工坊（digital-workshop）
 
-所有 Bot、项目和工作台的数据都统一放在这个文件夹里。
+所有 Bot、项目和工作台的数据统一放在本文件夹。
+
+## 公网预览
+**https://einkyhuang.github.io/digital-workshop/**
+
+> **注意：本仓库为公开（Public）。**  
+> 免费 GitHub 账号无法给私有仓库开 Pages，所以改成了公开。  
+> 仓库里只有 Bot 岗位职责、测试用买家公开信息、开发信草稿，**没有** API Key / Token / 密码。  
+> 不要把密钥写进本仓库。若以后需要私密部署，请升级 GitHub Pro 再改回私有，或换私有静态托管。
+
+仓库：https://github.com/einkyhuang/digital-workshop
 
 ## 目录结构
 ```
-app/            工作台网页（index.html，双击就能打开；也是 GitHub Pages 的站点）
-  data/         给网页读取的数据副本（sync.sh 会自动从 data/ 复制过来）
-data/           主数据 workspace.json（Bot、任务、群聊、定时任务、招聘、规则）
-bots/<名字>/    每个 Bot 一个文件夹：profile.md（职责/工具/测试用例）+ deliverables/ 交付物
-projects/       每个项目一个文件夹（看板、服装客户开发……）
-scripts/sync.sh 云端与本地同步脚本
-mac-app/        数字工坊.app（Mac 启动器）
+app/                 工作台网页（双击 index.html 本地打开；也是 Pages 站点根）
+  assets/            CSS / JS
+  data/workspace.json  网页读取的数据副本
+data/workspace.json  主数据（Bot / 任务 / 群聊 / 巡检 / 招聘 / 规则）
+bots/<名字>/         每个真实 Bot 一文件夹：profile.md + deliverables/
+projects/看板/       本工作台项目说明
+projects/服装客户开发/  群聊测试项目说明
+scripts/sync.sh      云端 ↔ 本地同步
+mac-app/数字工坊.app  Mac 启动器（未签名）
 ```
 
-## 打开方式
-- 公网：GitHub Pages 网址（见仓库 Settings → Pages）
-- 本地：双击 `app/index.html`，或者打开 `数字工坊.app`
+## 本地打开
+1. `git clone https://github.com/einkyhuang/digital-workshop.git ~/数字工坊`
+2. 双击 `~/数字工坊/app/index.html`，或打开 `mac-app/数字工坊.app`
+3. **Mac App 第一次打开**：右键 → 打开（未签名）
 
-## 同步（云端 = GitHub 仓库，本地 = git clone）
-1. 第一次使用：`git clone https://github.com/einkyhuang/digital-workshop.git ~/数字工坊`
-2. 在网页上改完内容后，点「导出 JSON」，用导出的文件覆盖 `data/workspace.json`
-3. 运行 `./scripts/sync.sh`（先拉取，再提交，再推送）
-4. Bot 的交付物直接写进 `bots/<名字>/deliverables/`，然后同样运行 sync.sh
+## 同步
+云端 = GitHub 仓库；本地 = git clone。
 
-注意：仓库里不要放任何 Token、密码或 API Key。
+1. 在网页上改完 →「导出 JSON」→ 覆盖 `data/workspace.json`
+2. 运行：`./scripts/sync.sh`（pull --rebase → add → commit → push）
+3. Bot 交付物直接写入 `bots/<名字>/deliverables/` 后同样 sync
+
+`sync.sh` 会把 `data/workspace.json` 复制到 `app/data/`，保证 Pages 与本地一致。
