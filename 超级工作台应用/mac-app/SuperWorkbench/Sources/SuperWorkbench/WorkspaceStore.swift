@@ -29,6 +29,12 @@ final class WorkspaceStore: ObservableObject {
             .appendingPathComponent("超级工作台应用/data/workspace.json")
     }
 
+    /// Full websiteProjects (client/amounts/localPath). Gitignored — local only.
+    var privateWebsiteProjectsURL: URL {
+        repoRoot
+            .appendingPathComponent("超级工作台应用/data/private/websiteProjects.local.json")
+    }
+
     var botsRootURL: URL {
         repoRoot.appendingPathComponent("bots")
     }
@@ -41,7 +47,11 @@ final class WorkspaceStore: ObservableObject {
                 return
             }
             let raw = try Data(contentsOf: url)
-            let decoded = try JSONDecoder().decode(WorkspaceData.self, from: raw)
+            var decoded = try JSONDecoder().decode(WorkspaceData.self, from: raw)
+            // Overlay full private websiteProjects when present
+            if let full = loadPrivateWebsiteProjects() {
+                decoded.websiteProjects = full
+            }
             data = decoded
             if selectedBotId == nil { selectedBotId = decoded.bots.first?.id }
             if selectedTaskId == nil { selectedTaskId = decoded.tasks.first?.id }
@@ -56,15 +66,98 @@ final class WorkspaceStore: ObservableObject {
             data.updatedAt = ISO8601DateFormatter().string(from: Date())
             let enc = JSONEncoder()
             enc.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
-            let raw = try enc.encode(data)
+            // 1) Write full websiteProjects to private local file
+            try savePrivateWebsiteProjects(data.websiteProjects ?? [])
+            // 2) Write redacted copy to tracked workspace.json (+ app copy)
+            var publicData = data
+            publicData.websiteProjects = redactWebsiteProjects(data.websiteProjects ?? [])
+            let raw = try enc.encode(publicData)
             try raw.write(to: dataFileURL, options: .atomic)
-            // Keep app/data copy in sync for the static web app
             let webCopy = repoRoot.appendingPathComponent("超级工作台应用/app/data/workspace.json")
             try? FileManager.default.createDirectory(at: webCopy.deletingLastPathComponent(), withIntermediateDirectories: true)
             try? raw.write(to: webCopy, options: .atomic)
             loadError = nil
         } catch {
             loadError = "保存失败：\(error.localizedDescription)"
+        }
+    }
+
+    // MARK: - Website project privacy (local full / public redacted)
+
+    private struct PrivateWebsiteDoc: Codable {
+        var version: Int?
+        var updatedAt: String?
+        var aliases: [String: String]?
+        var projects: [WebsiteProject]
+    }
+
+    private func loadPrivateWebsiteProjects() -> [WebsiteProject]? {
+        let url = privateWebsiteProjectsURL
+        guard FileManager.default.fileExists(atPath: url.path) else { return nil }
+        guard let raw = try? Data(contentsOf: url) else { return nil }
+        if let doc = try? JSONDecoder().decode(PrivateWebsiteDoc.self, from: raw) {
+            return doc.projects
+        }
+        // fallback: bare array
+        return try? JSONDecoder().decode([WebsiteProject].self, from: raw)
+    }
+
+    private func loadAliases() -> [String: String] {
+        let url = privateWebsiteProjectsURL
+        guard FileManager.default.fileExists(atPath: url.path),
+              let raw = try? Data(contentsOf: url),
+              let doc = try? JSONDecoder().decode(PrivateWebsiteDoc.self, from: raw) else { return [:] }
+        return doc.aliases ?? [:]
+    }
+
+    private func savePrivateWebsiteProjects(_ projects: [WebsiteProject]) throws {
+        var aliases = loadAliases()
+        var maxN = 0
+        for a in aliases.values {
+            if a.hasPrefix("客户A"), let n = Int(a.dropFirst(3)) { maxN = max(maxN, n) }
+        }
+        for p in projects where aliases[p.id] == nil {
+            let hasClient = !(p.clientName ?? "").isEmpty || !(p.clientCompany ?? "").isEmpty || !(p.localPath ?? "").isEmpty || (p.totalAmount ?? 0) > 0
+            if hasClient {
+                maxN += 1
+                aliases[p.id] = String(format: "客户A%02d", maxN)
+            }
+        }
+        let doc = PrivateWebsiteDoc(
+            version: 1,
+            updatedAt: ISO8601DateFormatter().string(from: Date()),
+            aliases: aliases,
+            projects: projects
+        )
+        let enc = JSONEncoder()
+        enc.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+        let raw = try enc.encode(doc)
+        let url = privateWebsiteProjectsURL
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try raw.write(to: url, options: .atomic)
+        // local web overlay
+        let appPriv = repoRoot.appendingPathComponent("超级工作台应用/app/data/private/websiteProjects.local.json")
+        try? FileManager.default.createDirectory(at: appPriv.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? raw.write(to: appPriv, options: .atomic)
+    }
+
+    private func redactWebsiteProjects(_ projects: [WebsiteProject]) -> [WebsiteProject] {
+        let aliases = loadAliases()
+        return projects.map { p in
+            var r = p
+            let hasClient = !(p.clientName ?? "").isEmpty || !(p.clientCompany ?? "").isEmpty || aliases[p.id] != nil
+            if hasClient {
+                r.clientName = aliases[p.id] ?? "已隐藏"
+            } else {
+                r.clientName = ""
+            }
+            if let cc = p.clientCompany, !cc.isEmpty { r.clientCompany = "已隐藏" } else { r.clientCompany = "" }
+            r.localPath = ""
+            r.totalAmount = nil
+            r.depositAmount = nil
+            r.paidAmount = nil
+            r.unpaidAmount = nil
+            return r
         }
     }
 
@@ -182,6 +275,9 @@ final class WorkspaceStore: ObservableObject {
             cp -f "超级工作台应用/data/workspace.json" "超级工作台应用/app/data/workspace.json" 2>/dev/null || true
             git pull --rebase --autostash 2>&1
             git add -A
+            # never stage private PII
+            git reset -q -- "超级工作台应用/data/private" "超级工作台应用/app/data/private" 2>/dev/null || true
+            node "超级工作台应用/scripts/check-website-privacy.mjs" --staged || exit 1
             if ! git diff --cached --quiet; then
               git commit -m "sync: $(date '+%Y-%m-%d %H:%M')" 2>&1
             else

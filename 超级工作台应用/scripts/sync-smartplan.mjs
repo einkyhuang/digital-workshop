@@ -15,6 +15,15 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { spawnSync } from "child_process";
+import {
+  loadPrivate,
+  savePrivate,
+  mergeFullWebsiteProjects,
+  redactProjects,
+  assertPublicClean,
+  forSmartPlanWriteback,
+  isAliasClientName,
+} from "./website-privacy.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(__dirname, "../..");
@@ -121,22 +130,26 @@ async function putApi(id, body) {
 }
 
 function insertSqlite(item) {
-  const services = JSON.stringify(item.services || []);
-  const cat = item.category || (item.status === "delivered" ? "已交付" : item.status === "inactive" ? "已暂停/挂了" : item.status === "infrastructure" ? "功能基础建设" : "进行中");
+  const safe = forSmartPlanWriteback(item);
+  const services = JSON.stringify(safe.services || []);
+  const cat = safe.category || (safe.status === "delivered" ? "已交付" : safe.status === "inactive" ? "已暂停/挂了" : safe.status === "infrastructure" ? "功能基础建设" : "进行中");
+  const clientName = (safe.clientName != null && !isAliasClientName(safe.clientName)) ? safe.clientName : "";
+  const clientCompany = (safe.clientCompany && String(safe.clientCompany).trim() !== "已隐藏") ? safe.clientCompany : "";
+  const localPath = safe.localPath || "";
   const sql = `INSERT INTO website_projects (
     id,name,category,status,local_path,url,framework,description,last_modified,
     client_name,client_phone,client_wechat,client_email,client_company,
     total_amount,deposit_amount,paid_amount,unpaid_amount,payment_status,
     assets_credentials,services,service_start_date,service_end_date,created_at,updated_at
   ) VALUES (
-    '${esc(item.id)}','${esc(item.name)}','${esc(cat)}','${esc(item.status)}',
-    '${esc(item.localPath || `/Users/ky/Desktop/定制网站-客户版/${cat}/${item.name}`)}',
-    '${esc(item.url)}','${esc(item.framework || "React")}','${esc(item.description)}',
+    '${esc(safe.id)}','${esc(safe.name)}','${esc(cat)}','${esc(safe.status)}',
+    '${esc(localPath)}',
+    '${esc(safe.url)}','${esc(safe.framework || "React")}','${esc(safe.description)}',
     datetime('now','localtime'),
-    '${esc(item.clientName)}','','','','${esc(item.clientCompany)}',
-    ${Number(item.totalAmount)||0},${Number(item.depositAmount)||0},${Number(item.paidAmount)||0},${Number(item.unpaidAmount)||0},
-    '${esc(item.paymentStatus||"pending")}','','${esc(services)}',
-    '${esc(item.serviceStartDate||"")}','${esc(item.deadline||item.serviceEndDate||"")}',
+    '${esc(clientName)}','','','','${esc(clientCompany)}',
+    ${Number(safe.totalAmount)||0},${Number(safe.depositAmount)||0},${Number(safe.paidAmount)||0},${Number(safe.unpaidAmount)||0},
+    '${esc(safe.paymentStatus||"pending")}','','${esc(services)}',
+    '${esc(safe.serviceStartDate||"")}','${esc(safe.deadline||safe.serviceEndDate||"")}',
     datetime('now'),datetime('now')
   );`;
   const r = spawnSync("sqlite3", [DB, sql], { encoding: "utf8" });
@@ -148,25 +161,30 @@ function esc(s) {
 }
 
 function toApiBody(item) {
-  return {
-    name: item.name,
-    url: item.url,
-    category: item.category,
-    status: item.status,
-    description: item.description,
-    framework: item.framework,
-    client_name: item.clientName,
-    client_company: item.clientCompany,
+  // Never push redacted aliases / hidden placeholders back into SmartPlan
+  const safe = forSmartPlanWriteback(item);
+  const body = {
+    name: safe.name,
+    url: safe.url,
+    category: safe.category,
+    status: safe.status,
+    description: safe.description,
+    framework: safe.framework,
     // intentionally omit phone/wechat/email/credentials
-    total_amount: item.totalAmount,
-    deposit_amount: item.depositAmount,
-    paid_amount: item.paidAmount,
-    unpaid_amount: item.unpaidAmount,
-    payment_status: item.paymentStatus,
-    services: item.services,
-    service_start_date: item.serviceStartDate,
-    service_end_date: item.deadline || item.serviceEndDate,
+    payment_status: safe.paymentStatus,
+    services: safe.services,
+    service_start_date: safe.serviceStartDate,
+    service_end_date: safe.deadline || safe.serviceEndDate,
   };
+  if (safe.clientName != null && !isAliasClientName(safe.clientName)) body.client_name = safe.clientName;
+  if (safe.clientCompany != null && String(safe.clientCompany).trim() && String(safe.clientCompany).trim() !== "已隐藏") {
+    body.client_company = safe.clientCompany;
+  }
+  if (safe.totalAmount != null) body.total_amount = safe.totalAmount;
+  if (safe.depositAmount != null) body.deposit_amount = safe.depositAmount;
+  if (safe.paidAmount != null) body.paid_amount = safe.paidAmount;
+  if (safe.unpaidAmount != null) body.unpaid_amount = safe.unpaidAmount;
+  return body;
 }
 
 function loadWs() {
@@ -259,10 +277,11 @@ async function main() {
     source,
     count: merged.length,
     direction: doPush ? "bidirectional-when-api-up" : "import",
-    note: "不导入 assets_credentials / 客户电话微信邮箱 / settings.llm_api_key。编辑写回依赖 PUT /api/websites/:id；新建无 POST 时走 SQLite INSERT。",
+    note: "不导入 assets_credentials / 客户电话微信邮箱 / settings.llm_api_key。编辑写回依赖 PUT /api/websites/:id；新建无 POST 时走 SQLite INSERT。公开仓库中的 websiteProjects 已脱敏；完整数据仅存 data/private/。",
     messages: notes.concat(pushErrors),
   };
-  saveWs(ws);
+  // Keep prior aliases stable across sync
+  saveWs(ws, { aliases: aliasSeed });
   console.log(JSON.stringify({ ok: true, count: merged.length, source, pushed, created, notes, pushErrors }, null, 2));
 }
 

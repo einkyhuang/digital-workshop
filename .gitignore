@@ -29,3 +29,8 @@ node_modules/
 智能日程管理/**/*.db-shm
 智能日程管理/.env
 智能日程管理/.env.*
+
+# Website project PII (client/amounts/localPath) — local only
+超级工作台应用/data/private/
+超级工作台应用/app/data/private/
+**/websiteProjects.local.json

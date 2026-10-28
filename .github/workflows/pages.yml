@@ -18,10 +18,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Privacy check (no client/amounts/paths in tracked data)
+        run: node "超级工作台应用/scripts/check-website-privacy.mjs"
       - name: Sync data into app
         run: |
           mkdir -p "超级工作台应用/app/data"
           cp -f "超级工作台应用/data/workspace.json" "超级工作台应用/app/data/workspace.json"
+          # never copy private/
+          rm -rf "超级工作台应用/app/data/private"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

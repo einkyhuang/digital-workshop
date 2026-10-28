@@ -1,6 +1,6 @@
 # 超级工作台应用
 
-本文件夹集中存放「数字工坊 · 工作台」的**应用本身**（网页、数据、同步脚本、Mac App），与仓库根目录的 `bots/`、`projects/` 业务内容分开。
+本文件夹集中存放「超级工作台」的**应用本身**（网页、数据、同步脚本、Mac App），与仓库根目录的 `bots/`、`projects/` 业务内容分开。
 
 ## 内容
 ```
@@ -32,3 +32,11 @@ mac-app/数字工坊.app  Mac 启动器（未签名）
 脚本会把 `data/workspace.json` 复制到 `app/data/`，再 git pull / commit / push（在仓库根目录执行）。
 
 请勿把 API Key、Token、密码放进本文件夹或仓库。
+
+## 网站项目隐私
+
+- **完整数据**（客户姓名/公司、金额、本机路径）仅保存在 `data/private/websiteProjects.local.json`（已 gitignore，勿提交）。
+- 仓库内 `data/workspace.json` / `app/data/workspace.json` 只含脱敏版：`客户A01` 等稳定别名、金额为空、`localPath` 清空。
+- `scripts/sync-smartplan.mjs` 会同时写 private + 脱敏公开文件；写回 SmartPlan 时不会把别名/`已隐藏` 推回去。
+- 提交前由 `.git/hooks/pre-commit` 与 `scripts/check-website-privacy.mjs` 检查。
+

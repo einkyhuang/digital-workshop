@@ -1,4 +1,4 @@
-# 数字工坊（digital-workshop）
+# 超级工作台（digital-workshop）
 
 业务内容（`bots/`、`projects/`）与**应用本体**分开存放。
 

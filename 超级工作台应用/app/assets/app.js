@@ -74,6 +74,26 @@
     } catch (_) {}
   }
 
+
+  async function tryLoadPrivateWebsiteProjects() {
+    const paths = [
+      "./data/private/websiteProjects.local.json",
+      "../data/private/websiteProjects.local.json",
+      "../../data/private/websiteProjects.local.json",
+      "data/private/websiteProjects.local.json",
+    ];
+    for (const p of paths) {
+      try {
+        const res = await fetch(p, { cache: "no-store" });
+        if (!res.ok) continue;
+        const json = await res.json();
+        if (json && Array.isArray(json.projects)) return json.projects;
+        if (Array.isArray(json)) return json;
+      } catch (_) {}
+    }
+    return null;
+  }
+
   async function loadData() {
     const cached = loadLocal();
     const paths = ["./data/workspace.json", "../data/workspace.json", "../../data/workspace.json", "data/workspace.json"];
@@ -92,7 +112,13 @@
                 rules: cached.rules || json.rules,
               })
             : json;
-          state.source = "json:" + p + (cached ? " + localStorage" : "");
+          const priv = await tryLoadPrivateWebsiteProjects();
+          if (priv && priv.length) {
+            state.data.websiteProjects = priv;
+            state.source = "json:" + p + " + private" + (cached ? " + localStorage" : "");
+          } else {
+            state.source = "json:" + p + (cached ? " + localStorage" : "");
+          }
           state.selectedId = (cached && cached.selectedId) || state.data.bots[0].id;
           state.editTaskId = (state.data.tasks[0] && state.data.tasks[0].id) || null;
           return;
@@ -145,6 +171,11 @@
       ? state.data.groupsOrder
       : ["管理中枢","网站项目","服装外贸","运营管理","战略决策","视觉设计","短剧组","外贸营销","个人成长","内容营销"];
   }
+  function moneyFmt(v) {
+    if (v == null || v === "" || Number(v) === 0) return "—";
+    return String(v);
+  }
+
   function esc(s) {
     return String(s == null ? "" : s)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -445,10 +476,10 @@ function webCard(w) {
       </div>`;
     } else if (tab === "finance") {
       pane = `<div class="props">
-        <div class="row"><div class="k">总额</div><div>${esc(String(w.totalAmount||0))}</div></div>
-        <div class="row"><div class="k">定金</div><div>${esc(String(w.depositAmount||0))}</div></div>
-        <div class="row"><div class="k">已付</div><div>${esc(String(w.paidAmount||0))}</div></div>
-        <div class="row"><div class="k">未付</div><div>${esc(String(w.unpaidAmount||0))}</div></div>
+        <div class="row"><div class="k">总额</div><div>${esc(moneyFmt(w.totalAmount))}</div></div>
+        <div class="row"><div class="k">定金</div><div>${esc(moneyFmt(w.depositAmount))}</div></div>
+        <div class="row"><div class="k">已付</div><div>${esc(moneyFmt(w.paidAmount))}</div></div>
+        <div class="row"><div class="k">未付</div><div>${esc(moneyFmt(w.unpaidAmount))}</div></div>
         <div class="row"><div class="k">付款</div><div>${esc(w.paymentStatus||"—")}</div></div>
       </div>`;
     } else {
