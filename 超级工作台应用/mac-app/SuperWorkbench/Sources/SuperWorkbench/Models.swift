@@ -12,6 +12,8 @@ struct WorkspaceData: Codable, Equatable {
     var rules: [RuleItem]
     var groupsOrder: [String]?
     var projects: [WorkbenchProject]?
+    var websiteProjects: [WebsiteProject]?
+    var smartplanSync: SmartplanSyncInfo?
 }
 
 struct Bot: Codable, Equatable, Identifiable, Hashable {
@@ -183,6 +185,54 @@ struct ProjectRun: Codable, Equatable, Hashable {
     var command: String?
     var url: String?
     var notes: String?
+}
+
+
+struct WebsiteProject: Codable, Equatable, Identifiable, Hashable {
+    var id: String
+    var name: String
+    var category: String
+    var status: String
+    var localPath: String?
+    var url: String?
+    var framework: String?
+    var description: String?
+    var clientName: String?
+    var clientCompany: String?
+    var totalAmount: Double?
+    var depositAmount: Double?
+    var paidAmount: Double?
+    var unpaidAmount: Double?
+    var paymentStatus: String?
+    var services: [String]?
+    var serviceStartDate: String?
+    var serviceEndDate: String?
+    var deadline: String?
+    var progress: Int?
+    var ownerBotId: String?
+    var lastModified: String?
+    var createdAt: String?
+    var updatedAt: String?
+    var source: String?
+    var dirty: Bool?
+    var localOnly: Bool?
+
+    var displayProgress: Int { progress ?? 0 }
+    var displayClient: String {
+        let a = clientName ?? ""
+        let b = clientCompany ?? ""
+        if !a.isEmpty && !b.isEmpty { return "\(a) · \(b)" }
+        return a.isEmpty ? (b.isEmpty ? "—" : b) : a
+    }
+}
+
+struct SmartplanSyncInfo: Codable, Equatable, Hashable {
+    var lastSyncAt: String?
+    var source: String?
+    var count: Int?
+    var direction: String?
+    var note: String?
+    var messages: [String]?
 }
 
 struct RuleItem: Codable, Equatable, Identifiable, Hashable {

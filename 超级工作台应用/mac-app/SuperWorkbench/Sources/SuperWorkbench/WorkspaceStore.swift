@@ -173,6 +173,10 @@ final class WorkspaceStore: ObservableObject {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             let script = """
             cd "$1" || exit 1
+            # 1) SmartPlan 网站项目导入（再可选写回）
+            if [ -f "超级工作台应用/scripts/sync-smartplan.mjs" ]; then
+              node "超级工作台应用/scripts/sync-smartplan.mjs" --push 2>&1 || node "超级工作台应用/scripts/sync-smartplan.mjs" 2>&1 || echo "smartplan sync skipped"
+            fi
             # sync data copies
             mkdir -p "超级工作台应用/app/data"
             cp -f "超级工作台应用/data/workspace.json" "超级工作台应用/app/data/workspace.json" 2>/dev/null || true
@@ -209,6 +213,32 @@ final class WorkspaceStore: ObservableObject {
                 }
             }
         }
+    }
+
+
+    func saveWebsiteProjects(_ items: [WebsiteProject]) {
+        data.websiteProjects = items
+        persist()
+    }
+
+    func upsertWebsiteProject(_ item: WebsiteProject) {
+        var list = data.websiteProjects ?? []
+        if let i = list.firstIndex(where: { $0.id == item.id }) {
+            list[i] = item
+        } else {
+            list.insert(item, at: 0)
+        }
+        data.websiteProjects = list
+        persist()
+    }
+
+    func markWebsiteDirty(_ id: String, mutate: (inout WebsiteProject) -> Void) {
+        var list = data.websiteProjects ?? []
+        guard let i = list.firstIndex(where: { $0.id == id }) else { return }
+        mutate(&list[i])
+        list[i].dirty = true
+        data.websiteProjects = list
+        persist()
     }
 
     var filteredBots: [Bot] {
