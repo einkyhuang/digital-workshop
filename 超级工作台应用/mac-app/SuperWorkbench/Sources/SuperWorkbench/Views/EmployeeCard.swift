@@ -15,9 +15,10 @@ struct EmployeeCard: View {
                     .fill(Color.white)
                     .frame(width: compact ? 92 : 112, height: compact ? 92 : 112)
                     .shadow(color: .black.opacity(0.08), radius: 8, y: 2)
-                avatar
+                avatarView
                     .frame(width: compact ? 84 : 104, height: compact ? 84 : 104)
                     .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
             }
 
             Text(spacedCode(bot.displayCode))
@@ -43,9 +44,10 @@ struct EmployeeCard: View {
                     .background(Color.black)
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 Spacer()
-                Text(bot.layerShort)
-                    .font(.system(size: 12, weight: .medium))
+                Text(bot.displayGroup)
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(Color(white: 0.55))
+                    .lineLimit(1)
             }
 
             VStack(alignment: .leading, spacing: 4) {
@@ -65,8 +67,12 @@ struct EmployeeCard: View {
         .padding(.bottom, 18)
         .frame(maxWidth: .infinity)
         .frame(minHeight: compact ? 240 : 280)
-        .background(Color(red: 0.945, green: 0.945, blue: 0.948))
+        .background(Color.white)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(Color.black.opacity(0.06), lineWidth: 1)
+        )
         .shadow(color: .black.opacity(hovering ? 0.14 : 0.06), radius: hovering ? 18 : 10, y: hovering ? 10 : 4)
         .scaleEffect(hovering ? 1.02 : 1.0)
         .animation(.easeOut(duration: 0.18), value: hovering)
@@ -74,16 +80,16 @@ struct EmployeeCard: View {
     }
 
     @ViewBuilder
-    private var avatar: some View {
-        let url = bot.avatarURL
-        if let img = NSImage(contentsOf: url) {
+    private var avatarView: some View {
+        if let img = NSImage(contentsOf: bot.avatarURL) {
             Image(nsImage: img).resizable().scaledToFill()
         } else {
+            // Never use broken emoji/SF Symbol squares — colored monogram fallback
             ZStack {
-                Circle().fill(
-                    LinearGradient(colors: [.blue.opacity(0.7), .purple.opacity(0.6)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                )
-                Text(bot.displayEmoji).font(.system(size: compact ? 36 : 44))
+                LinearGradient(colors: [.blue.opacity(0.85), .purple.opacity(0.75)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                Text(String(shortName(bot.name).prefix(1)))
+                    .font(.system(size: compact ? 32 : 40, weight: .bold))
+                    .foregroundStyle(.white)
             }
         }
     }

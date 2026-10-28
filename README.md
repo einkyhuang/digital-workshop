@@ -21,7 +21,7 @@
 ## 目录结构
 ```
 超级工作台应用/     ← 工作台应用（网页、数据、Mac App、同步脚本）
-bots/<名字>/        ← 每个 Bot：profile + deliverables/files/notes/memory
+bots/<组名>/<名字>/  ← 按业务分组；avatar.png + profile + deliverables/files/notes/memory
 projects/           ← 项目说明（看板、服装客户开发、超级工作台应用…）
 index.html          ← 本地跳转到 超级工作台应用/app/
 ```

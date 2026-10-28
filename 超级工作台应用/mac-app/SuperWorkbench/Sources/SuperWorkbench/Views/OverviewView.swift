@@ -3,6 +3,10 @@ import SwiftUI
 struct OverviewView: View {
     @EnvironmentObject var store: WorkspaceStore
 
+    private var groupOrder: [String] {
+        store.data.groupsOrder ?? ["管理中枢","战略决策组","运营财务组","客户开发组","内容营销组","设计视频组","个人成长组"]
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             if let err = store.loadError {
@@ -12,20 +16,31 @@ struct OverviewView: View {
                 MetricCard(value: "\(store.data.bots.count)", label: "数字员工", detail: "当前名册")
                 MetricCard(value: "\(store.data.tasks.filter { $0.status == "进行中" }.count)", label: "进行中", detail: "看板统计")
                 MetricCard(value: "\(store.data.bots.filter { $0.lastDelivery != "暂无" }.count)", label: "本周交付", detail: "有交付记录")
-                MetricCard(value: "\(store.data.groups.count)", label: "群聊数", detail: "已建协作群")
+                MetricCard(value: "\(groupOrder.count)", label: "业务分组", detail: "协作编组")
             }
 
-            Text("员工速览").font(.headline)
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 12)], spacing: 12) {
-                ForEach(store.filteredBots) { bot in
-                    Button {
-                        store.selectedBotId = bot.id
-                        store.selectedSection = .roster
-                        store.showingBotDetail = true
-                    } label: {
-                        EmployeeCard(bot: bot, compact: true)
+            ForEach(groupOrder, id: \.self) { g in
+                let items = store.filteredBots.filter { $0.group == g }
+                if !items.isEmpty {
+                    HStack {
+                        Text(g).font(.headline)
+                        Text("\(items.count)")
+                            .font(.caption2.weight(.bold))
+                            .padding(.horizontal, 7).padding(.vertical, 2)
+                            .background(Color.black.opacity(0.06)).clipShape(Capsule())
                     }
-                    .buttonStyle(.plain)
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 200), spacing: 12)], spacing: 12) {
+                        ForEach(items) { bot in
+                            Button {
+                                store.selectedBotId = bot.id
+                                store.selectedSection = .roster
+                                store.showingBotDetail = true
+                            } label: {
+                                EmployeeCard(bot: bot, compact: true)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
                 }
             }
 
@@ -39,7 +54,9 @@ struct OverviewView: View {
                         TagChip(text: t.status, color: SWTheme.columnColor(TaskColumn(rawValue: t.status) ?? .todo))
                     }
                     .padding(12)
-                    .swCard()
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black.opacity(0.06)))
                 }
             }
             Spacer(minLength: 80)

@@ -10,11 +10,14 @@ struct WorkspaceData: Codable, Equatable {
     var groups: [GroupRoom]
     var routines: [Routine]
     var rules: [RuleItem]
+    var groupsOrder: [String]?
 }
 
 struct Bot: Codable, Equatable, Identifiable, Hashable {
     var id: String
     var code: String?
+    var group: String?
+    var folder: String?
     var name: String
     var layer: String
     var role: String
@@ -62,29 +65,33 @@ struct Bot: Codable, Equatable, Identifiable, Hashable {
     }
 
     var folderName: String {
+        if let folder, !folder.isEmpty { return folder }
+        // fallback legacy flat name
         switch id {
-        case "chief": return "最强大脑"
-        case "strategy": return "战略官"
-        case "coo": return "COO"
-        case "finance": return "财务官"
-        case "critic": return "反调官"
-        case "director": return "视频导演"
-        case "knowledge": return "知识官"
-        case "designer": return "设计师"
-        case "writer": return "主笔"
-        case "hoppi": return "小红书助理Hoppi"
-        case "negotiator": return "谈判专家"
-        case "strategist": return "兵法策略师"
-        case "intel": return "情报官"
-        case "lead-hunt": return "外贸客户挖掘"
-        case "threadway": return "Threadway"
-        case "seo": return "Super-SEO-Hub"
-        case "mail": return "超级邮件助手"
-        case "coach": return "表达教练"
-        case "patrol": return "巡逻官"
+        case "chief": return "管理中枢/最强大脑"
+        case "strategy": return "战略决策组/战略官"
+        case "coo": return "运营财务组/COO"
+        case "finance": return "运营财务组/财务官"
+        case "critic": return "战略决策组/反调官"
+        case "director": return "设计视频组/视频导演"
+        case "knowledge": return "内容营销组/知识官"
+        case "designer": return "设计视频组/设计师"
+        case "writer": return "内容营销组/主笔"
+        case "hoppi": return "内容营销组/小红书助理Hoppi"
+        case "negotiator": return "客户开发组/谈判专家"
+        case "strategist": return "战略决策组/兵法策略师"
+        case "intel": return "客户开发组/情报官"
+        case "lead-hunt": return "客户开发组/外贸客户挖掘"
+        case "threadway": return "客户开发组/Threadway"
+        case "seo": return "内容营销组/Super-SEO-Hub"
+        case "mail": return "客户开发组/超级邮件助手"
+        case "coach": return "个人成长组/表达教练"
+        case "patrol": return "管理中枢/巡逻官"
         default: return name
         }
     }
+
+    var displayGroup: String { group ?? "其他" }
 
     var avatarURL: URL {
         FileManager.default.homeDirectoryForCurrentUser

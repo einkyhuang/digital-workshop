@@ -6,7 +6,7 @@ import AppKit
 final class WorkspaceStore: ObservableObject {
     @Published var data: WorkspaceData = WorkspaceData(
         version: 2, updatedAt: nil, timezone: "Asia/Shanghai",
-        bots: [], tasks: [], vacancies: [], groups: [], routines: [], rules: []
+        bots: [], tasks: [], vacancies: [], groups: [], routines: [], rules: [], groupsOrder: nil
     )
     @Published var selectedSection: SidebarSection = .overview
     @Published var selectedBotId: String?

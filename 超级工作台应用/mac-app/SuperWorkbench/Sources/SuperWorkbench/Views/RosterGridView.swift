@@ -3,32 +3,66 @@ import AppKit
 
 struct RosterGridView: View {
     @EnvironmentObject var store: WorkspaceStore
-    @State private var layerFilter: String = "全部"
+    @State private var groupFilter: String = "全部"
 
-    private var layers: [String] { ["全部", "幕僚室", "Studio执行层", "生活层", "系统"] }
+    private var groupOrder: [String] {
+        if let o = store.data.groupsOrder, !o.isEmpty { return o }
+        return ["管理中枢","战略决策组","运营财务组","客户开发组","内容营销组","设计视频组","个人成长组"]
+    }
+
+    private var chips: [String] { ["全部"] + groupOrder }
 
     private var bots: [Bot] {
         let base = store.filteredBots
-        if layerFilter == "全部" { return base }
-        return base.filter { $0.layer == layerFilter }
+        if groupFilter == "全部" { return base }
+        return base.filter { ($0.group ?? "") == groupFilter }
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 8) {
-                ForEach(layers, id: \.self) { layer in
-                    Button(layer) { layerFilter = layer }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(layerFilter == layer ? Color.black : Color.white)
-                        .foregroundStyle(layerFilter == layer ? Color.white : Color.primary)
-                        .clipShape(Capsule())
-                        .overlay(Capsule().stroke(SWTheme.border))
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(chips, id: \.self) { g in
+                        let count = g == "全部" ? store.data.bots.count : store.data.bots.filter { $0.group == g }.count
+                        Button("\(g) \(count)") { groupFilter = g }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(groupFilter == g ? Color.black : Color.white)
+                            .foregroundStyle(groupFilter == g ? Color.white : Color.primary)
+                            .clipShape(Capsule())
+                            .overlay(Capsule().stroke(Color.black.opacity(0.08)))
+                    }
                 }
             }
+
+            if groupFilter == "全部" {
+                ForEach(groupOrder, id: \.self) { g in
+                    let items = bots.filter { $0.group == g }
+                    if !items.isEmpty {
+                        section(g, items)
+                    }
+                }
+            } else {
+                section(groupFilter, bots)
+            }
+            Spacer(minLength: 80)
+        }
+    }
+
+    private func section(_ title: String, _ items: [Bot]) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(title).font(.headline)
+                Text("\(items.count)")
+                    .font(.caption2.weight(.bold))
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 2)
+                    .background(Color.black.opacity(0.06))
+                    .clipShape(Capsule())
+            }
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 200), spacing: 14)], spacing: 14) {
-                ForEach(bots) { bot in
+                ForEach(items) { bot in
                     Button {
                         store.selectedBotId = bot.id
                         store.showingBotDetail = true
@@ -38,7 +72,6 @@ struct RosterGridView: View {
                     .buttonStyle(.plain)
                 }
             }
-            Spacer(minLength: 80)
         }
     }
 }
@@ -52,36 +85,45 @@ struct BotDetailView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top, spacing: 16) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20).fill(SWTheme.layerColor(bot.layer).opacity(0.15)).frame(width: 72, height: 72)
-                    Text(bot.displayEmoji).font(.largeTitle)
+                Group {
+                    if let img = NSImage(contentsOf: bot.avatarURL) {
+                        Image(nsImage: img).resizable().scaledToFill()
+                    } else {
+                        Text(String(bot.name.prefix(1))).font(.largeTitle)
+                    }
                 }
+                .frame(width: 72, height: 72)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color.white, lineWidth: 3))
+                .shadow(radius: 4, y: 2)
+
                 VStack(alignment: .leading, spacing: 6) {
                     Text("\(bot.displayCode) · \(bot.role)").foregroundStyle(.secondary)
                     HStack {
-                        TagChip(text: bot.layer, color: SWTheme.layerColor(bot.layer))
+                        TagChip(text: bot.displayGroup, color: .blue)
+                        TagChip(text: bot.layerShort, color: SWTheme.layerColor(bot.layer))
                         HStack(spacing: 4) {
                             Circle().fill(SWTheme.statusColor(bot.status)).frame(width: 8, height: 8)
                             Text(bot.status).font(.caption)
                         }
                     }
-                    Text("文件夹 bots/\(bot.folderName)").font(.caption).foregroundStyle(.secondary)
+                    Text("bots/\(bot.folderName)").font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
-                Button {
-                    store.revealBotFolder(bot)
-                } label: {
+                Button { store.revealBotFolder(bot) } label: {
                     Label("在 Finder 中显示", systemImage: "folder")
                 }
                 .buttonStyle(.bordered)
             }
             .padding(16)
-            .swCard()
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.black.opacity(0.06)))
 
             HStack(alignment: .top, spacing: 14) {
                 VStack(alignment: .leading, spacing: 10) {
                     labeled("职责", bot.duty)
-                    labeled("工具", bot.tools)
+                    labeled("工具 / 模型", bot.tools)
                     labeled("知识库", bot.knowledge)
                     labeled("技能", bot.skills)
                     labeled("记忆", bot.memory)
@@ -90,7 +132,9 @@ struct BotDetailView: View {
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .swCard()
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.black.opacity(0.06)))
 
                 VStack(alignment: .leading, spacing: 12) {
                     Text("可编辑").font(.headline)
@@ -106,31 +150,28 @@ struct BotDetailView: View {
                     }
                     TextField("OKR", text: $bot.okr)
                     TextField("周报", text: $bot.weekly, axis: .vertical).lineLimit(3...6)
-                    Button("保存到 workspace.json") {
-                        store.updateBot(bot)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.black)
-
+                    Button("保存到 workspace.json") { store.updateBot(bot) }
+                        .buttonStyle(.borderedProminent).tint(.black)
                     Divider()
                     Text("Bot 文件夹文件").font(.headline)
                     if files.isEmpty {
-                        Text("暂无交付文件（忽略 .gitkeep）").font(.caption).foregroundStyle(.secondary)
+                        Text("暂无交付文件").font(.caption).foregroundStyle(.secondary)
                     } else {
                         ForEach(files, id: \.path) { url in
                             HStack {
                                 Image(systemName: "doc.text")
-                                Text(shortPath(url)).font(.caption).lineLimit(1)
+                                Text(url.lastPathComponent).font(.caption).lineLimit(1)
                                 Spacer()
-                                Button("打开") { NSWorkspace.shared.open(url) }
-                                    .buttonStyle(.borderless)
+                                Button("打开") { NSWorkspace.shared.open(url) }.buttonStyle(.borderless)
                             }
                         }
                     }
                 }
                 .padding(16)
                 .frame(width: 340, alignment: .leading)
-                .swCard()
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.black.opacity(0.06)))
             }
             Spacer(minLength: 80)
         }
@@ -142,10 +183,5 @@ struct BotDetailView: View {
             Text(title).font(.caption).foregroundStyle(.secondary)
             Text(text).font(.subheadline)
         }
-    }
-
-    private func shortPath(_ url: URL) -> String {
-        let root = store.botsRootURL.appendingPathComponent(bot.folderName).path
-        return url.path.replacingOccurrences(of: root + "/", with: "")
     }
 }

@@ -92,6 +92,14 @@
     state.editTaskId = (state.data.tasks[0] && state.data.tasks[0].id) || null;
   }
 
+  function avatarSrc(b) {
+    return "./avatars/" + encodeURIComponent(b.id) + ".png";
+  }
+  function groupOrder() {
+    return (state.data.groupsOrder && state.data.groupsOrder.length)
+      ? state.data.groupsOrder
+      : ["管理中枢","战略决策组","运营财务组","客户开发组","内容营销组","设计视频组","个人成长组"];
+  }
   function esc(s) {
     return String(s == null ? "" : s)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -226,72 +234,80 @@
     const tasks = state.data.tasks;
     const inProg = tasks.filter((t) => t.status === "进行中").length;
     const delivered = bots.filter((b) => b.lastDelivery && b.lastDelivery !== "暂无").length;
-    const rows = bots.map((b) =>
-      `<tr><td>${esc(b.name)}</td><td>${esc(b.layer)}</td><td>${statusBadge(b.status)}</td><td>${b.progress}%</td><td>${esc(b.lastDelivery.length > 40 ? b.lastDelivery.slice(0, 40) + "…" : b.lastDelivery)}</td></tr>`
-    ).join("");
-    return `
-      <h2 class="section-title">总览</h2>
-      <p class="muted">数据来自真实 Bot 与 2026-10-29「服装客户开发」测试。Token 均为「待接入」。页内改动写入 localStorage，可用导出/导入同步到仓库 data/。</p>
-      <div class="cards">
-        <div class="card"><div class="v">${bots.length}</div><div class="l">数字员工数</div></div>
-        <div class="card"><div class="v">${inProg}</div><div class="l">进行中任务</div></div>
-        <div class="card"><div class="v">${delivered}</div><div class="l">本周交付</div></div>
-        <div class="card"><div class="v">${(state.data.groups || []).length}</div><div class="l">群聊数</div></div>
-      </div>
-      <div class="callout"><strong>落地建议</strong>先稳住：幕僚长（已就位）+ 反调官（待招，建议优先）+ 执行岗。发信/发布/购买/删除须人工审批。</div>
-      <div class="diagram">
-        <div class="node">你</div><span class="arrow">→</span>
-        <div class="node">最强大脑<br/><span class="muted">幕僚长</span></div><span class="arrow">→</span>
-        <div class="node">Studio<br/><span class="muted">挖掘·Threadway·SEO·Hoppi·邮件</span></div><span class="arrow">→</span>
-        <div class="node">群聊协作</div><span class="arrow">→</span>
-        <div class="node">汇总汇报</div>
-      </div>
-      <table><thead><tr><th>岗位</th><th>层级</th><th>状态</th><th>进度</th><th>最近交付</th></tr></thead>
-      <tbody>${rows}</tbody></table>`;
-  }
-
-  function renderRoster() {
-    const filter = state.layerFilter;
-    const bots = filter === "全部" ? state.data.bots : state.data.bots.filter((b) => b.layer === filter);
-    const layers = ["全部", "幕僚室", "Studio执行层", "生活层", "系统"];
-    const layerShort = (layer) => {
-      if ((layer||"").includes("Studio") || (layer||"").includes("执行")) return "Studio";
-      if ((layer||"").includes("幕僚")) return "幕僚室";
-      if ((layer||"").includes("生活")) return "生活层";
-      if ((layer||"").includes("系统")) return "系统";
-      return layer || "";
-    };
+    const order = groupOrder();
+    const shortName = (n) => (n.includes("|") ? n.split("|")[0].trim() : n);
     const spaced = (code) => {
       if (!code) return "—";
       if (code.length >= 2 && /[A-Za-z]/.test(code[0])) return code[0] + " " + code.slice(1);
       return code;
     };
-    const shortName = (n) => (n.includes("|") ? n.split("|")[0].trim() : n);
-    const folderOf = (b) => {
-      const map = {"chief":"最强大脑","strategy":"战略官","coo":"COO","finance":"财务官","critic":"反调官","director":"视频导演","knowledge":"知识官","designer":"设计师","writer":"主笔","hoppi":"小红书助理Hoppi","negotiator":"谈判专家","strategist":"兵法策略师","intel":"情报官","lead-hunt":"外贸客户挖掘","threadway":"Threadway","seo":"Super-SEO-Hub","mail":"超级邮件助手","coach":"表达教练","patrol":"巡逻官"};
-      return map[b.id] || b.name;
-    };
-    const cards = bots.map((b) => {
-      const code = b.code || "—";
-      const emoji = b.emoji || "🤖";
-      // avatars are local files; on Pages use emoji fallback (file:// may work locally via relative path only if served)
-      return `<button type="button" class="emp-card" data-bot="${esc(b.id)}">
-        <div class="emp-avatar-wrap"><div class="emp-avatar">${esc(emoji)}</div></div>
-        <div class="emp-code">${esc(spaced(code))}</div>
+    const card = (b) => `<button type="button" class="emp-card" data-bot="${esc(b.id)}">
+        <div class="emp-avatar-wrap"><img class="emp-avatar-img" src="${avatarSrc(b)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="emp-avatar-fallback" style="display:none">${esc((b.name||'?')[0])}</div></div>
+        <div class="emp-code">${esc(spaced(b.code||""))}</div>
         <div class="emp-dots"><span class="dot ${b.status==="在线"?"ok":""}"></span><span class="dot"></span><span class="dot"></span></div>
-        <div class="emp-meta"><span class="emp-pill">${esc(code)}</span><span class="emp-layer">${esc(layerShort(b.layer))}</span></div>
+        <div class="emp-meta"><span class="emp-pill">${esc(b.code||"—")}</span><span class="emp-layer">${esc(b.group||"")}</span></div>
         <div class="emp-name">${esc(shortName(b.name))}</div>
         <div class="emp-role">${esc(b.role)}</div>
       </button>`;
-    }).join("");
+    let groupsHtml = "";
+    for (const g of order) {
+      const items = bots.filter((b) => (b.group||"") === g);
+      if (!items.length) continue;
+      groupsHtml += `<div class="group-block"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid">${items.map(card).join("")}</div></div>`;
+    }
+    return `
+      <h2 class="section-title">工作台总览</h2>
+      <p class="muted">数据来自 workspace.json · 共 ${bots.length} 位员工 · ${order.length} 个分组</p>
+      <div class="cards">
+        <div class="card"><div class="v">${bots.length}</div><div class="l">数字员工</div></div>
+        <div class="card"><div class="v">${inProg}</div><div class="l">进行中</div></div>
+        <div class="card"><div class="v">${delivered}</div><div class="l">本周交付</div></div>
+        <div class="card"><div class="v">${order.length}</div><div class="l">业务分组</div></div>
+      </div>
+      ${groupsHtml}`;
+  }
+
+function renderRoster() {
+    const filter = state.layerFilter; // reused as group filter
+    const order = groupOrder();
+    const chips = ["全部"].concat(order);
+    const botsAll = state.data.bots || [];
+    const q = (state.searchText||"").trim().toLowerCase();
+    const match = (b) => !q || (b.name+b.role+(b.group||"")).toLowerCase().includes(q);
+    const bots = botsAll.filter(match).filter((b) => filter === "全部" || (b.group||"") === filter);
+    const shortName = (n) => (n.includes("|") ? n.split("|")[0].trim() : n);
+    const spaced = (code) => {
+      if (!code) return "—";
+      if (code.length >= 2 && /[A-Za-z]/.test(code[0])) return code[0] + " " + code.slice(1);
+      return code;
+    };
+    const card = (b) => `<button type="button" class="emp-card" data-bot="${esc(b.id)}">
+        <div class="emp-avatar-wrap"><img class="emp-avatar-img" src="${avatarSrc(b)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="emp-avatar-fallback" style="display:none">${esc((b.name||'?')[0])}</div></div>
+        <div class="emp-code">${esc(spaced(b.code||""))}</div>
+        <div class="emp-dots"><span class="dot ${b.status==="在线"?"ok":""}"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="emp-meta"><span class="emp-pill">${esc(b.code||"—")}</span><span class="emp-layer">${esc(b.group||b.layer||"")}</span></div>
+        <div class="emp-name">${esc(shortName(b.name))}</div>
+        <div class="emp-role">${esc(b.role)}</div>
+      </button>`;
+    let body = "";
+    if (filter === "全部") {
+      for (const g of order) {
+        const items = bots.filter((b) => (b.group||"") === g);
+        if (!items.length) continue;
+        body += `<div class="group-block"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid">${items.map(card).join("")}</div></div>`;
+      }
+    } else {
+      body = `<div class="emp-grid">${bots.map(card).join("")}</div>`;
+    }
     const sel = selectedBot();
     return `
       <h2 class="section-title">员工档案</h2>
-      <div class="tabs" style="margin-bottom:12px">${layers.map((l) =>
-        `<button type="button" class="${filter === l ? "active" : ""}" data-layer="${esc(l)}">${esc(l)}</button>`
-      ).join("")}</div>
-      <div class="emp-grid">${cards}</div>
-      <div class="callout" style="margin-top:16px"><strong>${esc(sel.name)} · ${esc(sel.code||"")}</strong>${esc(sel.role)}<br/>工具/模型：${esc(sel.tools)}<br/>职责：${esc(sel.duty)}</div>`;
+      <div class="tabs" style="margin-bottom:12px">${chips.map((l) => {
+        const count = l==="全部"?botsAll.length:botsAll.filter(b=>b.group===l).length;
+        return `<button type="button" class="${filter === l ? "active" : ""}" data-layer="${esc(l)}">${esc(l)} ${count}</button>`;
+      }).join("")}</div>
+      ${body}
+      <div class="callout" style="margin-top:16px"><strong>${esc(sel.name)} · ${esc(sel.code||"")} · ${esc(sel.group||"")}</strong>${esc(sel.role)}<br/>工具/模型：${esc(sel.tools)}<br/>职责：${esc(sel.duty)}</div>`;
   }
 
 function renderKanban() {
@@ -411,7 +427,7 @@ function renderKanban() {
 
   function bindMain() {
     document.querySelectorAll("[data-bot]").forEach((el) => {
-      el.onclick = () => { state.selectedId = el.getAttribute("data-bot"); saveLocal(); render(); };
+      el.onclick = () => { state.selectedId = el.getAttribute("data-bot"); state.tab = "员工档案"; saveLocal(); render(); };
     });
     document.querySelectorAll("[data-layer]").forEach((el) => {
       el.onclick = () => { state.layerFilter = el.getAttribute("data-layer"); render(); };
