@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "updatedAt": "2026-10-28T19:10:48.980Z",
+  "updatedAt": "2026-10-28T19:15:03.801Z",
   "timezone": "Asia/Shanghai",
   "bots": [
     {
@@ -773,7 +773,7 @@
       "ownerBotId": "",
       "lastModified": "2026-10-24 14:28",
       "createdAt": "2026-10-10T20:35:32.370Z",
-      "updatedAt": "2026-10-28T18:28:07.017Z",
+      "updatedAt": "2026-10-28T19:15:03.791Z",
       "source": "smartplan",
       "dirty": false
     },
@@ -2245,13 +2245,14 @@
     }
   ],
   "smartplanSync": {
-    "lastSyncAt": "2026-10-28T19:10:48.967Z",
+    "lastSyncAt": "2026-10-28T19:15:03.796Z",
     "source": "api",
     "count": 53,
-    "direction": "import",
-    "note": "不导入 assets_credentials / 客户电话微信邮箱 / settings.llm_api_key。编辑写回依赖 PUT /api/websites/:id；新建无 POST 时走 SQLite INSERT。",
+    "direction": "bidirectional-when-api-up",
+    "note": "仅同步网站项目业务字段；不导入客户联系方式与密钥类字段。编辑写回走 PUT /api/websites/:id；无 POST 时新建用 SQLite INSERT。",
     "messages": [
-      "导入来源: api（53 条）"
+      "导入来源: api（53 条）",
+      "写回: PUT 1 · 新建 0"
     ]
   }
 }

@@ -202,7 +202,7 @@ struct WebsiteProject: Codable, Equatable, Identifiable, Hashable {
     var localPath: String?
     var url: String?
     var framework: String?
-    var description: String?
+    var detail: String?
     var clientName: String?
     var clientCompany: String?
     var totalAmount: Double?
@@ -223,7 +223,15 @@ struct WebsiteProject: Codable, Equatable, Identifiable, Hashable {
     var dirty: Bool?
     var localOnly: Bool?
 
-    var displayProgress: Int { progress ?? 0 }
+    enum CodingKeys: String, CodingKey {
+        case id, name, category, status, localPath, url, framework
+        case detail = "description"
+        case clientName, clientCompany, totalAmount, depositAmount, paidAmount, unpaidAmount
+        case paymentStatus, services, serviceStartDate, serviceEndDate, deadline, progress
+        case ownerBotId, lastModified, createdAt, updatedAt, source, dirty, localOnly
+    }
+
+        var displayProgress: Int { progress ?? 0 }
     var displayClient: String {
         let a = clientName ?? ""
         let b = clientCompany ?? ""

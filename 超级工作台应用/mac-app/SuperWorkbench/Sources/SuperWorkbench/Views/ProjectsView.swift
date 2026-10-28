@@ -81,7 +81,7 @@ struct ProjectsView: View {
                         let id = UUID().uuidString.lowercased()
                         editing = WebsiteProject(
                             id: id, name: "新网站项目", category: "进行中", status: "in_progress",
-                            localPath: "", url: "", framework: "React", description: "",
+                            localPath: "", url: "", framework: "React", detail: "",
                             clientName: "", clientCompany: "", totalAmount: 0, depositAmount: 0,
                             paidAmount: 0, unpaidAmount: 0, paymentStatus: "pending",
                             services: [], serviceStartDate: "", serviceEndDate: "", deadline: "",
@@ -242,7 +242,7 @@ struct WebsiteDetailPane: View {
                     gridRow("URL", project.url?.isEmpty == false ? (project.url ?? "") : "—")
                     gridRow("本地路径", project.localPath ?? "—")
                     gridRow("服务", (project.services ?? []).joined(separator: " · ").ifEmpty("—"))
-                    Text(project.description ?? "").font(.body).padding(.top, 4)
+                    Text(project.detail ?? "").font(.body).padding(.top, 4)
                 }
                 groupBox("负责人") {
                     if let owner {
@@ -325,7 +325,7 @@ struct WebsiteEditorSheet: View {
                 TextField("URL", text: Binding(get: { project.url ?? "" }, set: { project.url = $0 }))
                 TextField("框架", text: Binding(get: { project.framework ?? "" }, set: { project.framework = $0 }))
                 TextField("截止日期 (YYYY-MM-DD)", text: Binding(get: { project.deadline ?? project.serviceEndDate ?? "" }, set: { project.deadline = $0; project.serviceEndDate = $0 }))
-                TextField("描述", text: Binding(get: { project.description ?? "" }, set: { project.description = $0 }))
+                TextField("描述", text: Binding(get: { project.detail ?? "" }, set: { project.detail = $0 }))
                 Picker("状态", selection: Binding(get: { project.status }, set: { new in
                     project.status = new
                     if let cat = statusOptions.first(where: { $0.0 == new })?.1 { project.category = cat }
