@@ -96,7 +96,7 @@ struct TopBar: View {
     private var title: String { store.selectedSection.rawValue }
     private var subtitle: String {
         switch store.selectedSection {
-        case .overview: return "数字员工与协作总览 · 数据来自 workspace.json"
+        case .overview: return "网站业绩 → 日程 → 邮件 → 员工 · 金额仅本地"
         case .roster: return store.showingBotDetail ? "员工详情 · 可查看 bots 文件夹" : "共 \(store.data.bots.count) 位数字员工 · 点击卡片查看详情"
         case .tasks: return "共 \(store.data.tasks.count) 项任务 · 待办/进行中/验收/完成"
         case .rooms: return "群聊协作时间线"

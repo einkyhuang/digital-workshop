@@ -17,6 +17,10 @@ final class WorkspaceStore: ObservableObject {
     @Published var loadError: String?
     @Published var commandText: String = ""
     @Published var showingBotDetail: Bool = false
+    @Published var emailDaily: [OverviewMetrics.EmailDaily] = []
+    @Published var targetsFile: OverviewMetrics.TargetsFile? = nil
+    @Published var smartPlanTasks: [OverviewMetrics.SmartPlanTask] = []
+    @Published var expandedEmailDate: String? = nil
 
     /// Repo root: iCloud/超级工作台 (git clone)
     var repoRoot: URL {
@@ -56,6 +60,9 @@ final class WorkspaceStore: ObservableObject {
             if selectedBotId == nil { selectedBotId = decoded.bots.first?.id }
             if selectedTaskId == nil { selectedTaskId = decoded.tasks.first?.id }
             loadError = nil
+            loadTargets()
+            loadEmailDaily()
+            loadSmartPlanTasks()
         } catch {
             loadError = "读取失败：\(error.localizedDescription)"
         }
@@ -80,6 +87,107 @@ final class WorkspaceStore: ObservableObject {
         } catch {
             loadError = "保存失败：\(error.localizedDescription)"
         }
+    }
+
+
+    // MARK: - Overview auxiliaries (targets / email / SmartPlan tasks)
+
+    func loadTargets() {
+        // 金算盘：私有 targets.local.json（gitignore）
+        let url = repoRoot.appendingPathComponent("超级工作台应用/data/private/targets.local.json")
+        guard let raw = try? Data(contentsOf: url),
+              let doc = try? JSONDecoder().decode(OverviewMetrics.TargetsFile.self, from: raw) else {
+            targetsFile = nil
+            return
+        }
+        targetsFile = doc
+    }
+
+    func loadEmailDaily() {
+        let dir = repoRoot.appendingPathComponent("bots/外贸营销/超级邮件助手/deliverables/email-daily")
+        let fm = FileManager.default
+        var items: [OverviewMetrics.EmailDaily] = []
+        if let files = try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) {
+            for u in files where u.pathExtension == "json" {
+                if let raw = try? Data(contentsOf: u),
+                   let doc = try? JSONDecoder().decode(OverviewMetrics.EmailDaily.self, from: raw) {
+                    items.append(doc)
+                }
+            }
+        }
+        // fallback aggregated file
+        if items.isEmpty {
+            let agg = repoRoot.appendingPathComponent("超级工作台应用/data/email-daily.json")
+            if let raw = try? Data(contentsOf: agg),
+               let obj = try? JSONSerialization.jsonObject(with: raw) as? [String: Any],
+               let arr = obj["items"] as? [[String: Any]] {
+                let data = try? JSONSerialization.data(withJSONObject: arr)
+                if let data, let decoded = try? JSONDecoder().decode([OverviewMetrics.EmailDaily].self, from: data) {
+                    items = decoded
+                }
+            }
+        }
+        emailDaily = items.sorted { $0.date > $1.date }
+        if expandedEmailDate == nil { expandedEmailDate = emailDaily.first?.date }
+    }
+
+    func loadSmartPlanTasks() {
+        let db = repoRoot.appendingPathComponent("智能日程管理/server/smart_plan.db")
+        var remote: [OverviewMetrics.SmartPlanTask] = []
+        if FileManager.default.fileExists(atPath: db.path) {
+            let proc = Process()
+            proc.executableURL = URL(fileURLWithPath: "/usr/bin/sqlite3")
+            proc.arguments = ["-json", db.path, "SELECT id,title,status,priority,due_date FROM tasks WHERE status != 'archived' ORDER BY updated_at DESC LIMIT 200;"]
+            let pipe = Pipe()
+            proc.standardOutput = pipe
+            proc.standardError = Pipe()
+            do {
+                try proc.run()
+                proc.waitUntilExit()
+                let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                if let arr = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] {
+                    for row in arr {
+                        let id = row["id"] as? String ?? UUID().uuidString
+                        let title = row["title"] as? String ?? ""
+                        let st = OverviewMetrics.mapSmartStatus(row["status"] as? String ?? "todo")
+                        remote.append(.init(
+                            id: "sp-" + id,
+                            title: title,
+                            status: st,
+                            priority: row["priority"] as? String,
+                            dueDate: row["due_date"] as? String,
+                            source: "smartplan"
+                        ))
+                    }
+                }
+            } catch { /* ignore */ }
+        }
+        smartPlanTasks = remote
+    }
+
+    /// Merged read-only board: workspace tasks + SmartPlan (dedupe by title+status soft)
+    func overviewBoardTasks() -> [OverviewMetrics.SmartPlanTask] {
+        var out: [OverviewMetrics.SmartPlanTask] = []
+        var seen = Set<String>()
+        for t in data.tasks {
+            let key = t.id
+            seen.insert(key)
+            out.append(.init(id: t.id, title: t.title, status: t.status, priority: nil, dueDate: nil, source: "workspace"))
+        }
+        for t in smartPlanTasks {
+            let soft = t.title + "|" + t.status
+            if seen.contains(t.id) { continue }
+            // skip near-dup titles already in workspace
+            if out.contains(where: { $0.title == t.title }) { continue }
+            seen.insert(t.id)
+            _ = soft
+            out.append(t)
+        }
+        return out
+    }
+
+    func websiteKPI() -> OverviewMetrics.KPI {
+        OverviewMetrics.compute(projects: data.websiteProjects ?? [], targets: targetsFile)
     }
 
     // MARK: - Website project privacy (local full / public redacted)
@@ -269,6 +377,9 @@ final class WorkspaceStore: ObservableObject {
             # 1) SmartPlan 网站项目导入（再可选写回）
             if [ -f "超级工作台应用/scripts/sync-smartplan.mjs" ]; then
               node "超级工作台应用/scripts/sync-smartplan.mjs" --push 2>&1 || node "超级工作台应用/scripts/sync-smartplan.mjs" 2>&1 || echo "smartplan sync skipped"
+            fi
+            if [ -f "超级工作台应用/scripts/sync-email-daily.mjs" ]; then
+              node "超级工作台应用/scripts/sync-email-daily.mjs" 2>&1 || true
             fi
             # sync data copies
             mkdir -p "超级工作台应用/app/data"

@@ -65,5 +65,20 @@
       "ownerBotId"
     ],
     "p0GateOnDelivered": true
+  },
+  "overview": {
+    "sections": [
+      "websiteBoard",
+      "scheduleBoard",
+      "emailBoard",
+      "rosterBoard"
+    ],
+    "targetsFile": "data/private/targets.local.json",
+    "metricSpec": "bots/运营管理/财务官/deliverables/网站业绩看板口径.md",
+    "calcScript": "bots/运营管理/财务官/files/calc_website_dashboard.py",
+    "emailDailyDir": "bots/外贸营销/超级邮件助手/deliverables/email-daily",
+    "privacyFallback": "仅本地可见",
+    "emptyTargetLabel": "—",
+    "topInProgressLimit": 5
   }
 }

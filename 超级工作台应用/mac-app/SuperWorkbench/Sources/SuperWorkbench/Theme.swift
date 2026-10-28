@@ -28,6 +28,21 @@ enum SWTheme {
         static let badge: CGFloat = 8
     }
 
+    enum Space {
+        static let s1: CGFloat = 4
+        static let s2: CGFloat = 8
+        static let s3: CGFloat = 12
+        static let s4: CGFloat = 16
+        static let s5: CGFloat = 20
+        static let s6: CGFloat = 24
+        static let s8: CGFloat = 32
+    }
+
+    static let projProgressFill = Color(red: 0.859, green: 0.918, blue: 0.996) // #DBEAFE
+    static let projProgressFg = Color(red: 0.114, green: 0.306, blue: 0.847)
+    static let projHoldFill = Color(red: 1.0, green: 0.929, blue: 0.835) // #FFEDD5
+
+
     enum Roster {
         static let groupMinWidth: CGFloat = 340
         static let groupGap: CGFloat = 16

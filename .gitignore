@@ -10,7 +10,6 @@
 **/*api-key*
 node_modules/
 .local/
-
 # SwiftPM / Xcode
 超级工作台应用/mac-app/SuperWorkbench/.build/
 超级工作台应用/mac-app/SuperWorkbench/.swiftpm/
@@ -18,7 +17,6 @@ node_modules/
 *.xcuserstate
 超级工作台应用/mac-app/SuperWorkbench/Assets/AppIcon.iconset/
 超级工作台应用/mac-app/preview/
-
 # 智能日程管理（体积大，不整仓提交 node_modules/dist/本地库）
 智能日程管理/node_modules/
 智能日程管理/client/node_modules/
@@ -29,12 +27,10 @@ node_modules/
 智能日程管理/**/*.db-shm
 智能日程管理/.env
 智能日程管理/.env.*
-
 # Website project PII (client/amounts/localPath) — local only
 超级工作台应用/data/private/
 超级工作台应用/app/data/private/
 **/websiteProjects.local.json
-
 # Finance dashboard local calc (amounts) — never commit
 **/网站业绩看板实算.local.md
 **/targets.local.json

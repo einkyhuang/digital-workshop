@@ -291,3 +291,50 @@ th { color: var(--muted); font-weight: 600; }
 .modal-body{padding:16px}
 .chip{border:1px solid var(--border);background:#fff;border-radius:999px;padding:6px 12px;font-size:12px;cursor:pointer}
 .chip.active{background:#111;color:#fff;border-color:#111}
+
+/* —— 总览四看板（画眉 tokens） —— */
+.ov-panel{background:var(--sw-card-bg,#fff);border:1px solid var(--sw-border-group,rgba(0,0,0,.10));border-radius:var(--sw-radius-group,20px);padding:16px;margin:16px 0}
+.ov-panel-h{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.ov-panel-h h3{margin:0;font-size:18px;font-weight:700;color:var(--sw-text,#111)}
+.ov-sub{margin:16px 0 8px;font-size:13px;color:var(--sw-text-secondary,#737373)}
+.ov-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.ov-kpi{background:var(--sw-page-bg,#F6F7F8);border:1px solid var(--sw-border-soft,rgba(0,0,0,.06));border-radius:var(--sw-radius-panel,16px);padding:14px}
+.ov-kpi .v{font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.ov-kpi .l{font-size:13px;font-weight:600;margin-top:6px}
+.ov-kpi .d{font-size:11px;color:var(--sw-text-muted,#8A8A8E);margin-top:4px}
+.ov-dists{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+@media(max-width:720px){.ov-dists{grid-template-columns:1fr}}
+.ov-dist{background:var(--sw-page-bg,#F6F7F8);border-radius:12px;padding:12px}
+.ov-dist h4{margin:0 0 8px;font-size:13px;color:var(--sw-text-secondary,#737373)}
+.ov-dist-row{display:flex;align-items:center;gap:8px;font-size:12px;padding:3px 0}
+.ov-dist-row strong{margin-left:auto;font-variant-numeric:tabular-nums}
+.ov-dist-row .dot{width:8px;height:8px;border-radius:99px;background:#9CA3AF}
+.ov-dist-row .dot.in_progress{background:#1D4ED8}
+.ov-dist-row .dot.delivered{background:#15803D}
+.ov-dist-row .dot.infrastructure{background:#6D28D9}
+.ov-dist-row .dot.inactive{background:#C2410C}
+.ov-top-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border:1px solid var(--sw-border-soft,rgba(0,0,0,.06));border-radius:12px;margin-bottom:6px;font-size:13px}
+.ov-top-row .name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ov-top-row .pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:#DBEAFE;color:#1D4ED8;flex-shrink:0}
+.ov-kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:900px){.ov-kanban{grid-template-columns:1fr 1fr}}
+.ov-col{background:var(--sw-page-bg,#F6F7F8);border-radius:12px;padding:10px;min-height:120px}
+.ov-col-h{font-size:12px;font-weight:600;margin-bottom:8px;display:flex;gap:6px;align-items:center}
+.ov-col-h span{color:var(--sw-text-muted,#8A8A8E);font-weight:500}
+.ov-task{background:#fff;border:1px solid var(--sw-border-soft,rgba(0,0,0,.06));border-radius:10px;padding:8px;margin-bottom:6px}
+.ov-task .t{font-size:12px;font-weight:500}
+.ov-task .m{font-size:10px;margin-top:2px}
+.ov-empty{padding:16px;background:var(--sw-page-bg,#F6F7F8);border-radius:12px;color:var(--sw-text-secondary,#737373);font-size:13px}
+.ov-mail-day{border:1px solid var(--sw-border-soft,rgba(0,0,0,.06));border-radius:12px;padding:10px 12px;margin-bottom:8px;background:#fff}
+.ov-mail-toggle{display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:100%;background:none;border:0;padding:0;cursor:pointer;text-align:left;font:inherit}
+.ov-mail-toggle .chev{margin-left:auto;color:var(--sw-text-muted,#8A8A8E)}
+.chip-lite{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:rgba(0,0,0,.05)}
+.ov-mail-body{margin-top:10px}
+.ov-mail-item{background:var(--sw-page-bg,#F6F7F8);border-radius:10px;padding:10px;margin-top:6px;font-size:12px}
+.ov-mail-item .row{display:flex;justify-content:space-between;gap:8px}
+.ov-mail-item .sub{font-weight:600;margin-top:2px}
+.ov-mail-item .todo{color:#1D4ED8;margin-top:4px}
+.ov-mail-item .urg.高{color:#dc2626;font-weight:600}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.ov-roster .roster-groups{margin-top:8px}
+.ov-quality{margin-top:12px;padding:10px 12px;border-radius:10px;background:#FFEDD5;color:#C2410C;font-size:12px}
