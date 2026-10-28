@@ -1,4 +1,94 @@
 
+/* From 画眉 design-spec.md — paste into style.css :root */
+:root {
+  --sw-page-bg: #F6F7F8;
+  --sw-card-bg: #FFFFFF;
+  --sw-sidebar-bg: #F0F1F3;
+  --sw-overlay: rgba(15, 17, 21, 0.45);
+  --sw-border: rgba(0, 0, 0, 0.08);
+  --sw-border-soft: rgba(0, 0, 0, 0.06);
+  --sw-border-group: rgba(0, 0, 0, 0.10);
+  --sw-text: #111111;
+  --sw-text-secondary: #737373;
+  --sw-text-muted: #8A8A8E;
+  --sw-accent: #111111;
+  --sw-focus: #3B82F6;
+  --sw-proj-progress-bg: #DBEAFE;
+  --sw-proj-progress-fg: #1D4ED8;
+  --sw-proj-done-bg: #DCFCE7;
+  --sw-proj-done-fg: #15803D;
+  --sw-proj-build-bg: #EDE9FE;
+  --sw-proj-build-fg: #6D28D9;
+  --sw-proj-hold-bg: #FFEDD5;
+  --sw-proj-hold-fg: #C2410C;
+  --sw-radius-card: 28px;
+  --sw-radius-group: 20px;
+  --sw-radius-panel: 16px;
+  --sw-radius-modal: 20px;
+  --sw-radius-badge: 8px;
+  --sw-radius-pill: 999px;
+  --sw-space-2: 8px;
+  --sw-space-3: 12px;
+  --sw-space-4: 16px;
+  --sw-shadow-card: 0 8px 20px rgba(0, 0, 0, 0.06);
+  --sw-shadow-card-hover: 0 16px 28px rgba(0, 0, 0, 0.12);
+  --sw-shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.18);
+  --sw-fs-group-title: 15px;
+  --sw-fs-card-name: 18px;
+  --sw-fs-card-sub: 12px;
+  --sw-fs-badge: 11px;
+  --sw-fs-pill: 11px;
+}
+.roster-groups, .group-masonry {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--sw-space-4);
+  align-items: start;
+}
+.group-shell, .group-box {
+  background: var(--sw-card-bg);
+  border: 1px solid var(--sw-border-group);
+  border-radius: var(--sw-radius-group);
+  padding: var(--sw-space-3) var(--sw-space-3) var(--sw-space-4);
+  box-shadow: none;
+}
+.group-shell__grid, .group-box .emp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+.project-grid, .web-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.proj-card, .web-card {
+  background: var(--sw-card-bg);
+  border: 1px solid var(--sw-border-soft);
+  border-radius: var(--sw-radius-card);
+  box-shadow: var(--sw-shadow-card);
+  min-height: 220px;
+}
+.status-pill--progress { background: var(--sw-proj-progress-bg); color: var(--sw-proj-progress-fg); }
+.status-pill--done { background: var(--sw-proj-done-bg); color: var(--sw-proj-done-fg); }
+.status-pill--build { background: var(--sw-proj-build-bg); color: var(--sw-proj-build-fg); }
+.status-pill--hold { background: var(--sw-proj-hold-bg); color: var(--sw-proj-hold-fg); }
+.modal-overlay, .modal-backdrop {
+  position: fixed; inset: 0;
+  background: var(--sw-overlay);
+  backdrop-filter: blur(4px);
+  display: grid; place-items: center; z-index: 1000; padding: 24px;
+}
+.modal, .modal-card {
+  width: min(920px, 100%);
+  max-height: min(860px, calc(100vh - 48px));
+  background: var(--sw-page-bg);
+  border-radius: var(--sw-radius-modal);
+  box-shadow: var(--sw-shadow-modal);
+  overflow: auto;
+}
+.modal-close { width: 32px; height: 32px; }
+
 :root {
   /* Plug 画眉 visual tokens here / sync with data/ui-config.json → roster|website */
   --roster-group-min: 300px;

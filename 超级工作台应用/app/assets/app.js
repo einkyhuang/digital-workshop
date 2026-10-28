@@ -5,17 +5,27 @@
   const WEBSITE_UI = {
     defaultView: "list",
     omitFields: ["client_phone","client_wechat","client_email","assets_credentials"],
+    listColumns: [
+      {key:"name",title:"项目名称"},{key:"status",title:"状态"},{key:"client",title:"客户"},
+      {key:"url",title:"网址"},{key:"framework",title:"框架"},{key:"services",title:"服务"},
+      {key:"progress",title:"进度"},{key:"payment",title:"付款"},{key:"deadline",title:"服务截止"},
+      {key:"owner",title:"负责人"},{key:"updated",title:"最近更新"}
+    ],
     detailTabs: [
-      { id: "crm", title: "客户与服务" },
-      { id: "finance", title: "财务款项" },
-      { id: "tech", title: "技术与进度" }
+      { id: "basic", title: "基本信息" },
+      { id: "client", title: "客户" },
+      { id: "hosting", title: "域名和主机" },
+      { id: "seo", title: "SEO 状态" },
+      { id: "progress", title: "进度和里程碑" },
+      { id: "notes", title: "备注和链接" }
     ],
     statusMap: {
-      in_progress: { label: "进行中", category: "进行中", progress: 55 },
-      delivered: { label: "已交付", category: "已交付", progress: 100 },
-      infrastructure: { label: "基建中", category: "功能基础建设", progress: 25 },
-      inactive: { label: "挂起", category: "已暂停/挂了", progress: 0 }
-    }
+      in_progress: { label: "进行中", category: "进行中", progress: 55, pill: "progress" },
+      delivered: { label: "已交付", category: "已交付", progress: 100, pill: "done" },
+      infrastructure: { label: "筹建中", category: "功能基础建设", progress: 25, pill: "build" },
+      inactive: { label: "挂起", category: "已暂停/挂了", progress: 0, pill: "hold" }
+    },
+    p0Ids: ["robots_txt","ai_crawler_allow","sitemap_xml","ssr_readable","title_h1_meta","canonical","https_status"]
   };
 
   const COLS = ["待办", "进行中", "验收", "完成"];
@@ -323,12 +333,12 @@ function renderRoster() {
     const groups = (filter==="全部" ? order : [filter]).map(g => {
       const items = all.filter(b => botInGroup(b,g));
       if (!items.length) return "";
-      return `<div class="group-box"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid dense">${items.map(denseCard).join("")}</div></div>`;
+      return `<div class="group-shell group-box"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid dense">${items.map(denseCard).join("")}</div></div>`;
     }).join("");
     return `
       <h2 class="section-title">员工档案 <span class="badge">${all.length}</span></h2>
       <div class="filters">${chipHtml}</div>
-      <div class="group-masonry">${groups}</div>`;
+      <div class="roster-groups group-masonry">${groups}</div>`;
   }
 
   function renderProjects() {
@@ -340,7 +350,11 @@ function renderRoster() {
     const sync = state.data.smartplanSync || {};
     const cats = ["全部"].concat(Array.from(new Set(webs.map(w => w.category))).sort());
     const filtered = webs.filter(w => state.webCat === "全部" || w.category === state.webCat)
-      .slice().sort((a,b) => statusRank(a.status) - statusRank(b.status));
+      .slice().sort((a,b) => {
+        const ua=a.updatedAt||"", ub=b.updatedAt||"";
+        if (ua!==ub) return ua>ub?-1:1;
+        return statusRank(a.status)-statusRank(b.status);
+      });
     const productLink = products[0]
       ? `<button type="button" class="btn" id="openProduct" title="产品项目（不混入列表）">${esc(products[0].shortName||products[0].name)}</button>`
       : "";
@@ -373,7 +387,7 @@ function renderRoster() {
   }
 
   function statusRank(s) {
-    return s==="in_progress"?0:s==="delivered"?1:s==="infrastructure"?2:9;
+    return s==="in_progress"?0:s==="infrastructure"?1:s==="delivered"?2:s==="inactive"?3:9;
   }
   function statusLabel(s) {
     return (WEBSITE_UI.statusMap[s]||{}).label || s;
@@ -385,17 +399,27 @@ function renderRoster() {
   function webListRow(w) {
     const owner = (state.data.bots||[]).find(b=>b.id===(w.ownerBotId||""));
     const av = owner ? `<img class="web-owner" src="${avatarSrc(owner)}" alt=""/>` : `<span class="web-owner empty">—</span>`;
+    const pill = (WEBSITE_UI.statusMap[w.status]||{}).pill || "hold";
+    const pay = w.paymentStatus==="fully_paid"?"已结清":w.paymentStatus==="deposit_paid"?"已付定金":"待付款";
+    const url = (w.url||"").replace(/^https?:\/\//,"");
+    const svc = (w.services||[]).slice(0,2).join(" · ") || "—";
+    const dead = w.deadline||w.serviceEndDate||"—";
+    const upd = (w.updatedAt||"").slice(0,10)||"—";
     return `<tr class="web-row" data-web="${esc(w.id)}">
-      <td><div class="web-namecell"><span class="web-init ${esc(w.status)}">${esc((w.name||"?").slice(0,2).toUpperCase())}</span>
-        <div><strong>${esc(w.name)}</strong><div class="muted">${esc(w.framework||"")}</div></div></div></td>
+      <td><div class="web-namecell"><span class="web-init ${esc(w.status)}">${esc((w.name||"?").slice(0,1))}</span><div><strong>${esc(w.name)}</strong></div></div></td>
+      <td><span class="status-pill status-pill--${pill}">${esc(w.category||statusLabel(w.status))}</span></td>
       <td>${esc(w.clientName||w.clientCompany||"—")}</td>
-      <td><span class="badge status-${esc(w.status)}">${esc(w.category||statusLabel(w.status))}</span></td>
+      <td class="mono">${esc(url||"—")}</td>
+      <td>${esc(w.framework||"—")}</td>
+      <td>${esc(svc)}</td>
       <td><div class="bar"><i style="width:${esc(String(w.progress||0))}%"></i></div> ${esc(String(w.progress||0))}%</td>
-      <td class="mono">${esc(w.deadline||w.serviceEndDate||"—")}</td>
+      <td>${esc(pay)}</td>
+      <td class="mono">${esc(dead)}</td>
       <td>${av}</td>
+      <td class="mono" title="${esc(w.updatedAt||"")}">${esc(upd)}</td>
     </tr>`;
   }
-  function webCard(w) {
+function webCard(w) {
     return `<button type="button" class="web-card emp-card" data-web="${esc(w.id)}">
       <div class="emp-avatar-wrap dense"><div class="web-init big ${esc(w.status)}">${esc((w.name||"?").slice(0,1).toUpperCase())}</div></div>
       <div class="emp-meta dense"><span class="emp-pill">${esc((w.framework||"WEB").slice(0,6))}</span>
@@ -443,8 +467,8 @@ function renderRoster() {
         <button type="button" class="btn primary" id="saveWebStatus">保存状态（同步时写回）</button>
       </div>`;
     }
-    return `<div class="modal-backdrop" id="webModal">
-      <div class="modal-card">
+    return `<div class="modal-backdrop modal-overlay" id="webModal">
+      <div class="modal-card modal">
         <div class="modal-head">
           <div><h3>${esc(w.name)} <span class="badge status-${esc(w.status)}">${esc(w.category||"")}</span></h3>
             <p class="muted">${esc(w.url||"未配置线上网址")}</p></div>
