@@ -7,7 +7,7 @@ struct SidebarView: View {
         [
             ("工作台", [.overview, .roster, .tasks]),
             ("协作与运维", [.rooms, .routines]),
-            ("项目", [.projects]),
+            ("网站项目", [.projects]),
             ("组织与规则", [.hiring, .rules])
         ]
     }
@@ -111,7 +111,7 @@ struct SidebarView: View {
         case .tasks: return store.data.tasks.count
         case .hiring: return store.data.vacancies.filter { !$0.confirmed }.count
         case .rooms: return store.data.groups.count
-        case .projects: return (store.data.websiteProjects?.count ?? 0) + (store.data.projects?.count ?? 0)
+        case .projects: return store.data.websiteProjects?.count ?? 0
         default: return nil
         }
     }

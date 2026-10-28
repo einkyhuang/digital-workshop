@@ -103,7 +103,7 @@ struct TopBar: View {
         case .routines: return "规划中的定时巡检（尚未启用）"
         case .hiring: return "待招岗位 · 本地标记不会真正创建 Bot"
         case .rules: return "协作铁律与审批边界"
-        case .projects: return "网站与业务项目档案"
+        case .projects: return "SmartPlan 同步的客户网站档案"
         }
     }
 
@@ -181,7 +181,7 @@ struct TopBar: View {
     }
 
     private var selectedProjectTitle: String {
-        "项目"
+        "网站项目"
     }
 }
 

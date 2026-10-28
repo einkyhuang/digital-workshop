@@ -194,6 +194,14 @@ struct ProjectRun: Codable, Equatable, Hashable {
 }
 
 
+
+struct SeoCheckItem: Codable, Equatable, Hashable {
+    var pass: Bool?
+    var priority: String?
+    var note: String?
+    var updatedAt: String?
+}
+
 struct WebsiteProject: Codable, Equatable, Identifiable, Hashable {
     var id: String
     var name: String
@@ -222,6 +230,23 @@ struct WebsiteProject: Codable, Equatable, Identifiable, Hashable {
     var source: String?
     var dirty: Bool?
     var localOnly: Bool?
+    // Workbench-side extensions (搜搜 §5.3) — not yet in SmartPlan DB
+    var primaryDomain: String?
+    var hostingProvider: String?
+    var deployEnv: String?
+    var cdnProvider: String?
+    var sslStatus: String?
+    var hostingNotes: String?
+    var seoLastAuditAt: String?
+    var seoScore: Int?
+    var geoScore: Int?
+    var seoReportMd: String?
+    var seoReportHtml: String?
+    var seoChecklist: [String: SeoCheckItem]?
+    var notes: String?
+    var designUrl: String?
+    var repoUrl: String?
+    var gscPropertyUrl: String?
 
     enum CodingKeys: String, CodingKey {
         case id, name, category, status, localPath, url, framework
@@ -229,16 +254,21 @@ struct WebsiteProject: Codable, Equatable, Identifiable, Hashable {
         case clientName, clientCompany, totalAmount, depositAmount, paidAmount, unpaidAmount
         case paymentStatus, services, serviceStartDate, serviceEndDate, deadline, progress
         case ownerBotId, lastModified, createdAt, updatedAt, source, dirty, localOnly
+        case primaryDomain, hostingProvider, deployEnv, cdnProvider, sslStatus, hostingNotes
+        case seoLastAuditAt, seoScore, geoScore, seoReportMd, seoReportHtml, seoChecklist
+        case notes, designUrl, repoUrl, gscPropertyUrl
     }
 
-        var displayProgress: Int { progress ?? 0 }
+    var displayProgress: Int { progress ?? 0 }
     var displayClient: String {
         let a = clientName ?? ""
         let b = clientCompany ?? ""
         if !a.isEmpty && !b.isEmpty { return "\(a) · \(b)" }
         return a.isEmpty ? (b.isEmpty ? "—" : b) : a
     }
+    var displayDeadline: String { deadline ?? serviceEndDate ?? "—" }
 }
+
 
 struct SmartplanSyncInfo: Codable, Equatable, Hashable {
     var lastSyncAt: String?
@@ -263,7 +293,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
     case routines = "定时巡检"
     case hiring = "招聘规划"
     case rules = "规则与文档"
-    case projects = "项目"
+    case projects = "网站项目"
 
     var id: String { rawValue }
 
@@ -285,7 +315,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
         case .overview, .roster, .tasks: return "工作台"
         case .rooms, .routines: return "协作与运维"
         case .hiring, .rules: return "组织与规则"
-        case .projects: return "项目"
+        case .projects: return "网站项目"
         }
     }
 }

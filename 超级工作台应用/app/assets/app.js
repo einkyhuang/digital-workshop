@@ -1,6 +1,23 @@
 (function () {
   const LS_KEY = "digital-workshop-v2";
-  const TABS = ["总览", "员工档案", "项目", "任务看板", "群聊协作", "定时巡检", "招聘规划", "规则与文档"];
+  const TABS = ["总览", "员工档案", "网站项目", "任务看板", "群聊协作", "定时巡检", "招聘规划", "规则与文档"];
+  /** Plug 搜搜 field spec / 画眉 visual tokens via ../data/ui-config.json (mirrored here for static Pages). */
+  const WEBSITE_UI = {
+    defaultView: "list",
+    omitFields: ["client_phone","client_wechat","client_email","assets_credentials"],
+    detailTabs: [
+      { id: "crm", title: "客户与服务" },
+      { id: "finance", title: "财务款项" },
+      { id: "tech", title: "技术与进度" }
+    ],
+    statusMap: {
+      in_progress: { label: "进行中", category: "进行中", progress: 55 },
+      delivered: { label: "已交付", category: "已交付", progress: 100 },
+      infrastructure: { label: "基建中", category: "功能基础建设", progress: 25 },
+      inactive: { label: "挂起", category: "已暂停/挂了", progress: 0 }
+    }
+  };
+
   const COLS = ["待办", "进行中", "验收", "完成"];
   const state = {
     tab: "总览",
@@ -286,127 +303,158 @@
   }
 
 function renderRoster() {
-    const filter = state.layerFilter; // reused as group filter
     const order = groupOrder();
+    const filter = state.layerFilter;
+    const q = (document.getElementById("q") && document.getElementById("q").value || "").toLowerCase();
+    const match = (b) => !q || (b.name+b.role+(b.group||"")+ (b.code||"")).toLowerCase().includes(q);
+    const all = (state.data.bots||[]).filter(match);
     const chips = ["全部"].concat(order);
-    const botsAll = state.data.bots || [];
-    const q = (state.searchText||"").trim().toLowerCase();
-    const match = (b) => !q || (b.name+b.role+(b.group||"")).toLowerCase().includes(q);
-    const bots = botsAll.filter(match).filter((b) => filter === "全部" || botInGroup(b, filter));
-    const shortName = (n) => displayNick(n);
-    const spaced = (code) => {
-      if (!code) return "—";
-      if (code.length >= 2 && /[A-Za-z]/.test(code[0])) return code[0] + " " + code.slice(1);
-      return code;
-    };
-    const card = (b) => `<button type="button" class="emp-card" data-bot="${esc(b.id)}">
-        <div class="emp-avatar-wrap"><img class="emp-avatar-img" src="${avatarSrc(b)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="emp-avatar-fallback" style="display:none">${esc((b.name||'?')[0])}</div></div>
-        <div class="emp-code">${esc(spaced(b.code||""))}</div>
-        <div class="emp-dots"><span class="dot ${b.status==="在线"?"ok":""}"></span><span class="dot"></span><span class="dot"></span></div>
-        <div class="emp-meta"><span class="emp-pill">${esc(b.code||"—")}</span><span class="emp-layer">${esc(b.group||b.layer||"")}</span></div>
-        <div class="emp-name">${esc(displayNick(b.name))}</div>
-        <div class="emp-role">${esc(displayTitle(b.name, b.role))}</div>
+    const chipHtml = chips.map(g => {
+      const n = g==="全部" ? all.length : all.filter(b => botInGroup(b,g)).length;
+      return `<button type="button" class="chip ${filter===g?"active":""}" data-layer="${esc(g)}">${esc(g)} ${n}</button>`;
+    }).join("");
+    const denseCard = (b) => `
+      <button type="button" class="emp-card dense" data-bot="${esc(b.id)}">
+        <div class="emp-avatar-wrap dense"><img class="emp-avatar-img dense" src="${avatarSrc(b)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="emp-avatar-fallback dense" style="display:none">${esc((b.name||'?')[0])}</div></div>
+        <div class="emp-meta dense"><span class="emp-pill">${esc(b.code||"—")}</span><span class="dot ok"></span></div>
+        <div class="emp-name dense">${esc(displayNick(b.name))}</div>
+        <div class="emp-role dense">${esc(displayTitle(b.name,b.role))}</div>
       </button>`;
-    let body = "";
-    if (filter === "全部") {
-      for (const g of order) {
-        const items = bots.filter((b) => botInGroup(b, g));
-        if (!items.length) continue;
-        body += `<div class="group-block"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid">${items.map(card).join("")}</div></div>`;
-      }
-    } else {
-      body = `<div class="emp-grid">${bots.map(card).join("")}</div>`;
-    }
-    const sel = selectedBot();
+    const groups = (filter==="全部" ? order : [filter]).map(g => {
+      const items = all.filter(b => botInGroup(b,g));
+      if (!items.length) return "";
+      return `<div class="group-box"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid dense">${items.map(denseCard).join("")}</div></div>`;
+    }).join("");
     return `
-      <h2 class="section-title">员工档案</h2>
-      <div class="tabs" style="margin-bottom:12px">${chips.map((l) => {
-        const count = l==="全部"?botsAll.length:botsAll.filter(b=>botInGroup(b,l)).length;
-        return `<button type="button" class="${filter === l ? "active" : ""}" data-layer="${esc(l)}">${esc(l)} ${count}</button>`;
-      }).join("")}</div>
-      ${body}
-      <div class="callout" style="margin-top:16px"><strong>${esc(sel.name)} · ${esc(sel.code||"")} · ${esc(sel.group||"")}</strong>${esc(sel.role)}<br/>工具/模型：${esc(sel.tools)}<br/>职责：${esc(sel.duty)}</div>`;
+      <h2 class="section-title">员工档案 <span class="badge">${all.length}</span></h2>
+      <div class="filters">${chipHtml}</div>
+      <div class="group-masonry">${groups}</div>`;
   }
 
   function renderProjects() {
-    const products = state.data.projects || [];
     const webs = state.data.websiteProjects || [];
-    if (!state.projectSubTab) state.projectSubTab = "websites";
+    const products = state.data.projects || [];
+    if (!state.webView) state.webView = WEBSITE_UI.defaultView || "list";
     if (!state.webCat) state.webCat = "全部";
+    if (!state.webTab) state.webTab = "crm";
     const sync = state.data.smartplanSync || {};
     const cats = ["全部"].concat(Array.from(new Set(webs.map(w => w.category))).sort());
-    const filtered = webs.filter(w => state.webCat === "全部" || w.category === state.webCat);
-    if (!state.selectedWebId && filtered[0]) state.selectedWebId = filtered[0].id;
-    if (!state.selectedProjectId && products[0]) state.selectedProjectId = products[0].id;
-    const w = filtered.find(x => x.id === state.selectedWebId) || filtered[0];
-    const p = products.find(x => x.id === state.selectedProjectId) || products[0];
-    const tabs = `
-      <div class="filters" style="margin-bottom:12px">
-        <button type="button" class="${state.projectSubTab==="websites"?"active":""}" data-psub="websites">网站项目（${webs.length}）</button>
-        <button type="button" class="${state.projectSubTab==="products"?"active":""}" data-psub="products">产品项目（${products.length}）</button>
-      </div>
-      <p class="muted">SmartPlan 同步：${esc(sync.source||"—")} · ${esc(String(sync.count||0))} 条 · ${esc(sync.direction||"")} · ${esc(sync.lastSyncAt||"")}</p>`;
-
-    if (state.projectSubTab === "products") {
-      if (!products.length) return `<h2 class="section-title">项目</h2>${tabs}<p class="muted">暂无产品项目</p>`;
-      const owner = (state.data.bots||[]).find(b => b.id === p.ownerBotId);
-      const collabs = (p.collabBotIds||[]).map(id => (state.data.bots||[]).find(b => b.id === id)).filter(Boolean);
-      return `<h2 class="section-title">项目</h2>${tabs}
-        <div class="layout-2">
-          <div class="list">${products.map(x => `
-            <button type="button" class="${x.id===p.id?"active":""}" data-project="${esc(x.id)}">
-              ${esc(x.name)}<br/><span class="muted">${esc(x.category)} · ${esc(x.status)}</span>
-            </button>`).join("")}</div>
-          <div>
-            <h3>${esc(p.name)}</h3>
-            <p>${esc(p.summary)}</p>
-            <div class="callout"><strong>启动</strong><code>${esc((p.run&&p.run.command)||"")}</code> → ${esc((p.run&&p.run.url)||"")}</div>
-            <h4>匹配员工</h4>
-            <div class="emp-grid">${[owner,...collabs].filter(Boolean).map(b=>`<div class="emp-card" style="min-height:100px"><div class="emp-name">${esc(displayNick(b.name))}</div><div class="emp-role">${esc(b.role)}</div></div>`).join("")}</div>
-          </div>
-        </div>`;
-    }
-
-    const catBar = `<div class="filters">${cats.map(c => {
-      const n = c==="全部"? webs.length : webs.filter(x=>x.category===c).length;
-      return `<button type="button" class="${state.webCat===c?"active":""}" data-webcat="${esc(c)}">${esc(c)} ${n}</button>`;
-    }).join("")}</div>`;
-
-    if (!w) return `<h2 class="section-title">项目</h2>${tabs}${catBar}<p class="muted">暂无网站项目。请运行 scripts/sync-smartplan.sh</p>`;
-
-    const owner = (state.data.bots||[]).find(b => b.id === (w.ownerBotId||""));
-    return `<h2 class="section-title">项目</h2>${tabs}${catBar}
-      <div class="layout-2">
-        <div class="list">${filtered.map(x => `
-          <button type="button" class="${x.id===w.id?"active":""}" data-web="${esc(x.id)}">
-            ${esc(x.name)}<br/><span class="muted">${esc(x.clientName||x.clientCompany||"—")} · ${esc(x.category)} · ${esc(String(x.progress||0))}%</span>
-          </button>`).join("")}</div>
-        <div>
-          <h3>${esc(w.name)} <span class="badge">${esc(w.category)}</span> <span class="badge">${esc(w.status)}</span></h3>
-          <p>${esc(w.description||"")}</p>
-          <div class="props">
-            <div class="row"><div class="k">客户</div><div>${esc(w.clientName||"—")} / ${esc(w.clientCompany||"—")}</div></div>
-            <div class="row"><div class="k">进度</div><div>${esc(String(w.progress||0))}%</div></div>
-            <div class="row"><div class="k">截止</div><div>${esc(w.deadline||w.serviceEndDate||"—")}</div></div>
-            <div class="row"><div class="k">负责人</div><div>${esc(owner?owner.name:"未指定")}</div></div>
-            <div class="row"><div class="k">URL</div><div>${esc(w.url||"—")}</div></div>
-            <div class="row"><div class="k">框架</div><div>${esc(w.framework||"—")}</div></div>
-            <div class="row"><div class="k">付款</div><div>${esc(w.paymentStatus||"—")} · 总额 ${esc(String(w.totalAmount||0))}</div></div>
-            <div class="row"><div class="k">路径</div><div><code>${esc(w.localPath||"—")}</code></div></div>
-          </div>
-          <div class="card-actions" style="margin-top:12px">
-            <label>改状态 </label>
-            <select id="webStatus">
-              <option value="in_progress|进行中" ${w.status==="in_progress"?"selected":""}>进行中</option>
-              <option value="delivered|已交付" ${w.status==="delivered"?"selected":""}>已交付</option>
-              <option value="infrastructure|功能基础建设" ${w.status==="infrastructure"?"selected":""}>功能基础建设</option>
-              <option value="inactive|已暂停/挂了" ${w.status==="inactive"?"selected":""}>已暂停/挂了</option>
-            </select>
-            <button type="button" class="btn primary" id="saveWebStatus">保存状态（本地，同步时写回）</button>
-          </div>
-          <p class="muted">不同步电话/微信/邮箱/凭证。写回：PUT /api/websites/:id（需 SmartPlan :3300）。</p>
+    const filtered = webs.filter(w => state.webCat === "全部" || w.category === state.webCat)
+      .slice().sort((a,b) => statusRank(a.status) - statusRank(b.status));
+    const productLink = products[0]
+      ? `<button type="button" class="btn" id="openProduct" title="产品项目（不混入列表）">${esc(products[0].shortName||products[0].name)}</button>`
+      : "";
+    const toolbar = `
+      <div class="web-toolbar">
+        <div class="filters">
+          <button type="button" class="chip ${state.webView==="list"?"active":""}" data-webview="list">列表</button>
+          <button type="button" class="chip ${state.webView==="cards"?"active":""}" data-webview="cards">卡片</button>
         </div>
+        <div class="filters">${cats.map(c=>{
+          const n=c==="全部"?webs.length:webs.filter(x=>x.category===c).length;
+          return `<button type="button" class="chip ${state.webCat===c?"active":""}" data-webcat="${esc(c)}">${esc(c)} ${n}</button>`;
+        }).join("")}</div>
+        <span class="muted">SmartPlan ${esc(sync.source||"—")} · ${webs.length}</span>
+        <span style="flex:1"></span>
+        ${productLink}
       </div>`;
+
+    let body = "";
+    if (state.webView === "cards") {
+      body = `<div class="web-card-grid">${filtered.map(w => webCard(w)).join("")}</div>`;
+    } else {
+      body = `<div class="web-table-wrap"><table class="web-table">
+        <thead><tr><th>项目</th><th>客户</th><th>状态</th><th>进度</th><th>截止</th><th>负责人</th></tr></thead>
+        <tbody>${filtered.map(w => webListRow(w)).join("")}</tbody>
+      </table></div>`;
+    }
+    const modal = state.selectedWebId ? webDetailModal(webs.find(x=>x.id===state.selectedWebId)) : "";
+    return `<h2 class="section-title">网站项目</h2>${toolbar}${body}${modal}`;
+  }
+
+  function statusRank(s) {
+    return s==="in_progress"?0:s==="delivered"?1:s==="infrastructure"?2:9;
+  }
+  function statusLabel(s) {
+    return (WEBSITE_UI.statusMap[s]||{}).label || s;
+  }
+  function ownerName(id) {
+    const b = (state.data.bots||[]).find(x=>x.id===id);
+    return b ? displayNick(b.name) : "—";
+  }
+  function webListRow(w) {
+    const owner = (state.data.bots||[]).find(b=>b.id===(w.ownerBotId||""));
+    const av = owner ? `<img class="web-owner" src="${avatarSrc(owner)}" alt=""/>` : `<span class="web-owner empty">—</span>`;
+    return `<tr class="web-row" data-web="${esc(w.id)}">
+      <td><div class="web-namecell"><span class="web-init ${esc(w.status)}">${esc((w.name||"?").slice(0,2).toUpperCase())}</span>
+        <div><strong>${esc(w.name)}</strong><div class="muted">${esc(w.framework||"")}</div></div></div></td>
+      <td>${esc(w.clientName||w.clientCompany||"—")}</td>
+      <td><span class="badge status-${esc(w.status)}">${esc(w.category||statusLabel(w.status))}</span></td>
+      <td><div class="bar"><i style="width:${esc(String(w.progress||0))}%"></i></div> ${esc(String(w.progress||0))}%</td>
+      <td class="mono">${esc(w.deadline||w.serviceEndDate||"—")}</td>
+      <td>${av}</td>
+    </tr>`;
+  }
+  function webCard(w) {
+    return `<button type="button" class="web-card emp-card" data-web="${esc(w.id)}">
+      <div class="emp-avatar-wrap dense"><div class="web-init big ${esc(w.status)}">${esc((w.name||"?").slice(0,1).toUpperCase())}</div></div>
+      <div class="emp-meta dense"><span class="emp-pill">${esc((w.framework||"WEB").slice(0,6))}</span>
+        <span class="badge status-${esc(w.status)}">${esc(w.category||"")}</span></div>
+      <div class="emp-name dense">${esc(w.name)}</div>
+      <div class="emp-role dense">${esc(w.clientName||w.clientCompany||"—")}</div>
+      <div class="bar" style="width:100%;margin-top:8px"><i style="width:${esc(String(w.progress||0))}%"></i></div>
+    </button>`;
+  }
+  function webDetailModal(w) {
+    if (!w) return "";
+    const tab = state.webTab || "crm";
+    const tabs = WEBSITE_UI.detailTabs.map(t =>
+      `<button type="button" class="chip ${tab===t.id?"active":""}" data-webtab="${t.id}">${t.title}</button>`).join("");
+    let pane = "";
+    if (tab === "crm") {
+      pane = `<div class="props">
+        <div class="row"><div class="k">客户</div><div>${esc(w.clientName||"—")}</div></div>
+        <div class="row"><div class="k">公司</div><div>${esc(w.clientCompany||"—")}</div></div>
+        <div class="row"><div class="k">服务</div><div>${esc((w.services||[]).join(" · ")||"—")}</div></div>
+        <div class="row"><div class="k">周期</div><div>${esc(w.serviceStartDate||"—")} → ${esc(w.deadline||w.serviceEndDate||"—")}</div></div>
+        <div class="row"><div class="k">负责人</div><div>${esc(ownerName(w.ownerBotId))}</div></div>
+      </div>`;
+    } else if (tab === "finance") {
+      pane = `<div class="props">
+        <div class="row"><div class="k">总额</div><div>${esc(String(w.totalAmount||0))}</div></div>
+        <div class="row"><div class="k">定金</div><div>${esc(String(w.depositAmount||0))}</div></div>
+        <div class="row"><div class="k">已付</div><div>${esc(String(w.paidAmount||0))}</div></div>
+        <div class="row"><div class="k">未付</div><div>${esc(String(w.unpaidAmount||0))}</div></div>
+        <div class="row"><div class="k">付款</div><div>${esc(w.paymentStatus||"—")}</div></div>
+      </div>`;
+    } else {
+      pane = `<div class="props">
+        <div class="row"><div class="k">URL</div><div>${esc(w.url||"—")}</div></div>
+        <div class="row"><div class="k">框架</div><div>${esc(w.framework||"—")}</div></div>
+        <div class="row"><div class="k">路径</div><div><code>${esc(w.localPath||"—")}</code></div></div>
+        <div class="row"><div class="k">描述</div><div>${esc(w.description||w.detail||"—")}</div></div>
+        <div class="row"><div class="k">进度</div><div>${esc(String(w.progress||0))}%</div></div>
+      </div>
+      <div class="card-actions" style="margin-top:12px">
+        <select id="webStatus">${Object.keys(WEBSITE_UI.statusMap).map(k=>{
+          const m=WEBSITE_UI.statusMap[k];
+          return `<option value="${k}|${m.category}" ${w.status===k?"selected":""}>${m.label}</option>`;
+        }).join("")}</select>
+        <button type="button" class="btn primary" id="saveWebStatus">保存状态（同步时写回）</button>
+      </div>`;
+    }
+    return `<div class="modal-backdrop" id="webModal">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h3>${esc(w.name)} <span class="badge status-${esc(w.status)}">${esc(w.category||"")}</span></h3>
+            <p class="muted">${esc(w.url||"未配置线上网址")}</p></div>
+          <button type="button" class="btn" id="closeWebModal">关闭</button>
+        </div>
+        <div class="filters" style="padding:8px 16px">${tabs}</div>
+        <div class="modal-body">${pane}</div>
+        <p class="muted" style="padding:0 16px 12px">联系方式/凭证不同步。字段配置：data/ui-config.json</p>
+      </div>
+    </div>`;
   }
 
 function renderKanban() {
@@ -519,7 +567,7 @@ function renderKanban() {
       "定时巡检": renderRoutines,
       "招聘规划": renderHire,
       "规则与文档": renderRules,
-      "项目": renderProjects,
+      "网站项目": renderProjects,
     };
     document.getElementById("main").innerHTML = (map[state.tab] || renderOverview)();
     bindMain();

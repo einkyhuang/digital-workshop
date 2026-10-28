@@ -1,24 +1,26 @@
 import SwiftUI
 import AppKit
 
+enum WebsiteViewMode: String {
+    case list, cards
+}
+
 struct ProjectsView: View {
     @EnvironmentObject var store: WorkspaceStore
-    @State private var tab: Int = 1 // default 网站项目 (user asked for list/management)
-    @State private var selectedProductId: String?
-    @State private var selectedWebId: String?
+    @State private var viewMode: WebsiteViewMode = .list
     @State private var categoryFilter: String = "全部"
+    @State private var detailId: String? = nil
     @State private var showEditor = false
-    @State private var editing: WebsiteProject?
+    @State private var creating: WebsiteProject? = nil
 
-    private var products: [WorkbenchProject] { store.data.projects ?? [] }
     private var websites: [WebsiteProject] { store.data.websiteProjects ?? [] }
+    private var products: [WorkbenchProject] { store.data.projects ?? [] }
 
     private var categories: [String] {
-        let cats = Array(Set(websites.map(\.category))).sorted()
-        return ["全部"] + cats
+        ["全部"] + Array(Set(websites.map(\.category))).sorted()
     }
 
-    private var filteredWebsites: [WebsiteProject] {
+    private var filtered: [WebsiteProject] {
         let q = store.searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         return websites.filter { w in
             let catOK = categoryFilter == "全部" || w.category == categoryFilter
@@ -26,183 +28,190 @@ struct ProjectsView: View {
             guard !q.isEmpty else { return true }
             let blob = [w.name, w.clientName ?? "", w.clientCompany ?? "", w.url ?? "", w.status].joined(separator: " ").lowercased()
             return blob.contains(q)
+        }.sorted { a, b in
+            statusRank(a.status) < statusRank(b.status)
         }
     }
 
-    private var selectedProduct: WorkbenchProject? {
-        products.first { $0.id == selectedProductId } ?? products.first
-    }
-    private var selectedWeb: WebsiteProject? {
-        filteredWebsites.first { $0.id == selectedWebId } ?? filteredWebsites.first
+    private var detailProject: WebsiteProject? {
+        websites.first { $0.id == detailId }
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Picker("", selection: $tab) {
-                Text("网站项目 (\(websites.count))").tag(1)
-                Text("产品项目 (\(products.count))").tag(0)
-            }
-            .pickerStyle(.segmented)
-            .frame(maxWidth: 420)
-
-            if let sync = store.data.smartplanSync {
-                Text("SmartPlan 同步：\(sync.source ?? "?") · \(sync.count ?? 0) 条 · \(sync.lastSyncAt ?? "") · \(sync.direction ?? "")")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
-
-            if tab == 1 {
-                webProjectsPane
-            } else {
-                productProjectsPane
-            }
-        }
-        .sheet(isPresented: $showEditor) {
-            if let editing {
-                WebsiteEditorSheet(project: editing) { updated in
-                    var u = updated
-                    u.dirty = true
-                    if u.localOnly != true { u.localOnly = updated.localOnly }
-                    store.upsertWebsiteProject(u)
-                    selectedWebId = u.id
-                    showEditor = false
-                } onCancel: { showEditor = false }
-            }
-        }
-    }
-
-    private var webProjectsPane: some View {
-        HStack(alignment: .top, spacing: 16) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("网站项目列表").font(.headline)
-                    Spacer()
-                    Button {
-                        let id = UUID().uuidString.lowercased()
-                        editing = WebsiteProject(
-                            id: id, name: "新网站项目", category: "进行中", status: "in_progress",
-                            localPath: "", url: "", framework: "React", detail: "",
-                            clientName: "", clientCompany: "", totalAmount: 0, depositAmount: 0,
-                            paidAmount: 0, unpaidAmount: 0, paymentStatus: "pending",
-                            services: [], serviceStartDate: "", serviceEndDate: "", deadline: "",
-                            progress: 10, ownerBotId: "seo", source: "workbench", dirty: true, localOnly: true
-                        )
-                        showEditor = true
-                    } label: { Label("新建", systemImage: "plus") }
-                    .buttonStyle(.borderedProminent).tint(.black)
+            HStack(spacing: 12) {
+                Picker("", selection: $viewMode) {
+                    Text("列表").tag(WebsiteViewMode.list)
+                    Text("卡片").tag(WebsiteViewMode.cards)
                 }
+                .pickerStyle(.segmented)
+                .frame(width: 160)
+
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
                         ForEach(categories, id: \.self) { c in
-                            let count = c == "全部" ? websites.count : websites.filter { $0.category == c }.count
-                            Button(c == "全部" ? "全部 \(count)" : "\(c) \(count)") { categoryFilter = c }
+                            let n = c == "全部" ? websites.count : websites.filter { $0.category == c }.count
+                            Button(c == "全部" ? "全部 \(n)" : "\(c) \(n)") { categoryFilter = c }
                                 .buttonStyle(.bordered)
                                 .tint(categoryFilter == c ? .black : .gray)
                         }
                     }
                 }
-                ScrollView {
-                    LazyVStack(spacing: 8) {
-                        ForEach(filteredWebsites) { w in
-                            Button { selectedWebId = w.id } label: {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 3) {
-                                        Text(w.name).font(.subheadline.weight(.semibold)).lineLimit(1)
-                                        Text(w.displayClient).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
-                                    }
-                                    Spacer()
-                                    VStack(alignment: .trailing, spacing: 2) {
-                                        TagChip(text: w.category, color: categoryColor(w.category))
-                                        Text("\(w.displayProgress)%").font(.caption2).foregroundStyle(.secondary)
-                                    }
-                                }
-                                .padding(10)
-                                .background(selectedWeb?.id == w.id ? Color.black.opacity(0.06) : Color.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black.opacity(0.06)))
-                            }
-                            .buttonStyle(.plain)
+
+                Spacer()
+
+                if let p = products.first {
+                    Button {
+                        if let url = p.run?.url, let u = URL(string: url) {
+                            NSWorkspace.shared.open(u)
+                        } else {
+                            store.revealProject(p)
                         }
+                    } label: {
+                        Label(p.shortName ?? p.name, systemImage: "shippingbox")
+                    }
+                    .buttonStyle(.bordered)
+                    .help("产品项目 · 智能日程管理（不混入网站列表）")
+                }
+
+                Button {
+                    let neu = WebsiteProject(
+                        id: UUID().uuidString.lowercased(),
+                        name: "新网站项目",
+                        category: "进行中",
+                        status: "in_progress",
+                        localPath: "",
+                        url: "",
+                        framework: "React",
+                        detail: "",
+                        clientName: "",
+                        clientCompany: "",
+                        totalAmount: 0, depositAmount: 0, paidAmount: 0, unpaidAmount: 0,
+                        paymentStatus: "pending",
+                        services: [],
+                        serviceStartDate: "", serviceEndDate: "", deadline: "",
+                        progress: 10, ownerBotId: "seo",
+                        source: "workbench", dirty: true, localOnly: true
+                    )
+                    creating = neu
+                    showEditor = true
+                } label: { Label("新建", systemImage: "plus") }
+                .buttonStyle(.borderedProminent).tint(.black)
+            }
+
+            if let sync = store.data.smartplanSync {
+                Text("SmartPlan：\(sync.source ?? "?") · \(sync.count ?? 0) 条 · \(sync.direction ?? "") · \(sync.lastSyncAt ?? "")")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+
+            if viewMode == .list {
+                listView
+            } else {
+                cardsView
+            }
+        }
+        .sheet(isPresented: Binding(
+            get: { detailId != nil },
+            set: { if !$0 { detailId = nil } }
+        )) {
+            if let id = detailId, let w = store.data.websiteProjects?.first(where: { $0.id == id }) {
+                WebsiteDetailSheet(project: w) { detailId = nil }
+                    .environmentObject(store)
+            } else {
+                Text("项目不存在").padding(24)
+            }
+        }
+        .sheet(isPresented: $showEditor) {
+            if let creating {
+                WebsiteEditorSheet(project: creating) { updated in
+                    var u = updated
+                    u.dirty = true
+                    store.upsertWebsiteProject(u)
+                    showEditor = false
+                    detailId = u.id
+                } onCancel: { showEditor = false }
+            }
+        }
+        .onAppear { applyShotMode() }
+    }
+
+    private var listView: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text("项目").frame(maxWidth: .infinity, alignment: .leading)
+                Text("客户").frame(width: 140, alignment: .leading)
+                Text("状态").frame(width: 90, alignment: .leading)
+                Text("进度").frame(width: 120, alignment: .leading)
+                Text("截止").frame(width: 100, alignment: .leading)
+                Text("负责人").frame(width: 72, alignment: .center)
+            }
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+
+            Divider()
+
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    ForEach(filtered) { w in
+                        Button { detailId = w.id } label: {
+                            WebsiteListRow(project: w)
+                        }
+                        .buttonStyle(.plain)
+                        Divider().opacity(0.5)
                     }
                 }
             }
-            .frame(width: 300)
-
-            if let w = selectedWeb {
-                WebsiteDetailPane(project: w, onEdit: {
-                    editing = w
-                    showEditor = true
-                }, onStatus: { status, category in
-                    store.markWebsiteDirty(w.id) { item in
-                        item.status = status
-                        item.category = category
-                        item.progress = defaultProgress(status)
-                    }
-                })
-            } else {
-                Text("暂无网站项目 — 点「同步」从 SmartPlan 导入").foregroundStyle(.secondary)
-            }
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.black.opacity(0.06)))
         }
     }
 
-    private var productProjectsPane: some View {
-        HStack(alignment: .top, spacing: 16) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("产品项目").font(.headline)
-                ForEach(products) { p in
-                    Button { selectedProductId = p.id } label: {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(p.name).font(.subheadline.weight(.semibold))
-                                Text(p.category).font(.caption2).foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            TagChip(text: p.status, color: .blue)
-                        }
-                        .padding(12)
-                        .background(selectedProduct?.id == p.id ? Color.black.opacity(0.06) : Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.black.opacity(0.06)))
+    private var cardsView: some View {
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: SWTheme.Website.cardMinWidth), spacing: 14)], spacing: 14) {
+                ForEach(filtered) { w in
+                    Button { detailId = w.id } label: {
+                        WebsiteProjectCard(project: w)
                     }
                     .buttonStyle(.plain)
                 }
-                Spacer()
             }
-            .frame(width: 260)
-            if let p = selectedProduct {
-                ProjectDetailPane(project: p)
-            } else {
-                Text("暂无产品项目").foregroundStyle(.secondary)
-            }
+            Spacer(minLength: 80)
         }
     }
 
-    private func categoryColor(_ c: String) -> Color {
-        switch c {
-        case "进行中": return .blue
-        case "已交付": return .green
-        case "功能基础建设": return .purple
-        case "已暂停/挂了", "挂了": return .orange
-        default: return .gray
+    private func statusRank(_ s: String) -> Int {
+        switch s {
+        case "in_progress": return 0
+        case "delivered": return 1
+        case "infrastructure": return 2
+        default: return 9
         }
     }
 
-    private func defaultProgress(_ status: String) -> Int {
-        switch status {
-        case "delivered": return 100
-        case "in_progress": return 55
-        case "infrastructure": return 25
-        case "inactive": return 0
-        default: return 40
+    private func applyShotMode() {
+        let mode = UserDefaults.standard.string(forKey: "SWShot") ?? ""
+        switch mode {
+        case "web-list": viewMode = .list
+        case "web-cards": viewMode = .cards
+        case "web-detail":
+            viewMode = .list
+            if let first = filtered.first ?? websites.first {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    detailId = first.id
+                }
+            }
+        default: break
         }
     }
 }
 
-struct WebsiteDetailPane: View {
+struct WebsiteListRow: View {
     @EnvironmentObject var store: WorkspaceStore
     let project: WebsiteProject
-    var onEdit: () -> Void
-    var onStatus: (String, String) -> Void
 
     private var owner: Bot? {
         guard let id = project.ownerBotId, !id.isEmpty else { return nil }
@@ -210,84 +219,319 @@ struct WebsiteDetailPane: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(project.name).font(.system(size: 24, weight: .bold))
-                        Text(project.displayClient).foregroundStyle(.secondary)
-                        HStack {
-                            TagChip(text: project.category, color: .blue)
-                            TagChip(text: project.status, color: .gray)
-                            if project.dirty == true { TagChip(text: "待写回", color: .orange) }
+        HStack(spacing: 12) {
+            ZStack {
+                Circle().fill(statusTint.opacity(0.15))
+                Text(initials(project.name))
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(statusTint)
+            }
+            .frame(width: 34, height: 34)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(project.name).font(.subheadline.weight(.semibold)).lineLimit(1)
+                Text(project.framework ?? "—").font(.caption2).foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text(project.displayClient)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .frame(width: 140, alignment: .leading)
+
+            TagChip(text: project.category, color: statusTint)
+                .frame(width: 90, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 3) {
+                ProgressView(value: Double(project.displayProgress), total: 100)
+                    .tint(statusTint)
+                Text("\(project.displayProgress)%").font(.caption2).foregroundStyle(.secondary)
+            }
+            .frame(width: 120, alignment: .leading)
+
+            Text(project.deadline ?? project.serviceEndDate ?? "—")
+                .font(.caption.monospaced())
+                .foregroundStyle(.secondary)
+                .frame(width: 100, alignment: .leading)
+
+            Group {
+                if let owner, let img = NSImage(contentsOf: owner.avatarURL) {
+                    Image(nsImage: img).resizable().scaledToFill()
+                } else if let owner {
+                    Text(String(owner.name.prefix(1)))
+                        .font(.caption.bold()).frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.gray.opacity(0.2))
+                } else {
+                    Image(systemName: "person.crop.circle")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .frame(width: 28, height: 28)
+            .clipShape(Circle())
+            .frame(width: 72, alignment: .center)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .contentShape(Rectangle())
+        .background(Color.white)
+    }
+
+    private var statusTint: Color {
+        SWTheme.websiteStatusColor(project.status)
+    }
+
+    private func initials(_ name: String) -> String {
+        let cleaned = name.trimmingCharacters(in: .whitespaces)
+        return String(cleaned.prefix(2)).uppercased()
+    }
+}
+
+struct WebsiteProjectCard: View {
+    let project: WebsiteProject
+    @State private var hovering = false
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Spacer(minLength: 14)
+            ZStack {
+                Circle().fill(Color.white)
+                    .frame(width: 72, height: 72)
+                    .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
+                ZStack {
+                    Circle().fill(statusTint.opacity(0.18))
+                    Text(String(project.name.prefix(1)).uppercased())
+                        .font(.system(size: 26, weight: .bold))
+                        .foregroundStyle(statusTint)
+                }
+                .frame(width: 64, height: 64)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color.white, lineWidth: 3))
+            }
+
+            Spacer(minLength: 12)
+
+            HStack {
+                Text(project.framework?.prefix(6) ?? "WEB")
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.black)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                Spacer()
+                TagChip(text: project.category, color: statusTint)
+            }
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(project.name)
+                    .font(.system(size: 16, weight: .bold))
+                    .lineLimit(1)
+                Text(project.displayClient)
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color(white: 0.45))
+                    .lineLimit(1)
+                ProgressView(value: Double(project.displayProgress), total: 100)
+                    .tint(statusTint)
+                    .padding(.top, 4)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, 8)
+        }
+        .padding(.horizontal, 14)
+        .padding(.bottom, 14)
+        .frame(maxWidth: .infinity)
+        .frame(minHeight: SWTheme.Website.cardMinHeight)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: SWTheme.Website.cardCorner, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: SWTheme.Website.cardCorner).stroke(Color.black.opacity(0.06)))
+        .shadow(color: .black.opacity(hovering ? 0.12 : 0.05), radius: hovering ? 14 : 8, y: hovering ? 8 : 3)
+        .scaleEffect(hovering ? 1.02 : 1)
+        .onHover { hovering = $0 }
+    }
+
+    private var statusTint: Color {
+        SWTheme.websiteStatusColor(project.status)
+    }
+}
+
+struct WebsiteDetailSheet: View {
+    @EnvironmentObject var store: WorkspaceStore
+    @State var project: WebsiteProject
+    var onClose: () -> Void
+    @State private var tab: Int = 0 // 0 CRM 1 Finance 2 Tech
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack(alignment: .top, spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12).fill(Color.black)
+                    Image(systemName: "globe").foregroundStyle(.white)
+                }
+                .frame(width: 40, height: 40)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(project.name).font(.title3.bold())
+                        TagChip(text: project.category, color: .blue)
+                        if project.dirty == true { TagChip(text: "待写回", color: .orange) }
+                    }
+                    HStack(spacing: 8) {
+                        if let url = project.url, !url.isEmpty {
+                            Link(url.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: ""),
+                                 destination: URL(string: url) ?? URL(string: "about:blank")!)
+                                .font(.caption.monospaced())
+                        } else {
+                            Text("未配置线上网址").font(.caption).foregroundStyle(.secondary)
+                        }
+                        if let path = project.localPath, !path.isEmpty {
+                            Text("· \(path)").font(.caption2).foregroundStyle(.tertiary).lineLimit(1)
                         }
                     }
-                    Spacer()
-                    Button("编辑", action: onEdit).buttonStyle(.borderedProminent).tint(.black)
-                }
-
-                ProgressView(value: Double(project.displayProgress), total: 100) {
-                    Text("进度 \(project.displayProgress)%")
-                }
-
-                groupBox("客户与商务") {
-                    gridRow("客户", project.clientName ?? "—")
-                    gridRow("公司", project.clientCompany ?? "—")
-                    gridRow("付款", project.paymentStatus ?? "—")
-                    gridRow("金额", amountLine)
-                    gridRow("服务期", "\(project.serviceStartDate ?? "—") → \(project.deadline ?? project.serviceEndDate ?? "—")")
-                }
-                groupBox("技术") {
-                    gridRow("框架", project.framework ?? "—")
-                    gridRow("URL", project.url?.isEmpty == false ? (project.url ?? "") : "—")
-                    gridRow("本地路径", project.localPath ?? "—")
-                    gridRow("服务", (project.services ?? []).joined(separator: " · ").ifEmpty("—"))
-                    Text(project.detail ?? "").font(.body).padding(.top, 4)
-                }
-                groupBox("负责人") {
-                    if let owner {
-                        Text("\(owner.name)").font(.subheadline.weight(.semibold))
-                    } else {
-                        Text("未指定（可在编辑里选员工）").foregroundStyle(.secondary)
+                    if let services = project.services, !services.isEmpty {
+                        HStack(spacing: 4) {
+                            Text("已订服务:").font(.caption2).foregroundStyle(.secondary)
+                            ForEach(services, id: \.self) { TagChip(text: $0, color: .gray) }
+                        }
                     }
                 }
-                groupBox("快捷改状态") {
-                    HStack {
-                        statusBtn("进行中", "in_progress", "进行中")
-                        statusBtn("已交付", "delivered", "已交付")
-                        statusBtn("基建中", "infrastructure", "功能基础建设")
-                        statusBtn("挂起", "inactive", "已暂停/挂了")
-                    }
+                Spacer()
+                Button("关闭", action: onClose).keyboardShortcut(.cancelAction)
+            }
+            .padding(16)
+            .background(Color.white)
+
+            // Tabs (omit assets/credentials)
+            HStack(spacing: 8) {
+                tabBtn("客户与服务", 0)
+                tabBtn("财务款项", 1)
+                tabBtn("技术与进度", 2)
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(Color.black.opacity(0.03))
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    if tab == 0 { crmTab }
+                    if tab == 1 { financeTab }
+                    if tab == 2 { techTab }
                 }
-                Text("写回说明：点顶部「同步」会先跑 sync-smartplan --push（API PUT 更新；新建走 SQLite）。不写回电话/微信/邮箱/凭证。")
-                    .font(.caption2).foregroundStyle(.secondary)
-                Spacer(minLength: 60)
+                .padding(20)
+            }
+
+            HStack {
+                statusQuick
+                Spacer()
+                Button("保存并标记写回") {
+                    project.dirty = true
+                    store.upsertWebsiteProject(project)
+                    onClose()
+                }
+                .buttonStyle(.borderedProminent).tint(.black)
+            }
+            .padding(16)
+            .background(Color.white)
+            .overlay(alignment: .top) { Divider() }
+        }
+        .frame(width: SWTheme.Website.detailWidth, height: SWTheme.Website.detailHeight)
+        .background(Color(NSColor.windowBackgroundColor))
+    }
+
+    private var statusQuick: some View {
+        HStack {
+            ForEach(WebsiteFieldConfig.statusOptions, id: \.status) { opt in
+                Button(opt.label) {
+                    project.status = opt.status
+                    project.category = opt.category
+                    project.progress = opt.progress
+                }
+                .buttonStyle(.bordered)
             }
         }
     }
 
-    private var amountLine: String {
-        let t = project.totalAmount ?? 0
-        let p = project.paidAmount ?? 0
-        let u = project.unpaidAmount ?? 0
-        return String(format: "总额 %.0f · 已付 %.0f · 未付 %.0f", t, p, u)
-    }
-
-    private func statusBtn(_ title: String, _ status: String, _ category: String) -> some View {
-        Button(title) { onStatus(status, category) }.buttonStyle(.bordered)
-    }
-
-    private func gridRow(_ k: String, _ v: String) -> some View {
-        HStack(alignment: .top) {
-            Text(k).font(.caption).foregroundStyle(.secondary).frame(width: 72, alignment: .leading)
-            Text(v).font(.subheadline).textSelection(.enabled)
-            Spacer()
+    private var crmTab: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            section("客户资料") {
+                field("客户名", Binding(get: { project.clientName ?? "" }, set: { project.clientName = $0 }))
+                field("公司", Binding(get: { project.clientCompany ?? "" }, set: { project.clientCompany = $0 }))
+                Text("联系方式不同步到工作台（电话/微信/邮箱仅留在 SmartPlan）")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+            section("服务周期") {
+                field("开始", Binding(get: { project.serviceStartDate ?? "" }, set: { project.serviceStartDate = $0 }))
+                field("截止", Binding(get: { project.deadline ?? project.serviceEndDate ?? "" }, set: {
+                    project.deadline = $0; project.serviceEndDate = $0
+                }))
+            }
+            section("已订服务（逗号分隔）") {
+                field("服务", Binding(
+                    get: { (project.services ?? []).joined(separator: ", ") },
+                    set: { project.services = $0.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty } }
+                ))
+            }
+            section("负责人") {
+                Picker("员工", selection: Binding(get: { project.ownerBotId ?? "" }, set: { project.ownerBotId = $0 })) {
+                    Text("未指定").tag("")
+                    ForEach(store.data.bots.filter { $0.belongs(to: "网站项目") || ["seo","coo","chief"].contains($0.id) }) { b in
+                        Text(b.name).tag(b.id)
+                    }
+                }
+            }
         }
     }
 
-    private func groupBox<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+    private var financeTab: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            section("财务金额") {
+                numField("总额", Binding(get: { project.totalAmount ?? 0 }, set: { project.totalAmount = $0 }))
+                numField("定金", Binding(get: { project.depositAmount ?? 0 }, set: { project.depositAmount = $0 }))
+                numField("已付", Binding(get: { project.paidAmount ?? 0 }, set: { project.paidAmount = $0 }))
+                numField("未付", Binding(get: { project.unpaidAmount ?? 0 }, set: { project.unpaidAmount = $0 }))
+                Picker("付款状态", selection: Binding(get: { project.paymentStatus ?? "pending" }, set: { project.paymentStatus = $0 })) {
+                    Text("待付").tag("pending")
+                    Text("已付定金").tag("deposit_paid")
+                    Text("已结清").tag("fully_paid")
+                }
+            }
+        }
+    }
+
+    private var techTab: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            section("技术信息") {
+                field("名称", Binding(get: { project.name }, set: { project.name = $0 }))
+                field("URL", Binding(get: { project.url ?? "" }, set: { project.url = $0 }))
+                field("框架", Binding(get: { project.framework ?? "" }, set: { project.framework = $0 }))
+                field("本地路径", Binding(get: { project.localPath ?? "" }, set: { project.localPath = $0 }))
+                field("描述", Binding(get: { project.detail ?? "" }, set: { project.detail = $0 }))
+            }
+            section("进度") {
+                Stepper("进度 \(project.progress ?? 0)%", value: Binding(get: { project.progress ?? 0 }, set: { project.progress = $0 }), in: 0...100, step: 5)
+                ProgressView(value: Double(project.displayProgress), total: 100)
+            }
+            Text("点工作台「同步」会执行 sync-smartplan --push 写回 SmartPlan（不含凭证字段）。")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+    }
+
+    private func tabBtn(_ title: String, _ i: Int) -> some View {
+        Button(title) { tab = i }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(tab == i ? Color.black : Color.white)
+            .foregroundStyle(tab == i ? Color.white : Color.primary)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.black.opacity(0.08)))
+    }
+
+    private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(.headline)
+            Text(title).font(.caption.weight(.bold)).foregroundStyle(.secondary)
             content()
         }
         .padding(14)
@@ -296,10 +540,20 @@ struct WebsiteDetailPane: View {
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.black.opacity(0.06)))
     }
-}
 
-private extension String {
-    func ifEmpty(_ fallback: String) -> String { isEmpty ? fallback : self }
+    private func field(_ label: String, _ text: Binding<String>) -> some View {
+        HStack {
+            Text(label).frame(width: 72, alignment: .leading).font(.caption).foregroundStyle(.secondary)
+            TextField(label, text: text).textFieldStyle(.roundedBorder)
+        }
+    }
+
+    private func numField(_ label: String, _ value: Binding<Double>) -> some View {
+        HStack {
+            Text(label).frame(width: 72, alignment: .leading).font(.caption).foregroundStyle(.secondary)
+            TextField(label, value: value, format: .number).textFieldStyle(.roundedBorder)
+        }
+    }
 }
 
 struct WebsiteEditorSheet: View {
@@ -308,147 +562,22 @@ struct WebsiteEditorSheet: View {
     var onCancel: () -> Void
     @EnvironmentObject var store: WorkspaceStore
 
-    private let statusOptions: [(String, String)] = [
-        ("in_progress", "进行中"),
-        ("delivered", "已交付"),
-        ("infrastructure", "功能基础建设"),
-        ("inactive", "已暂停/挂了")
-    ]
-
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(project.localOnly == true ? "新建网站项目" : "编辑网站项目").font(.title2.bold())
+            Text("新建网站项目").font(.title2.bold())
             Form {
-                TextField("名称", text: Binding(get: { project.name }, set: { project.name = $0 }))
-                TextField("客户名", text: Binding(get: { project.clientName ?? "" }, set: { project.clientName = $0 }))
-                TextField("客户公司", text: Binding(get: { project.clientCompany ?? "" }, set: { project.clientCompany = $0 }))
+                TextField("名称", text: $project.name)
+                TextField("客户", text: Binding(get: { project.clientName ?? "" }, set: { project.clientName = $0 }))
                 TextField("URL", text: Binding(get: { project.url ?? "" }, set: { project.url = $0 }))
-                TextField("框架", text: Binding(get: { project.framework ?? "" }, set: { project.framework = $0 }))
-                TextField("截止日期 (YYYY-MM-DD)", text: Binding(get: { project.deadline ?? project.serviceEndDate ?? "" }, set: { project.deadline = $0; project.serviceEndDate = $0 }))
-                TextField("描述", text: Binding(get: { project.detail ?? "" }, set: { project.detail = $0 }))
-                Picker("状态", selection: Binding(get: { project.status }, set: { new in
-                    project.status = new
-                    if let cat = statusOptions.first(where: { $0.0 == new })?.1 { project.category = cat }
-                })) {
-                    ForEach(statusOptions, id: \.0) { Text($0.1).tag($0.0) }
-                }
-                Stepper("进度 \(project.progress ?? 0)%", value: Binding(get: { project.progress ?? 0 }, set: { project.progress = $0 }), in: 0...100, step: 5)
-                Picker("负责人", selection: Binding(get: { project.ownerBotId ?? "" }, set: { project.ownerBotId = $0 })) {
-                    Text("未指定").tag("")
-                    ForEach(store.data.bots.filter { $0.belongs(to: "网站项目") || $0.id == "seo" || $0.id == "coo" }) { b in
-                        Text(b.name).tag(b.id)
-                    }
-                }
             }
             HStack {
                 Button("取消", action: onCancel)
                 Spacer()
-                Button("保存") {
-                    project.dirty = true
-                    onSave(project)
-                }
-                .buttonStyle(.borderedProminent).tint(.black)
+                Button("创建") { project.dirty = true; project.localOnly = true; onSave(project) }
+                    .buttonStyle(.borderedProminent).tint(.black)
             }
         }
         .padding(24)
-        .frame(width: 520, height: 560)
-    }
-}
-
-struct ProjectDetailPane: View {
-    @EnvironmentObject var store: WorkspaceStore
-    let project: WorkbenchProject
-
-    private var owner: Bot? { store.data.bots.first { $0.id == project.ownerBotId } }
-    private var collabs: [Bot] {
-        project.collabBotIds.compactMap { id in store.data.bots.first { $0.id == id } }
-    }
-    private var relatedTasks: [WorkbenchTask] {
-        store.data.tasks.filter { $0.note.contains(project.id) || $0.note.contains("smart-plan") || $0.title.contains(project.name) }
-    }
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(project.name).font(.system(size: 26, weight: .bold))
-                        Text(project.shortName ?? "").foregroundStyle(.secondary)
-                        HStack {
-                            TagChip(text: project.category, color: .indigo)
-                            TagChip(text: project.status, color: .blue)
-                        }
-                    }
-                    Spacer()
-                    Button { store.revealProject(project) } label: { Label("在 Finder 中显示", systemImage: "folder") }
-                        .buttonStyle(.bordered)
-                    if project.run?.url != nil {
-                        Button { store.openProjectURL(project) } label: { Label("打开本地网址", systemImage: "safari") }
-                            .buttonStyle(.borderedProminent).tint(.black)
-                    }
-                }
-                Text(project.summary).font(.body)
-                groupBox("技术栈") { FlowTech(tags: project.techStack) }
-                groupBox("路径") {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("相对：\(project.localPath)").font(.caption.monospaced())
-                        Text(project.absolutePathHint ?? "").font(.caption2).foregroundStyle(.secondary)
-                    }
-                }
-                groupBox("匹配员工") {
-                    VStack(alignment: .leading, spacing: 10) {
-                        if let owner { staffRow(owner, tag: "负责人") }
-                        ForEach(collabs) { b in staffRow(b, tag: "协作") }
-                    }
-                }
-                groupBox("相关任务") {
-                    if relatedTasks.isEmpty {
-                        Text("暂无关联任务").font(.caption).foregroundStyle(.secondary)
-                    } else {
-                        ForEach(relatedTasks) { t in
-                            HStack { Text(t.title); Spacer(); TagChip(text: t.status, color: .gray) }
-                        }
-                    }
-                }
-                Spacer(minLength: 80)
-            }
-        }
-    }
-
-    private func staffRow(_ b: Bot, tag: String) -> some View {
-        HStack(spacing: 10) {
-            if let img = NSImage(contentsOf: b.avatarURL) {
-                Image(nsImage: img).resizable().scaledToFill()
-                    .frame(width: 36, height: 36).clipShape(Circle())
-            }
-            VStack(alignment: .leading) {
-                Text(b.name.components(separatedBy: "-").first ?? b.name).font(.subheadline.weight(.semibold))
-                Text(b.role).font(.caption).foregroundStyle(.secondary)
-            }
-            Spacer()
-            TagChip(text: tag, color: .primary)
-        }
-        .padding(8)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-    }
-
-    private func groupBox<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(.headline)
-            content()
-        }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.black.opacity(0.06)))
-    }
-}
-
-struct FlowTech: View {
-    let tags: [String]
-    var body: some View {
-        HStack(spacing: 8) { ForEach(tags, id: \.self) { TagChip(text: $0, color: .blue) } }
+        .frame(width: 420, height: 280)
     }
 }

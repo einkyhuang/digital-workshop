@@ -1,0 +1,55 @@
+{
+  "$comment": "First-pass tokens + website field config. Plug 画眉 visual spec and 搜搜 field spec here (see README in deliverables paths).",
+  "version": 1,
+  "specHooks": {
+    "visual": "bots/视觉设计/设计师/deliverables/workbench-ui/",
+    "fields": "bots/网站项目/Super-SEO-Hub/deliverables/网站项目字段规范.md"
+  },
+  "roster": {
+    "groupBoxMinWidth": 300,
+    "groupBoxMaxWidth": 720,
+    "groupBoxPadding": 12,
+    "groupBoxRadius": 16,
+    "groupBorderOpacity": 0.08,
+    "cardMinWidth": 130,
+    "cardGap": 8,
+    "denseAvatar": 56,
+    "denseMinHeight": 168,
+    "denseCorner": 20,
+    "groupsFirst": "管理中枢"
+  },
+  "website": {
+    "defaultView": "list",
+    "listColumns": ["name", "client", "status", "progress", "deadline", "owner"],
+    "cardStyle": "employee-like",
+    "detailTabs": ["crm", "finance", "tech"],
+    "omitFields": ["client_phone", "client_wechat", "client_email", "assets_credentials"],
+    "statusMap": {
+      "in_progress": { "label": "进行中", "category": "进行中", "progress": 55, "color": "blue" },
+      "delivered": { "label": "已交付", "category": "已交付", "progress": 100, "color": "green" },
+      "infrastructure": { "label": "基建中", "category": "功能基础建设", "progress": 25, "color": "purple" },
+      "inactive": { "label": "挂起", "category": "已暂停/挂了", "progress": 0, "color": "orange" }
+    },
+    "fields": [
+      { "key": "name", "label": "项目名", "tab": "tech", "editable": true },
+      { "key": "clientName", "label": "客户名", "tab": "crm", "editable": true },
+      { "key": "clientCompany", "label": "客户公司", "tab": "crm", "editable": true },
+      { "key": "services", "label": "已订服务", "tab": "crm", "editable": true, "type": "tags" },
+      { "key": "serviceStartDate", "label": "服务开始", "tab": "crm", "editable": true, "type": "date" },
+      { "key": "deadline", "label": "截止日期", "tab": "crm", "editable": true, "type": "date" },
+      { "key": "ownerBotId", "label": "负责人", "tab": "crm", "editable": true, "type": "bot" },
+      { "key": "totalAmount", "label": "总额", "tab": "finance", "editable": true, "type": "number" },
+      { "key": "depositAmount", "label": "定金", "tab": "finance", "editable": true, "type": "number" },
+      { "key": "paidAmount", "label": "已付", "tab": "finance", "editable": true, "type": "number" },
+      { "key": "unpaidAmount", "label": "未付", "tab": "finance", "editable": true, "type": "number" },
+      { "key": "paymentStatus", "label": "付款状态", "tab": "finance", "editable": true },
+      { "key": "url", "label": "线上网址", "tab": "tech", "editable": true },
+      { "key": "framework", "label": "框架", "tab": "tech", "editable": true },
+      { "key": "localPath", "label": "本地路径", "tab": "tech", "editable": true },
+      { "key": "detail", "label": "描述", "tab": "tech", "editable": true, "jsonKey": "description" },
+      { "key": "progress", "label": "进度", "tab": "tech", "editable": true, "type": "percent" },
+      { "key": "status", "label": "状态", "tab": "tech", "editable": true },
+      { "key": "category", "label": "分类", "tab": "tech", "editable": true }
+    ]
+  }
+}

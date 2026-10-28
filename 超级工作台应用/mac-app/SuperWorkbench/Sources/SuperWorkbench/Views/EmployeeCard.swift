@@ -4,78 +4,91 @@ import AppKit
 struct EmployeeCard: View {
     let bot: Bot
     var compact: Bool = false
+    var dense: Bool = false
     @State private var hovering = false
+
+    private var avatarOuter: CGFloat { dense ? 64 : (compact ? SWTheme.Roster.avatarOuter : 112) }
+    private var avatarInner: CGFloat { dense ? 56 : (compact ? SWTheme.Roster.avatarInner : 104) }
+    private var minH: CGFloat { dense ? 168 : (compact ? SWTheme.Roster.cardMinHeight : 280) }
+    private var corner: CGFloat { dense ? 20 : SWTheme.Radius.card }
 
     var body: some View {
         VStack(spacing: 0) {
-            Spacer(minLength: compact ? 12 : 20)
+            Spacer(minLength: dense ? 8 : (compact ? 12 : 20))
 
             ZStack {
                 Circle()
                     .fill(Color.white)
-                    .frame(width: compact ? 92 : 112, height: compact ? 92 : 112)
-                    .shadow(color: .black.opacity(0.08), radius: 8, y: 2)
+                    .frame(width: avatarOuter, height: avatarOuter)
+                    .shadow(color: .black.opacity(0.08), radius: dense ? 4 : 8, y: 2)
                 avatarView
-                    .frame(width: compact ? 84 : 104, height: compact ? 84 : 104)
+                    .frame(width: avatarInner, height: avatarInner)
                     .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                    .overlay(Circle().stroke(Color.white, lineWidth: dense ? 3 : 4))
             }
 
-            Text(spacedCode(bot.displayCode))
-                .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(Color(white: 0.55))
-                .padding(.top, 10)
-
-            HStack(spacing: 4) {
-                Circle().fill(SWTheme.statusColor(bot.status)).frame(width: 5, height: 5)
-                Circle().fill(Color.black.opacity(0.12)).frame(width: 5, height: 5)
-                Circle().fill(Color.black.opacity(0.12)).frame(width: 5, height: 5)
+            if !dense {
+                Text(spacedCode(bot.displayCode))
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(Color(white: 0.55))
+                    .padding(.top, 10)
+                HStack(spacing: 4) {
+                    Circle().fill(SWTheme.statusColor(bot.status)).frame(width: 5, height: 5)
+                    Circle().fill(Color.black.opacity(0.12)).frame(width: 5, height: 5)
+                    Circle().fill(Color.black.opacity(0.12)).frame(width: 5, height: 5)
+                }
+                .padding(.top, 6)
+            } else {
+                Spacer(minLength: 6)
             }
-            .padding(.top, 6)
 
-            Spacer(minLength: compact ? 16 : 28)
+            Spacer(minLength: dense ? 8 : (compact ? 16 : 28))
 
             HStack(alignment: .center) {
                 Text(bot.displayCode)
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .font(.system(size: dense ? 10 : 11, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
+                    .padding(.horizontal, dense ? 8 : 10)
+                    .padding(.vertical, dense ? 3 : 5)
                     .background(Color.black)
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 Spacer()
-                Text(bot.displayGroup)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(Color(white: 0.55))
-                    .lineLimit(1)
+                if !dense {
+                    Text(bot.displayGroup)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Color(white: 0.55))
+                        .lineLimit(1)
+                } else {
+                    Circle().fill(SWTheme.statusColor(bot.status)).frame(width: 6, height: 6)
+                }
             }
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: dense ? 2 : 4) {
                 Text(displayNick(bot.name))
-                    .font(.system(size: compact ? 18 : 20, weight: .bold))
+                    .font(.system(size: dense ? 15 : (compact ? 18 : 20), weight: .bold))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                 Text(displayTitle(bot.name, bot.role))
-                    .font(.system(size: 12))
+                    .font(.system(size: dense ? 11 : 12))
                     .foregroundStyle(Color(white: 0.45))
                     .lineLimit(1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.top, 10)
+            .padding(.top, dense ? 6 : 10)
         }
-        .padding(.horizontal, 18)
-        .padding(.bottom, 18)
+        .padding(.horizontal, dense ? 12 : 18)
+        .padding(.bottom, dense ? 12 : 18)
         .frame(maxWidth: .infinity)
-        .frame(minHeight: compact ? 240 : 280)
+        .frame(minHeight: minH)
         .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: corner, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
+            RoundedRectangle(cornerRadius: corner, style: .continuous)
                 .stroke(Color.black.opacity(0.06), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(hovering ? 0.14 : 0.06), radius: hovering ? 18 : 10, y: hovering ? 10 : 4)
-        .scaleEffect(hovering ? 1.02 : 1.0)
-        .animation(.easeOut(duration: 0.18), value: hovering)
+        .shadow(color: .black.opacity(hovering ? 0.12 : 0.05), radius: hovering ? 12 : 6, y: hovering ? 6 : 3)
+        .scaleEffect(hovering ? 1.015 : 1.0)
+        .animation(.easeOut(duration: 0.15), value: hovering)
         .onHover { hovering = $0 }
     }
 
@@ -84,11 +97,10 @@ struct EmployeeCard: View {
         if let img = NSImage(contentsOf: bot.avatarURL) {
             Image(nsImage: img).resizable().scaledToFill()
         } else {
-            // Never use broken emoji/SF Symbol squares — colored monogram fallback
             ZStack {
                 LinearGradient(colors: [.blue.opacity(0.85), .purple.opacity(0.75)], startPoint: .topLeading, endPoint: .bottomTrailing)
                 Text(String(shortName(bot.name).prefix(1)))
-                    .font(.system(size: compact ? 32 : 40, weight: .bold))
+                    .font(.system(size: dense ? 22 : (compact ? 32 : 40), weight: .bold))
                     .foregroundStyle(.white)
             }
         }
@@ -100,14 +112,10 @@ struct EmployeeCard: View {
         }
         return code
     }
-
     private func displayNick(_ name: String) -> String {
-        if let idx = name.firstIndex(of: "-") {
-            return String(name[..<idx])
-        }
+        if let idx = name.firstIndex(of: "-") { return String(name[..<idx]) }
         return name
     }
-
     private func displayTitle(_ name: String, _ role: String) -> String {
         if let idx = name.firstIndex(of: "-") {
             let t = String(name[name.index(after: idx)...])
@@ -115,6 +123,5 @@ struct EmployeeCard: View {
         }
         return role
     }
-
     private func shortName(_ name: String) -> String { displayNick(name) }
 }
