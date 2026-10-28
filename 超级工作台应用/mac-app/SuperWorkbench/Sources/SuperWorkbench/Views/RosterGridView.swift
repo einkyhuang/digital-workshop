@@ -7,7 +7,7 @@ struct RosterGridView: View {
 
     private var groupOrder: [String] {
         if let o = store.data.groupsOrder, !o.isEmpty { return o }
-        return ["管理中枢","网站项目","服装外贸","运营管理","战略决策","视觉设计","外贸营销","个人成长","内容营销"]
+        return ["管理中枢","网站项目","服装外贸","运营管理","战略决策","视觉设计","短剧组","外贸营销","个人成长","内容营销"]
     }
 
     private var chips: [String] { ["全部"] + groupOrder }

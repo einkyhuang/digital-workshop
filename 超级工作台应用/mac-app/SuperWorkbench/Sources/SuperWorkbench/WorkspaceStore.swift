@@ -6,7 +6,7 @@ import AppKit
 final class WorkspaceStore: ObservableObject {
     @Published var data: WorkspaceData = WorkspaceData(
         version: 2, updatedAt: nil, timezone: "Asia/Shanghai",
-        bots: [], tasks: [], vacancies: [], groups: [], routines: [], rules: [], groupsOrder: nil, projects: nil
+        bots: [], tasks: [], vacancies: [], groups: [], routines: [], rules: [], groupsOrder: nil, projects: nil, websiteProjects: nil, smartplanSync: nil
     )
     @Published var selectedSection: SidebarSection = .overview
     @Published var selectedBotId: String?
@@ -218,7 +218,7 @@ final class WorkspaceStore: ObservableObject {
 
     func saveWebsiteProjects(_ items: [WebsiteProject]) {
         data.websiteProjects = items
-        persist()
+        save()
     }
 
     func upsertWebsiteProject(_ item: WebsiteProject) {
@@ -229,7 +229,7 @@ final class WorkspaceStore: ObservableObject {
             list.insert(item, at: 0)
         }
         data.websiteProjects = list
-        persist()
+        save()
     }
 
     func markWebsiteDirty(_ id: String, mutate: (inout WebsiteProject) -> Void) {
@@ -238,7 +238,7 @@ final class WorkspaceStore: ObservableObject {
         mutate(&list[i])
         list[i].dirty = true
         data.websiteProjects = list
-        persist()
+        save()
     }
 
     var filteredBots: [Bot] {

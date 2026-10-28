@@ -64,6 +64,9 @@ struct Bot: Codable, Equatable, Identifiable, Hashable {
         case "mail": return "✉️"
         case "coach": return "🎙️"
         case "patrol": return "🛡️"
+        case "8b8cac2e-3e5d-4452-aeb4-d8fb67ab7803": return "📕"
+        case "e1f8699d-f595-4bef-b510-1e4aebc1ed43": return "📝"
+        case "1996eabe-d327-4969-a407-2bfc5e0686c3": return "🎬"
         default: return "🤖"
         }
     }
@@ -79,6 +82,9 @@ struct Bot: Codable, Equatable, Identifiable, Hashable {
         case "coo": return "运营管理/COO"
         case "finance": return "运营管理/财务官"
         case "seo": return "网站项目/Super-SEO-Hub"
+        case "8b8cac2e-3e5d-4452-aeb4-d8fb67ab7803": return "网站项目/网站获客业务员"
+        case "e1f8699d-f595-4bef-b510-1e4aebc1ed43": return "短剧组/短剧编剧"
+        case "1996eabe-d327-4969-a407-2bfc5e0686c3": return "短剧组/短剧制片"
         case "lead-hunt": return "服装外贸/外贸客户挖掘"
         case "threadway": return "服装外贸/Threadway"
         case "designer": return "视觉设计/设计师"

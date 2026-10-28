@@ -4,7 +4,7 @@ struct OverviewView: View {
     @EnvironmentObject var store: WorkspaceStore
 
     private var groupOrder: [String] {
-        store.data.groupsOrder ?? ["网站项目","服装外贸","运营管理","战略决策","视觉设计","外贸营销","个人成长","内容营销","管理中枢"]
+        store.data.groupsOrder ?? ["网站项目","服装外贸","运营管理","战略决策","视觉设计","短剧组","外贸营销","个人成长","内容营销","管理中枢"]
     }
 
     var body: some View {

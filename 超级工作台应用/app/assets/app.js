@@ -116,7 +116,7 @@
   function groupOrder() {
     return (state.data.groupsOrder && state.data.groupsOrder.length)
       ? state.data.groupsOrder
-      : ["管理中枢","网站项目","服装外贸","运营管理","战略决策","视觉设计","外贸营销","个人成长","内容营销"];
+      : ["管理中枢","网站项目","服装外贸","运营管理","战略决策","视觉设计","短剧组","外贸营销","个人成长","内容营销"];
   }
   function esc(s) {
     return String(s == null ? "" : s)
@@ -328,35 +328,83 @@ function renderRoster() {
       <div class="callout" style="margin-top:16px"><strong>${esc(sel.name)} · ${esc(sel.code||"")} · ${esc(sel.group||"")}</strong>${esc(sel.role)}<br/>工具/模型：${esc(sel.tools)}<br/>职责：${esc(sel.duty)}</div>`;
   }
 
-function renderProjects() {
-    const projects = state.data.projects || [];
-    if (!projects.length) return `<h2 class="section-title">项目</h2><p class="muted">暂无项目</p>`;
-    if (!state.selectedProjectId) state.selectedProjectId = projects[0].id;
-    const p = projects.find(x => x.id === state.selectedProjectId) || projects[0];
-    const owner = (state.data.bots||[]).find(b => b.id === p.ownerBotId);
-    const collabs = (p.collabBotIds||[]).map(id => (state.data.bots||[]).find(b => b.id === id)).filter(Boolean);
-    const tagOf = (b) => b.id==="designer"?"UI": b.id==="writer"?"文案": b.id==="coo"?"进度":"协作";
-    return `
-      <h2 class="section-title">项目</h2>
+  function renderProjects() {
+    const products = state.data.projects || [];
+    const webs = state.data.websiteProjects || [];
+    if (!state.projectSubTab) state.projectSubTab = "websites";
+    if (!state.webCat) state.webCat = "全部";
+    const sync = state.data.smartplanSync || {};
+    const cats = ["全部"].concat(Array.from(new Set(webs.map(w => w.category))).sort());
+    const filtered = webs.filter(w => state.webCat === "全部" || w.category === state.webCat);
+    if (!state.selectedWebId && filtered[0]) state.selectedWebId = filtered[0].id;
+    if (!state.selectedProjectId && products[0]) state.selectedProjectId = products[0].id;
+    const w = filtered.find(x => x.id === state.selectedWebId) || filtered[0];
+    const p = products.find(x => x.id === state.selectedProjectId) || products[0];
+    const tabs = `
+      <div class="filters" style="margin-bottom:12px">
+        <button type="button" class="${state.projectSubTab==="websites"?"active":""}" data-psub="websites">网站项目（${webs.length}）</button>
+        <button type="button" class="${state.projectSubTab==="products"?"active":""}" data-psub="products">产品项目（${products.length}）</button>
+      </div>
+      <p class="muted">SmartPlan 同步：${esc(sync.source||"—")} · ${esc(String(sync.count||0))} 条 · ${esc(sync.direction||"")} · ${esc(sync.lastSyncAt||"")}</p>`;
+
+    if (state.projectSubTab === "products") {
+      if (!products.length) return `<h2 class="section-title">项目</h2>${tabs}<p class="muted">暂无产品项目</p>`;
+      const owner = (state.data.bots||[]).find(b => b.id === p.ownerBotId);
+      const collabs = (p.collabBotIds||[]).map(id => (state.data.bots||[]).find(b => b.id === id)).filter(Boolean);
+      return `<h2 class="section-title">项目</h2>${tabs}
+        <div class="layout-2">
+          <div class="list">${products.map(x => `
+            <button type="button" class="${x.id===p.id?"active":""}" data-project="${esc(x.id)}">
+              ${esc(x.name)}<br/><span class="muted">${esc(x.category)} · ${esc(x.status)}</span>
+            </button>`).join("")}</div>
+          <div>
+            <h3>${esc(p.name)}</h3>
+            <p>${esc(p.summary)}</p>
+            <div class="callout"><strong>启动</strong><code>${esc((p.run&&p.run.command)||"")}</code> → ${esc((p.run&&p.run.url)||"")}</div>
+            <h4>匹配员工</h4>
+            <div class="emp-grid">${[owner,...collabs].filter(Boolean).map(b=>`<div class="emp-card" style="min-height:100px"><div class="emp-name">${esc(displayNick(b.name))}</div><div class="emp-role">${esc(b.role)}</div></div>`).join("")}</div>
+          </div>
+        </div>`;
+    }
+
+    const catBar = `<div class="filters">${cats.map(c => {
+      const n = c==="全部"? webs.length : webs.filter(x=>x.category===c).length;
+      return `<button type="button" class="${state.webCat===c?"active":""}" data-webcat="${esc(c)}">${esc(c)} ${n}</button>`;
+    }).join("")}</div>`;
+
+    if (!w) return `<h2 class="section-title">项目</h2>${tabs}${catBar}<p class="muted">暂无网站项目。请运行 scripts/sync-smartplan.sh</p>`;
+
+    const owner = (state.data.bots||[]).find(b => b.id === (w.ownerBotId||""));
+    return `<h2 class="section-title">项目</h2>${tabs}${catBar}
       <div class="layout-2">
-        <div class="list">${projects.map(x => `
-          <button type="button" class="${x.id===p.id?"active":""}" data-project="${esc(x.id)}">
-            ${esc(x.name)}<br/><span class="muted">${esc(x.category)} · ${esc(x.status)}</span>
+        <div class="list">${filtered.map(x => `
+          <button type="button" class="${x.id===w.id?"active":""}" data-web="${esc(x.id)}">
+            ${esc(x.name)}<br/><span class="muted">${esc(x.clientName||x.clientCompany||"—")} · ${esc(x.category)} · ${esc(String(x.progress||0))}%</span>
           </button>`).join("")}</div>
         <div>
-          <h3>${esc(p.name)} <span class="badge">${esc(p.shortName||"")}</span></h3>
-          <p>${esc(p.summary)}</p>
-          <p><strong>技术栈：</strong>${(p.techStack||[]).map(t=>`<span class="emp-pill" style="display:inline-block;margin:2px">${esc(t)}</span>`).join(" ")}</p>
-          <div class="callout"><strong>路径</strong>仓库根目录 <code>${esc(p.localPath)}</code>（未移动；node_modules/dist 约 883MB，已 gitignore）</div>
-          <div class="callout"><strong>启动</strong><code>${esc((p.run&&p.run.command)||"")}</code> → <a href="${esc((p.run&&p.run.url)||"#")}" target="_blank">${esc((p.run&&p.run.url)||"")}</a><br/>${esc((p.run&&p.run.notes)||"")}</div>
-          <h4>负责人</h4>
-          ${owner?`<div class="emp-card" style="min-height:auto;align-items:flex-start;padding:12px" data-bot="${esc(owner.id)}"><strong>${esc(displayNick(owner.name))}</strong> · ${esc(displayTitle(owner.name,owner.role))} <span class="emp-pill">负责人</span></div>`:""}
-          <h4>协作</h4>
-          <div class="emp-grid">${collabs.map(b=>`<button type="button" class="emp-card" data-bot="${esc(b.id)}" style="min-height:120px">
-            <div class="emp-avatar-wrap"><img class="emp-avatar-img" src="${avatarSrc(b)}" alt=""/></div>
-            <div class="emp-name">${esc(displayNick(b.name))}</div>
-            <div class="emp-role">${esc(displayTitle(b.name,b.role))} · ${esc(tagOf(b))}</div>
-          </button>`).join("")}</div>
+          <h3>${esc(w.name)} <span class="badge">${esc(w.category)}</span> <span class="badge">${esc(w.status)}</span></h3>
+          <p>${esc(w.description||"")}</p>
+          <div class="props">
+            <div class="row"><div class="k">客户</div><div>${esc(w.clientName||"—")} / ${esc(w.clientCompany||"—")}</div></div>
+            <div class="row"><div class="k">进度</div><div>${esc(String(w.progress||0))}%</div></div>
+            <div class="row"><div class="k">截止</div><div>${esc(w.deadline||w.serviceEndDate||"—")}</div></div>
+            <div class="row"><div class="k">负责人</div><div>${esc(owner?owner.name:"未指定")}</div></div>
+            <div class="row"><div class="k">URL</div><div>${esc(w.url||"—")}</div></div>
+            <div class="row"><div class="k">框架</div><div>${esc(w.framework||"—")}</div></div>
+            <div class="row"><div class="k">付款</div><div>${esc(w.paymentStatus||"—")} · 总额 ${esc(String(w.totalAmount||0))}</div></div>
+            <div class="row"><div class="k">路径</div><div><code>${esc(w.localPath||"—")}</code></div></div>
+          </div>
+          <div class="card-actions" style="margin-top:12px">
+            <label>改状态 </label>
+            <select id="webStatus">
+              <option value="in_progress|进行中" ${w.status==="in_progress"?"selected":""}>进行中</option>
+              <option value="delivered|已交付" ${w.status==="delivered"?"selected":""}>已交付</option>
+              <option value="infrastructure|功能基础建设" ${w.status==="infrastructure"?"selected":""}>功能基础建设</option>
+              <option value="inactive|已暂停/挂了" ${w.status==="inactive"?"selected":""}>已暂停/挂了</option>
+            </select>
+            <button type="button" class="btn primary" id="saveWebStatus">保存状态（本地，同步时写回）</button>
+          </div>
+          <p class="muted">不同步电话/微信/邮箱/凭证。写回：PUT /api/websites/:id（需 SmartPlan :3300）。</p>
         </div>
       </div>`;
   }
