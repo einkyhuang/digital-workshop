@@ -10,3 +10,11 @@
 **/*api-key*
 node_modules/
 .local/
+
+# SwiftPM / Xcode
+超级工作台应用/mac-app/SuperWorkbench/.build/
+超级工作台应用/mac-app/SuperWorkbench/.swiftpm/
+**/DerivedData/
+*.xcuserstate
+超级工作台应用/mac-app/SuperWorkbench/Assets/AppIcon.iconset/
+超级工作台应用/mac-app/preview/
