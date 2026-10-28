@@ -5,7 +5,7 @@ struct RosterGridView: View {
     @EnvironmentObject var store: WorkspaceStore
     @State private var layerFilter: String = "全部"
 
-    private var layers: [String] { ["全部", "幕僚室", "Studio执行层", "生活层"] }
+    private var layers: [String] { ["全部", "幕僚室", "Studio执行层", "生活层", "系统"] }
 
     private var bots: [Bot] {
         let base = store.filteredBots
@@ -27,7 +27,7 @@ struct RosterGridView: View {
                         .overlay(Capsule().stroke(SWTheme.border))
                 }
             }
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 280), spacing: 14)], spacing: 14) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 200), spacing: 14)], spacing: 14) {
                 ForEach(bots) { bot in
                     Button {
                         store.selectedBotId = bot.id
@@ -54,10 +54,10 @@ struct BotDetailView: View {
             HStack(alignment: .top, spacing: 16) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 20).fill(SWTheme.layerColor(bot.layer).opacity(0.15)).frame(width: 72, height: 72)
-                    Text(bot.emoji).font(.largeTitle)
+                    Text(bot.displayEmoji).font(.largeTitle)
                 }
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(bot.role).foregroundStyle(.secondary)
+                    Text("\(bot.displayCode) · \(bot.role)").foregroundStyle(.secondary)
                     HStack {
                         TagChip(text: bot.layer, color: SWTheme.layerColor(bot.layer))
                         HStack(spacing: 4) {

@@ -71,6 +71,11 @@ struct HiringView: View {
     @EnvironmentObject var store: WorkspaceStore
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            if store.data.vacancies.isEmpty {
+                Text("花名册岗位均已入职，招聘规划暂无待招项。")
+                    .font(.subheadline).foregroundStyle(.secondary)
+                    .padding(14).frame(maxWidth: .infinity, alignment: .leading).swCard()
+            } else {
             Text("点「确认招聘」仅写入本地 JSON，不会自动创建 Bot。")
                 .font(.caption).foregroundStyle(.secondary)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 12)], spacing: 12) {
@@ -96,6 +101,7 @@ struct HiringView: View {
                 }
             }
             Spacer(minLength: 80)
+            }
         }
     }
 }

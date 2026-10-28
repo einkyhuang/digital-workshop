@@ -253,45 +253,48 @@
   function renderRoster() {
     const filter = state.layerFilter;
     const bots = filter === "全部" ? state.data.bots : state.data.bots.filter((b) => b.layer === filter);
+    const layers = ["全部", "幕僚室", "Studio执行层", "生活层", "系统"];
+    const layerShort = (layer) => {
+      if ((layer||"").includes("Studio") || (layer||"").includes("执行")) return "Studio";
+      if ((layer||"").includes("幕僚")) return "幕僚室";
+      if ((layer||"").includes("生活")) return "生活层";
+      if ((layer||"").includes("系统")) return "系统";
+      return layer || "";
+    };
+    const spaced = (code) => {
+      if (!code) return "—";
+      if (code.length >= 2 && /[A-Za-z]/.test(code[0])) return code[0] + " " + code.slice(1);
+      return code;
+    };
+    const shortName = (n) => (n.includes("|") ? n.split("|")[0].trim() : n);
+    const folderOf = (b) => {
+      const map = {"chief":"最强大脑","strategy":"战略官","coo":"COO","finance":"财务官","critic":"反调官","director":"视频导演","knowledge":"知识官","designer":"设计师","writer":"主笔","hoppi":"小红书助理Hoppi","negotiator":"谈判专家","strategist":"兵法策略师","intel":"情报官","lead-hunt":"外贸客户挖掘","threadway":"Threadway","seo":"Super-SEO-Hub","mail":"超级邮件助手","coach":"表达教练","patrol":"巡逻官"};
+      return map[b.id] || b.name;
+    };
+    const cards = bots.map((b) => {
+      const code = b.code || "—";
+      const emoji = b.emoji || "🤖";
+      // avatars are local files; on Pages use emoji fallback (file:// may work locally via relative path only if served)
+      return `<button type="button" class="emp-card" data-bot="${esc(b.id)}">
+        <div class="emp-avatar-wrap"><div class="emp-avatar">${esc(emoji)}</div></div>
+        <div class="emp-code">${esc(spaced(code))}</div>
+        <div class="emp-dots"><span class="dot ${b.status==="在线"?"ok":""}"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="emp-meta"><span class="emp-pill">${esc(code)}</span><span class="emp-layer">${esc(layerShort(b.layer))}</span></div>
+        <div class="emp-name">${esc(shortName(b.name))}</div>
+        <div class="emp-role">${esc(b.role)}</div>
+      </button>`;
+    }).join("");
     const sel = selectedBot();
-    const layers = ["全部", "幕僚室", "Studio执行层", "生活层"];
-    const list = bots.map((b) =>
-      `<button type="button" class="${b.id === sel.id ? "active" : ""}" data-bot="${esc(b.id)}">${esc(b.name)}<br/><span class="muted">${esc(b.layer)} · ${esc(b.status)}</span></button>`
-    ).join("");
     return `
       <h2 class="section-title">员工档案</h2>
       <div class="tabs" style="margin-bottom:12px">${layers.map((l) =>
         `<button type="button" class="${filter === l ? "active" : ""}" data-layer="${esc(l)}">${esc(l)}</button>`
       ).join("")}</div>
-      <div class="layout-2">
-        <div class="list">${list}</div>
-        <div>
-          <div class="props">
-            <div class="row"><div class="k">岗位名称</div><div>${esc(sel.name)}</div></div>
-            <div class="row"><div class="k">角色</div><div>${esc(sel.role)}</div></div>
-            <div class="row"><div class="k">层级</div><div>${esc(sel.layer)}</div></div>
-            <div class="row"><div class="k">当前状态</div><div>${statusBadge(sel.status)}</div></div>
-            <div class="row"><div class="k">工具与模型</div><div>${esc(sel.tools)}</div></div>
-            <div class="row"><div class="k">最近交付</div><div>${esc(sel.lastDelivery)}</div></div>
-          </div>
-          <div class="field"><label>改状态</label>
-            <select id="botStatus">${["在线","忙碌","空闲"].map((s)=>`<option ${s===sel.status?"selected":""}>${s}</option>`).join("")}</select>
-          </div>
-          <div class="field"><label>本周进度 %</label><input id="botProgress" type="number" min="0" max="100" value="${sel.progress}"/></div>
-          <div class="field"><label>OKR</label><input id="botOkr" value="${esc(sel.okr)}"/></div>
-          <div class="field"><label>周报</label><textarea id="botWeekly">${esc(sel.weekly)}</textarea></div>
-          <div class="card-actions"><button type="button" class="btn primary" id="saveBot">保存档案改动</button></div>
-          <div class="callout" style="margin-top:14px"><strong>职责</strong>${esc(sel.duty)}</div>
-          <div class="callout"><strong>知识库</strong>${esc(sel.knowledge)}</div>
-          <div class="callout"><strong>技能库</strong>${esc(sel.skills)}</div>
-          <div class="callout"><strong>记忆</strong>${esc(sel.memory)}</div>
-          <div class="callout"><strong>测试用例</strong>${esc(sel.testCases)}</div>
-          <div class="callout warn"><strong>Token</strong>${esc(sel.token)}。外部 API Key 按 Bot 单独存放，不要共用。</div>
-        </div>
-      </div>`;
+      <div class="emp-grid">${cards}</div>
+      <div class="callout" style="margin-top:16px"><strong>${esc(sel.name)} · ${esc(sel.code||"")}</strong>${esc(sel.role)}<br/>工具/模型：${esc(sel.tools)}<br/>职责：${esc(sel.duty)}</div>`;
   }
 
-  function renderKanban() {
+function renderKanban() {
     const tasks = state.data.tasks;
     const edit = selectedTask();
     const names = botNames();

@@ -14,6 +14,7 @@ struct WorkspaceData: Codable, Equatable {
 
 struct Bot: Codable, Equatable, Identifiable, Hashable {
     var id: String
+    var code: String?
     var name: String
     var layer: String
     var role: String
@@ -30,15 +31,32 @@ struct Bot: Codable, Equatable, Identifiable, Hashable {
     var skills: String
     var memory: String
     var weekly: String
+    var emoji: String?
 
-    var emoji: String {
+    var displayCode: String { code ?? "—" }
+
+    var displayEmoji: String {
+        if let emoji, !emoji.isEmpty { return emoji }
         switch id {
         case "chief": return "🧠"
+        case "strategy": return "♟️"
+        case "coo": return "📋"
+        case "finance": return "💹"
+        case "critic": return "⚔️"
+        case "director": return "🎬"
+        case "knowledge": return "📚"
+        case "designer": return "🎨"
+        case "writer": return "✍️"
+        case "hoppi": return "📕"
+        case "negotiator": return "🤝"
+        case "strategist": return "🗺️"
+        case "intel": return "🕵️"
         case "lead-hunt": return "🔍"
         case "threadway": return "🧵"
         case "seo": return "📈"
-        case "hoppi": return "📕"
         case "mail": return "✉️"
+        case "coach": return "🎙️"
+        case "patrol": return "🛡️"
         default: return "🤖"
         }
     }
@@ -46,13 +64,41 @@ struct Bot: Codable, Equatable, Identifiable, Hashable {
     var folderName: String {
         switch id {
         case "chief": return "最强大脑"
+        case "strategy": return "战略官"
+        case "coo": return "COO"
+        case "finance": return "财务官"
+        case "critic": return "反调官"
+        case "director": return "视频导演"
+        case "knowledge": return "知识官"
+        case "designer": return "设计师"
+        case "writer": return "主笔"
+        case "hoppi": return "小红书助理Hoppi"
+        case "negotiator": return "谈判专家"
+        case "strategist": return "兵法策略师"
+        case "intel": return "情报官"
         case "lead-hunt": return "外贸客户挖掘"
         case "threadway": return "Threadway"
         case "seo": return "Super-SEO-Hub"
-        case "hoppi": return "小红书助理Hoppi"
         case "mail": return "超级邮件助手"
+        case "coach": return "表达教练"
+        case "patrol": return "巡逻官"
         default: return name
         }
+    }
+
+    var avatarURL: URL {
+        FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Mobile Documents/com~apple~CloudDocs/超级工作台/bots")
+            .appendingPathComponent(folderName)
+            .appendingPathComponent("avatar.png")
+    }
+
+    var layerShort: String {
+        if layer.contains("Studio") || layer.contains("执行") { return "Studio" }
+        if layer.contains("幕僚") { return "幕僚室" }
+        if layer.contains("生活") { return "生活层" }
+        if layer.contains("系统") { return "系统" }
+        return layer
     }
 }
 
