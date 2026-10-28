@@ -1,0 +1,12 @@
+.DS_Store
+*.pem
+*.key
+.env
+.env.*
+**/secrets/
+**/*secret*
+**/*token*
+**/*apikey*
+**/*api-key*
+node_modules/
+.local/
