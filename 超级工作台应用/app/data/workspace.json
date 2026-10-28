@@ -1,6 +1,6 @@
 {
   "version": 4,
-  "updatedAt": "2026-10-29T02:45:00+08:00",
+  "updatedAt": "2026-10-29T02:55:00+08:00",
   "timezone": "Asia/Shanghai",
   "bots": [
     {
@@ -46,8 +46,8 @@
       "memory": "新纳入名册。",
       "weekly": "本周：入册待命。",
       "emoji": "♟️",
-      "group": "战略决策组",
-      "folder": "战略决策组/战略官"
+      "group": "战略决策",
+      "folder": "战略决策/战略官"
     },
     {
       "id": "coo",
@@ -69,8 +69,8 @@
       "memory": "新纳入名册。",
       "weekly": "本周：入册待命。",
       "emoji": "📋",
-      "group": "运营财务组",
-      "folder": "运营财务组/COO"
+      "group": "运营管理",
+      "folder": "运营管理/COO"
     },
     {
       "id": "finance",
@@ -92,8 +92,8 @@
       "memory": "新纳入名册。",
       "weekly": "本周：入册待命。",
       "emoji": "💹",
-      "group": "运营财务组",
-      "folder": "运营财务组/财务官"
+      "group": "运营管理",
+      "folder": "运营管理/财务官"
     },
     {
       "id": "critic",
@@ -115,8 +115,8 @@
       "memory": "新纳入名册。",
       "weekly": "本周：入册待命。",
       "emoji": "⚔️",
-      "group": "战略决策组",
-      "folder": "战略决策组/反调官"
+      "group": "战略决策",
+      "folder": "战略决策/反调官"
     },
     {
       "id": "director",
@@ -138,8 +138,8 @@
       "memory": "新纳入名册。",
       "weekly": "本周：入册待命。",
       "emoji": "🎬",
-      "group": "设计视频组",
-      "folder": "设计视频组/视频导演"
+      "group": "视觉设计",
+      "folder": "视觉设计/视频导演"
     },
     {
       "id": "knowledge",
@@ -161,8 +161,8 @@
       "memory": "新纳入名册。",
       "weekly": "本周：入册待命。",
       "emoji": "📚",
-      "group": "内容营销组",
-      "folder": "内容营销组/知识官"
+      "group": "内容营销",
+      "folder": "内容营销/知识官"
     },
     {
       "id": "designer",
@@ -184,8 +184,8 @@
       "memory": "新纳入名册。",
       "weekly": "本周：入册待命。",
       "emoji": "🎨",
-      "group": "设计视频组",
-      "folder": "设计视频组/设计师"
+      "group": "视觉设计",
+      "folder": "视觉设计/设计师"
     },
     {
       "id": "writer",
@@ -207,8 +207,8 @@
       "memory": "新纳入名册。",
       "weekly": "本周：入册待命。",
       "emoji": "✍️",
-      "group": "内容营销组",
-      "folder": "内容营销组/主笔"
+      "group": "内容营销",
+      "folder": "内容营销/主笔"
     },
     {
       "id": "hoppi",
@@ -230,8 +230,8 @@
       "memory": "尚未参与本轮服装客户开发测试。",
       "weekly": "本周：待命。",
       "emoji": "📕",
-      "group": "内容营销组",
-      "folder": "内容营销组/小红书助理Hoppi"
+      "group": "内容营销",
+      "folder": "内容营销/小红书助理Hoppi"
     },
     {
       "id": "negotiator",
@@ -253,8 +253,8 @@
       "memory": "新纳入名册。",
       "weekly": "本周：入册待命。",
       "emoji": "🤝",
-      "group": "客户开发组",
-      "folder": "客户开发组/谈判专家"
+      "group": "外贸营销",
+      "folder": "外贸营销/谈判专家"
     },
     {
       "id": "strategist",
@@ -276,8 +276,8 @@
       "memory": "新纳入名册。",
       "weekly": "本周：入册待命。",
       "emoji": "🗺️",
-      "group": "战略决策组",
-      "folder": "战略决策组/兵法策略师"
+      "group": "战略决策",
+      "folder": "战略决策/兵法策略师"
     },
     {
       "id": "intel",
@@ -299,8 +299,8 @@
       "memory": "新纳入名册。",
       "weekly": "本周：入册待命。",
       "emoji": "🕵️",
-      "group": "客户开发组",
-      "folder": "客户开发组/情报官"
+      "group": "外贸营销",
+      "folder": "外贸营销/情报官"
     },
     {
       "id": "lead-hunt",
@@ -322,8 +322,8 @@
       "memory": "本轮三家均在洛杉矶、主打女装批发。",
       "weekly": "本周：交付洛杉矶女装批发商名单 3 家。",
       "emoji": "🔍",
-      "group": "客户开发组",
-      "folder": "客户开发组/外贸客户挖掘"
+      "group": "服装外贸",
+      "folder": "服装外贸/外贸客户挖掘"
     },
     {
       "id": "threadway",
@@ -345,8 +345,8 @@
       "memory": "Shop 17 官网与常见联系页无公开邮箱/电话；称呼留 [Buyer Name]。",
       "weekly": "本周：完成三家分层 + Shop 17 开发信草稿。",
       "emoji": "🧵",
-      "group": "客户开发组",
-      "folder": "客户开发组/Threadway"
+      "group": "服装外贸",
+      "folder": "服装外贸/Threadway"
     },
     {
       "id": "seo",
@@ -368,8 +368,8 @@
       "memory": "尚未参与本轮服装客户开发测试。",
       "weekly": "本周：待命。",
       "emoji": "📈",
-      "group": "内容营销组",
-      "folder": "内容营销组/Super-SEO-Hub"
+      "group": "网站项目",
+      "folder": "网站项目/Super-SEO-Hub"
     },
     {
       "id": "mail",
@@ -391,8 +391,8 @@
       "memory": "新纳入工作台名册。",
       "weekly": "本周：入册待命。",
       "emoji": "✉️",
-      "group": "客户开发组",
-      "folder": "客户开发组/超级邮件助手"
+      "group": "外贸营销",
+      "folder": "外贸营销/超级邮件助手"
     },
     {
       "id": "coach",
@@ -414,8 +414,8 @@
       "memory": "新纳入名册。",
       "weekly": "本周：入册待命。",
       "emoji": "🎙️",
-      "group": "个人成长组",
-      "folder": "个人成长组/表达教练"
+      "group": "个人成长",
+      "folder": "个人成长/表达教练"
     },
     {
       "id": "patrol",
@@ -548,12 +548,14 @@
     }
   ],
   "groupsOrder": [
-    "管理中枢",
-    "战略决策组",
-    "运营财务组",
-    "客户开发组",
-    "内容营销组",
-    "设计视频组",
-    "个人成长组"
+    "网站项目",
+    "服装外贸",
+    "运营管理",
+    "战略决策",
+    "视觉设计",
+    "外贸营销",
+    "个人成长",
+    "内容营销",
+    "管理中枢"
   ]
 }
