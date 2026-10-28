@@ -20,6 +20,23 @@ enum SWTheme {
     static let muted = Color.secondary
     static let sidebarWidth: CGFloat = 260
 
+    // Overview v2
+    static let shadowElevated = Color.black.opacity(0.06)
+    static let radiusKPI: CGFloat = 18
+    static let radiusSection: CGFloat = 24
+    static let ringTrack = Color(red: 232/255, green: 236/255, blue: 240/255)
+    static let ringContract = Color(red: 59/255, green: 130/255, blue: 246/255)
+    static let ringPaid = Color(red: 16/255, green: 185/255, blue: 129/255)
+    static let urgencyHigh = Color(red: 239/255, green: 68/255, blue: 68/255)
+    static let urgencyMid = Color(red: 245/255, green: 158/255, blue: 11/255)
+    static let urgencyLow = Color(red: 148/255, green: 163/255, blue: 184/255)
+    static let gradBlueTop = Color.white
+    static let gradBlueBot = Color(red: 240/255, green: 246/255, blue: 1)
+    static let gradGreenBot = Color(red: 240/255, green: 253/255, blue: 246/255)
+    static let gradAmberBot = Color(red: 1, green: 248/255, blue: 237/255)
+    static let gradRoseBot = Color(red: 1, green: 241/255, blue: 242/255)
+    static let gradVioletBot = Color(red: 245/255, green: 243/255, blue: 1)
+
     enum Radius {
         static let card: CGFloat = 28
         static let group: CGFloat = 20

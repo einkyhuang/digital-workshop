@@ -440,86 +440,166 @@
     const kpi = computeWebsiteKPI(webs, state.targetsFile);
     const privacy = !kpi.amountsAvailable;
     const priv = (v) => privacy ? PRIVACY_LABEL : v;
+    const ringPct = (n, d) => {
+      if (d == null || !(Number(d) > 0) || n == null) return null;
+      return Math.min(100, (Number(n) / Number(d)) * 100);
+    };
+    const ringStyle = (pct, color) => {
+      if (pct == null) return `background:conic-gradient(${color} 0%, var(--sw-ring-track) 0)`;
+      return `background:conic-gradient(${color} ${pct.toFixed(1)}%, var(--sw-ring-track) 0)`;
+    };
+    const urgencyClass = (u) => {
+      if (u === "高") return "high";
+      if (u === "中") return "mid";
+      return "low";
+    };
 
-    const cardsA = [
-      ["合同总额", priv(moneyFmtCNY(kpi.portfolioContract)), "全库 Σ totalAmount"],
-      ["已收", priv(moneyFmtCNY(kpi.portfolioPaid)), "全库 Σ paidAmount"],
-      ["待收", priv(moneyFmtCNY(kpi.portfolioUnpaid)), "存量主卡"],
-      ["逾期", priv(moneyFmtCNY(kpi.portfolioOverdue)), kpi.overdueRiskCount?("另有风险 "+kpi.overdueRiskCount):"有截止日且待收"],
-      ["有金额项目", priv(String(kpi.pricedCount)), "totalAmount > 0"],
-    ].map(([l,v,d]) => `<div class="ov-kpi"><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div><div class="d">${esc(d)}</div></div>`).join("");
+    const kpiCards = [
+      { cls: "", icon: "¥", val: priv(moneyFmtCNY(kpi.portfolioContract)), label: "合同总额", detail: "全库 Σ totalAmount" },
+      { cls: "kpi-card--paid", icon: "收", val: priv(moneyFmtCNY(kpi.portfolioPaid)), label: "已收", detail: "全库 Σ paidAmount" },
+      { cls: "kpi-card--unpaid", icon: "待", val: priv(moneyFmtCNY(kpi.portfolioUnpaid)), label: "待收", detail: "存量 · 主卡" },
+      { cls: "kpi-card--overdue", icon: "逾", val: priv(moneyFmtCNY(kpi.portfolioOverdue)), label: "逾期", detail: kpi.overdueRiskCount ? ("另有风险 " + kpi.overdueRiskCount) : "有截止日且待收" },
+      { cls: "kpi-card--count", icon: "#", val: priv(String(kpi.pricedCount)), label: "有金额项目", detail: "totalAmount > 0" },
+    ].map(c => `
+      <article class="kpi-card ${c.cls}">
+        <div class="kpi-top"><div class="kpi-icon">${c.icon}</div></div>
+        <div class="kpi-value">${esc(c.val)}</div>
+        <div class="kpi-label">${esc(c.label)}</div>
+        <div class="kpi-detail">${esc(c.detail)}</div>
+      </article>`).join("");
 
-    const cardsB = [
-      ["合同目标完成率", priv(pctRate(kpi.yearContract, kpi.yearContractTarget)),
-        privacy?"—":(kpi.yearContractTarget==null?"目标待设定":("本年合同 "+moneyFmtCNY(kpi.yearContract)+" / "+moneyFmtCNY(kpi.yearContractTarget)))],
-      ["回款目标完成率", priv(pctRate(kpi.yearPaid, kpi.yearCollectionTarget)),
-        privacy?"—":(kpi.yearCollectionTarget==null?"目标待设定":("本年已收 "+moneyFmtCNY(kpi.yearPaid)+" / "+moneyFmtCNY(kpi.yearCollectionTarget)))],
-      ["本年合同额", priv(moneyFmtCNY(kpi.yearContract)), "合同归属年"],
-      ["本月合同额", priv(moneyFmtCNY(kpi.monthContract)), "合同归属月"],
-    ].map(([l,v,d]) => `<div class="ov-kpi"><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div><div class="d">${esc(d)}</div></div>`).join("");
+    const cRate = privacy ? null : ringPct(kpi.yearContract, kpi.yearContractTarget);
+    const pRate = privacy ? null : ringPct(kpi.yearPaid, kpi.yearCollectionTarget);
+    const goals = [
+      {
+        paid: false,
+        color: "#3B82F6",
+        pct: cRate,
+        label: privacy ? PRIVACY_LABEL : pctRate(kpi.yearContract, kpi.yearContractTarget),
+        title: "合同目标",
+        sub: "完成率",
+        detail: privacy ? "—" : (kpi.yearContractTarget == null ? "目标待设定" : ("本年合同 " + moneyFmtCNY(kpi.yearContract) + " / " + moneyFmtCNY(kpi.yearContractTarget)))
+      },
+      {
+        paid: true,
+        color: "#10B981",
+        pct: pRate,
+        label: privacy ? PRIVACY_LABEL : pctRate(kpi.yearPaid, kpi.yearCollectionTarget),
+        title: "回款目标",
+        sub: "完成率",
+        detail: privacy ? "—" : (kpi.yearCollectionTarget == null ? "目标待设定" : ("本年已收 " + moneyFmtCNY(kpi.yearPaid) + " / " + moneyFmtCNY(kpi.yearCollectionTarget)))
+      },
+      {
+        paid: false,
+        color: "#8B5CF6",
+        pct: privacy ? null : 100,
+        label: privacy ? PRIVACY_LABEL : moneyFmtCNY(kpi.yearContract).replace("¥", "¥"),
+        title: "本年合同额",
+        sub: "合同归属年",
+        detail: privacy ? "—" : moneyFmtCNY(kpi.yearContract)
+      },
+      {
+        paid: false,
+        color: "#F59E0B",
+        pct: privacy ? null : (kpi.yearContract > 0 ? Math.min(100, (kpi.monthContract / kpi.yearContract) * 100) : null),
+        label: privacy ? PRIVACY_LABEL : moneyFmtCNY(kpi.monthContract),
+        title: "本月合同额",
+        sub: "合同归属月",
+        detail: privacy ? "—" : moneyFmtCNY(kpi.monthContract)
+      },
+    ].map(g => `
+      <article class="goal-card ${g.paid ? "goal-card--paid" : ""}">
+        <div class="ring-wrap">
+          <div class="ring" style="${ringStyle(g.pct, g.color)}"></div>
+          <div class="ring-label">${esc(g.label.length > 6 ? g.label.slice(0, 6) : g.label)}</div>
+        </div>
+        <div class="goal-text">
+          <div class="v">${esc(g.title)}</div>
+          <div class="l">${esc(g.sub)}</div>
+          <div class="d">${esc(g.detail)}</div>
+        </div>
+      </article>`).join("");
 
-    const qualityHtml = (kpi.quality||[]).length
-      ? `<div class="ov-quality">${esc(kpi.quality.map(q=>q.label+" "+q.count).join(" · "))}</div>`
+    const qualityHtml = (kpi.quality || []).length
+      ? `<div class="quality">数据质量：${esc(kpi.quality.map(q => q.label + " " + q.count).join(" · "))}</div>`
       : "";
 
-    const statusKeys = [["in_progress","进行中"],["delivered","已交付"],["infrastructure","筹建"],["inactive","挂起"]];
-    const statusHtml = statusKeys.map(([k,lab])=>{
-      const n = webs.filter(w=>w.status===k).length;
-      return `<div class="ov-dist-row"><span class="dot ${esc(k)}"></span><span>${esc(lab)}</span><strong>${n}</strong></div>`;
+    const statusKeys = [["in_progress","进行中","#1D4ED8"],["delivered","已交付","#15803D"],["infrastructure","筹建","#6D28D9"],["inactive","挂起","#C2410C"]];
+    const statusHtml = statusKeys.map(([k,lab,col]) => {
+      const n = webs.filter(w => w.status === k).length;
+      return `<div class="dist-row-item"><span class="dot" style="background:${col}"></span>${esc(lab)}<span class="cnt">${n}</span></div>`;
     }).join("");
     const payKeys = [["fully_paid","已结清"],["deposit_paid","已付定金"],["pending","待收款"]];
-    const payHtml = payKeys.map(([k,lab])=>{
-      const n = webs.filter(w=>(w.paymentStatus||"")===k).length;
-      return `<div class="ov-dist-row"><span>${esc(lab)}</span><strong>${n}</strong></div>`;
-    }).join("") + `<div class="ov-dist-row"><span>逾期风险(无截止)</span><strong>${kpi.overdueRiskCount||0}</strong></div>`;
+    const payHtml = payKeys.map(([k,lab]) => {
+      const n = webs.filter(w => (w.paymentStatus || "") === k).length;
+      return `<div class="dist-row-item"><span>${esc(lab)}</span><span class="cnt">${n}</span></div>`;
+    }).join("") + `<div class="dist-row-item"><span>逾期风险(无截止)</span><span class="cnt">${kpi.overdueRiskCount || 0}</span></div>`;
 
-    const top = webs.filter(w=>w.status==="in_progress"||w.status==="infrastructure")
-      .sort((a,b)=>(b.progress||0)-(a.progress||0)).slice(0,5);
-    const topHtml = top.length ? top.map(w=>{
-      const st=(WEBSITE_UI.statusMap[w.status]||{}).label||w.status;
-      return `<div class="ov-top-row"><span class="pill">${esc(st)} · ${w.progress||0}%</span><span class="name">${esc(w.name)}</span></div>`;
+    const top = webs.filter(w => w.status === "in_progress" || w.status === "infrastructure")
+      .sort((a, b) => (b.progress || 0) - (a.progress || 0)).slice(0, 5);
+    const topHtml = top.length ? top.map(w => {
+      const st = (WEBSITE_UI.statusMap[w.status] || {}).label || w.status;
+      const pill = w.status === "infrastructure" ? "pill-build" : "pill-prog";
+      return `<div class="prio-item"><span class="pill ${pill}">${esc(st)} · ${w.progress || 0}%</span><span class="prio-name">${esc(w.name)}</span><span class="prio-pct">${w.progress || 0}%</span></div>`;
     }).join("") : `<p class="muted">暂无进行中项目</p>`;
 
-    const colMap = {"待办":[],"进行中":[],"验收":[],"完成":[]};
+    const colMeta = [
+      ["待办", "kdot-todo"],
+      ["进行中", "kdot-doing"],
+      ["验收", "kdot-review"],
+      ["完成", "kdot-done"],
+    ];
+    const colMap = { "待办": [], "进行中": [], "验收": [], "完成": [] };
     for (const t of tasks) {
-      const st = t.status==="审核"?"验收":t.status;
-      (colMap[st]||colMap["待办"]).push(t);
+      const st = t.status === "审核" ? "验收" : t.status;
+      (colMap[st] || colMap["待办"]).push(t);
     }
-    const kanban = Object.keys(colMap).map(col=>{
-      const items = colMap[col].slice(0,8).map(t=>`<div class="ov-task"><div class="t">${esc(t.title)}</div><div class="m muted">工作台</div></div>`).join("")||`<div class="muted">—</div>`;
-      return `<div class="ov-col"><div class="ov-col-h">${esc(col)} <span>${colMap[col].length}</span></div>${items}</div>`;
+    const kanban = colMeta.map(([col, dot]) => {
+      const items = (colMap[col] || []).slice(0, 8).map(t =>
+        `<div class="task-chip"><div class="task-chip__title">${esc(t.title)}</div><div class="task-chip__meta">工作台</div></div>`
+      ).join("") || `<div class="muted" style="font-size:12px;padding:8px">—</div>`;
+      return `<div class="kanban-col"><div class="kanban-col__head"><span class="kdot ${dot}"></span>${esc(col)} <span class="n">${(colMap[col]||[]).length}</span></div>${items}</div>`;
     }).join("");
 
     let emailHtml = "";
     if (!state.emailDaily.length) {
-      emailHtml = `<div class="ov-empty">暂无每日邮件总结。放入 <code>bots/外贸营销/超级邮件助手/deliverables/email-daily/YYYY-MM-DD.json</code> 后同步。</div>`;
+      emailHtml = `<div class="quality" style="background:#F8FAFC;color:#737373">暂无每日邮件总结。放入 bots/外贸营销/超级邮件助手/deliverables/email-daily/YYYY-MM-DD.json 后同步。</div>`;
     } else {
-      emailHtml = state.emailDaily.map(day=>{
-        const open = state.expandedEmail===day.date;
-        const cats = day["清理分类"]||{};
-        const catStr = Object.keys(cats).map(k=>k+" "+cats[k]).join(" · ");
-        const tags = (day["话题标签"]||[]).map(t=>`<span class="chip-lite">${esc(t)}</span>`).join("");
-        const important = (day["重要邮件"]||[]).map(m=>`
-          <div class="ov-mail-item">
-            <div class="row"><strong>${esc(m["发件方"]||"—")}</strong><span class="urg ${esc(m["紧急度"]||"")}">${esc(m["紧急度"]||"")}</span></div>
-            <div class="sub">${esc(m["主题"]||"—")}</div>
-            <div class="sum muted">${esc(m["摘要"]||"")}</div>
-            ${m["待办"]?`<div class="todo">待办：${esc(m["待办"])}</div>`:""}
-          </div>`).join("");
-        return `<div class="ov-mail-day">
-          <button type="button" class="ov-mail-toggle" data-email-day="${esc(day.date)}">
-            <strong>${esc(day.date)}</strong>
-            <span class="chip-lite">新${day["新邮件数"]??0}</span>
-            <span class="chip-lite">清理${day["已清理数"]??0}</span>
-            <span class="chip-lite">待回${day["待回复数"]??0}</span>
-            <span class="chev">${open?"▴":"▾"}</span>
+      emailHtml = state.emailDaily.map(day => {
+        const open = state.expandedEmail === day.date;
+        const cats = day["清理分类"] || {};
+        const catStr = Object.keys(cats).map(k => k + " " + cats[k]).join(" · ");
+        const tags = (day["话题标签"] || []).map(t => `<span class="ecap ecap-clean">${esc(t)}</span>`).join("");
+        const cards = (day["重要邮件"] || []).map(m => {
+          const u = m["紧急度"] || "";
+          const uc = urgencyClass(u);
+          return `<article class="email-card email-card--${uc}">
+            <div class="email-card__bar"></div>
+            <div class="email-card__body">
+              <div class="email-card__top">
+                <span class="email-card__company">${esc(m["发件方"] || "—")}</span>
+                <span class="email-card__urgency">${esc(u)}</span>
+              </div>
+              <div class="email-card__subject">${esc(m["主题"] || "—")}</div>
+              <div class="email-card__summary">${esc(m["摘要"] || "")}</div>
+              ${m["待办"] ? `<div class="email-card__todo">待办：${esc(m["待办"])}</div>` : ""}
+            </div>
+          </article>`;
+        }).join("");
+        return `<div class="email-day">
+          <button type="button" class="email-day__head" data-email-day="${esc(day.date)}">
+            <span class="email-day__date">${esc(day.date)}</span>
+            <span class="ecap ecap-new">新${day["新邮件数"] ?? 0}</span>
+            <span class="ecap ecap-clean">清理${day["已清理数"] ?? 0}</span>
+            <span class="ecap ecap-pend">待回${day["待回复数"] ?? 0}</span>
+            <span style="margin-left:auto;color:#8A8A8E;font-size:12px">${open ? "▴" : "▾"}</span>
           </button>
-          ${open?`<div class="ov-mail-body">
-            ${day.source?`<p class="muted">${esc(day.source)}</p>`:""}
-            ${catStr?`<p class="muted">清理：${esc(catStr)}</p>`:""}
-            <div class="tag-row">${tags}</div>
-            ${important||'<p class="muted">无重要邮件</p>'}
-          </div>`:""}
+          ${open ? `<div>
+            ${day.source ? `<p class="muted" style="font-size:12px;margin:8px 0">${esc(day.source)}</p>` : ""}
+            ${catStr ? `<p class="muted" style="font-size:12px">清理：${esc(catStr)}</p>` : ""}
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">${tags}</div>
+            <div class="email-grid">${cards || '<p class="muted">无重要邮件</p>'}</div>
+          </div>` : ""}
         </div>`;
       }).join("");
     }
@@ -539,37 +619,41 @@
     }
 
     return `
+      <div class="overview-main">
       <h2 class="section-title">工作台总览</h2>
-      <p class="muted">网站业绩 → 日程 → 邮件 → 员工 · 基准 ${esc(kpi.asOf)} · ${privacy ? "金额"+PRIVACY_LABEL : "本地完整金额"}</p>
-      <section class="ov-panel">
-        <div class="ov-panel-h"><h3>网站项目看板</h3><span class="badge">${webs.length}</span></div>
-        <p class="muted">口径：金算盘 · CNY</p>
-        <h4 class="ov-sub">存量健康</h4>
-        <div class="ov-kpis">${cardsA}</div>
-        <h4 class="ov-sub">本年目标完成率</h4>
-        <div class="ov-kpis">${cardsB}</div>
+      <p class="muted"><b>网站业绩</b> · 日程 · 邮件 · 员工 · 基准 ${esc(kpi.asOf)} · ${privacy ? "金额" + PRIVACY_LABEL : "本地完整金额"} · v2</p>
+      <div class="overview-stack">
+      <section class="section-shell">
+        <div class="section-shell__head"><h3 class="section-shell__title">网站项目看板</h3><span class="section-shell__badge">${webs.length}</span></div>
+        <div class="section-shell__meta">口径：金算盘 · CNY</div>
+        <div class="section-subhead" style="margin-top:0">存量健康</div>
+        <div class="kpi-grid">${kpiCards}</div>
+        <div class="section-subhead">本年目标完成率</div>
+        <div class="goal-grid">${goals}</div>
         ${qualityHtml}
-        <div class="ov-dists">
-          <div class="ov-dist"><h4>状态分布</h4>${statusHtml}</div>
-          <div class="ov-dist"><h4>收款状态</h4>${payHtml}</div>
+        <div class="dist-row">
+          <div class="dist-box"><h4>状态分布</h4>${statusHtml}</div>
+          <div class="dist-box"><h4>收款状态</h4>${payHtml}</div>
         </div>
-        <h4 class="ov-sub">进行中优先</h4>
-        <div class="ov-top">${topHtml}</div>
+        <div class="section-subhead">进行中优先</div>
+        <div class="prio-list">${topHtml}</div>
       </section>
-      <section class="ov-panel">
-        <div class="ov-panel-h"><h3>日程管理 · 任务看板</h3><span class="badge">${tasks.length}</span></div>
-        <p class="muted">只读 · 工作台任务</p>
-        <div class="ov-kanban">${kanban}</div>
+      <section class="section-shell">
+        <div class="section-shell__head"><h3 class="section-shell__title">日程管理 · 任务看板</h3><span class="section-shell__badge">${tasks.length}</span></div>
+        <div class="section-shell__meta">只读 · 工作台任务</div>
+        <div class="kanban-row">${kanban}</div>
       </section>
-      <section class="ov-panel">
-        <div class="ov-panel-h"><h3>邮件看板</h3><span class="badge">${state.emailDaily.length}</span></div>
-        <p class="muted">信鸽-邮件助手 · email-daily</p>
+      <section class="section-shell">
+        <div class="section-shell__head"><h3 class="section-shell__title">邮件看板</h3><span class="section-shell__badge">${state.emailDaily.length}</span></div>
+        <div class="section-shell__meta">信鸽-邮件助手 · email-daily</div>
         ${emailHtml}
       </section>
-      <section class="ov-panel ov-roster">
-        <div class="ov-panel-h"><h3>员工看板</h3><span class="badge">${bots.length}</span></div>
-        <div class="roster-groups">${roster}</div>
-      </section>`;
+      <section class="section-shell">
+        <div class="section-shell__head"><h3 class="section-shell__title">员工看板</h3><span class="section-shell__badge">${bots.length}</span></div>
+        <div class="roster-groups-ov">${roster}</div>
+      </section>
+      </div>
+      </div>`;
   }
 
 function renderRoster() {

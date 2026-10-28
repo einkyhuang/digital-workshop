@@ -1,7 +1,7 @@
 {
   "version": 2,
   "specHooks": {
-    "visual": "bots/视觉设计/设计师/deliverables/workbench-ui/design-spec.md",
+    "visual": "bots/视觉设计/设计师/deliverables/workbench-ui/design-spec-v2.md",
     "fields": "bots/网站项目/Super-SEO-Hub/deliverables/网站项目字段规范.md"
   },
   "roster": {
@@ -79,6 +79,8 @@
     "emailDailyDir": "bots/外贸营销/超级邮件助手/deliverables/email-daily",
     "privacyFallback": "仅本地可见",
     "emptyTargetLabel": "—",
-    "topInProgressLimit": 5
+    "topInProgressLimit": 5,
+    "layout": "full-width",
+    "designSpec": "v2"
   }
 }
