@@ -615,7 +615,7 @@
     for (const g of order) {
       const items = bots.filter(b => botInGroup(b, g));
       if (!items.length) continue;
-      roster += `<div class="group-shell"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid dense">${items.map(shortCard).join("")}</div></div>`;
+      roster += `<div class="group-shell"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid dense ov-row">${items.map(shortCard).join("")}</div></div>`;
     }
 
     return `

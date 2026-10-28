@@ -568,3 +568,18 @@ th { color: var(--muted); font-weight: 600; }
   .section-shell { padding: 24px 26px 26px; }
 }
 
+
+/* Overview roster: one row of cards per group (no wrap; scale to fit) */
+.roster-groups-ov .group-shell .emp-grid.dense,
+.roster-groups-ov .emp-grid.ov-row {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 10px;
+  align-items: stretch;
+}
+.roster-groups-ov .emp-grid.ov-row > .emp-card,
+.roster-groups-ov .group-shell .emp-grid.dense > .emp-card {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: none;
+}

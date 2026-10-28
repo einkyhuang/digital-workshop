@@ -506,7 +506,8 @@ struct OverviewView: View {
                                     .padding(.horizontal, 7).padding(.vertical, 2)
                                     .background(Color.black.opacity(0.06)).clipShape(Capsule())
                             }
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 12)], spacing: 12) {
+                            // Single row: equal-width cards, no wrap (scale to fit).
+                            HStack(alignment: .top, spacing: 10) {
                                 ForEach(items) { bot in
                                     Button {
                                         store.selectedBotId = bot.id
@@ -516,6 +517,7 @@ struct OverviewView: View {
                                         EmployeeCard(bot: bot, compact: true)
                                     }
                                     .buttonStyle(.plain)
+                                    .frame(maxWidth: .infinity, alignment: .top)
                                 }
                             }
                         }
