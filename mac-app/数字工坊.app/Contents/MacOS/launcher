@@ -3,6 +3,8 @@
 set -euo pipefail
 
 CANDIDATES=(
+  "$HOME/Library/Mobile Documents/com~apple~CloudDocs/超级工作台/app/index.html"
+  "$HOME/Desktop/超级工作台/app/index.html"
   "$HOME/数字工坊/app/index.html"
   "$HOME/digital-workshop/app/index.html"
 )
