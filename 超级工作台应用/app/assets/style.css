@@ -145,6 +145,19 @@ header {
 .actions .ghost { opacity: .75; }
 .import-btn { display: inline-flex; align-items: center; cursor: pointer; }
 main { max-width: 1120px; margin: 0 auto; padding: 20px; }
+/* Overview v2 full-width: do not cap at 1120 */
+main:has(.overview-main) {
+  max-width: none;
+  margin: 0;
+  padding: 20px 32px 48px;
+}
+@media (min-width: 1920px) {
+  main:has(.overview-main) { padding: 24px 40px 56px; }
+}
+@media (min-width: 2560px) {
+  main:has(.overview-main) { padding: 28px 48px 64px; }
+}
+
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 16px 0; }
 .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
 .card .v { font-size: 28px; font-weight: 650; }
@@ -534,7 +547,7 @@ th { color: var(--muted); font-weight: 600; }
 .email-card__todo { font-size: 11px; color: #1D4ED8; margin-top: 6px; font-weight: 500; }
 
 .roster-groups-ov {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px;
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px;
 }
 
 @media (max-width: 1279px) {
@@ -555,7 +568,7 @@ th { color: var(--muted); font-weight: 600; }
   .goal-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
   .email-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
   .kanban-row { gap: 16px; }
-  .roster-groups-ov { grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px; }
+  .roster-groups-ov { gap: 20px; }
 }
 /* FULL-WIDTH override (user): no 1680 cap — add columns instead of centering */
 @media (min-width: 2560px) {
@@ -564,22 +577,34 @@ th { color: var(--muted); font-weight: 600; }
   .goal-grid { grid-template-columns: repeat(5, 1fr); gap: 20px; }
   .email-grid { grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
   .kanban-row { gap: 20px; }
-  .roster-groups-ov { grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 20px; }
+  .roster-groups-ov { gap: 20px; }
   .section-shell { padding: 24px 26px 26px; }
 }
 
 
-/* Overview roster: one row of cards per group (no wrap; scale to fit) */
-.roster-groups-ov .group-shell .emp-grid.dense,
-.roster-groups-ov .emp-grid.ov-row {
+/* Overview roster: fixed-size cards in one row per group; groups flow-wrap */
+.roster-groups-ov {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
+}
+.roster-groups-ov .group-shell {
+  flex: 0 0 auto;
+  width: max-content;
+  max-width: 100%;
+}
+.roster-groups-ov .emp-grid.ov-row,
+.roster-groups-ov .group-shell .emp-grid.dense.ov-row {
   display: flex !important;
   flex-wrap: nowrap !important;
   gap: 10px;
   align-items: stretch;
+  margin-top: 0;
 }
-.roster-groups-ov .emp-grid.ov-row > .emp-card,
-.roster-groups-ov .group-shell .emp-grid.dense > .emp-card {
-  flex: 1 1 0;
-  min-width: 0;
-  max-width: none;
+.roster-groups-ov .emp-grid.ov-row > .emp-card {
+  flex: 0 0 auto;
+  width: var(--roster-card-min, 160px);
+  min-width: var(--roster-card-min, 160px);
+  max-width: var(--roster-card-min, 160px);
 }
