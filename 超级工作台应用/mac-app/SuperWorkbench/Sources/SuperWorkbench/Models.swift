@@ -11,12 +11,14 @@ struct WorkspaceData: Codable, Equatable {
     var routines: [Routine]
     var rules: [RuleItem]
     var groupsOrder: [String]?
+    var projects: [WorkbenchProject]?
 }
 
 struct Bot: Codable, Equatable, Identifiable, Hashable {
     var id: String
     var code: String?
     var group: String?
+    var groups: [String]?
     var folder: String?
     var name: String
     var layer: String
@@ -92,6 +94,16 @@ struct Bot: Codable, Equatable, Identifiable, Hashable {
 
     var displayGroup: String { group ?? "其他" }
 
+    var displayGroups: [String] {
+        if let groups, !groups.isEmpty { return groups }
+        if let group, !group.isEmpty { return [group] }
+        return ["其他"]
+    }
+
+    func belongs(to groupName: String) -> Bool {
+        displayGroups.contains(groupName)
+    }
+
     var avatarURL: URL {
         FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Mobile Documents/com~apple~CloudDocs/超级工作台/bots")
@@ -149,6 +161,30 @@ struct Routine: Codable, Equatable, Identifiable, Hashable {
     var id: String { name }
 }
 
+struct WorkbenchProject: Codable, Equatable, Identifiable, Hashable {
+    var id: String
+    var name: String
+    var shortName: String?
+    var category: String
+    var status: String
+    var summary: String
+    var techStack: [String]
+    var localPath: String
+    var absolutePathHint: String?
+    var run: ProjectRun?
+    var readmePath: String?
+    var pointerDoc: String?
+    var ownerBotId: String
+    var collabBotIds: [String]
+    var relatedTaskHints: [String]?
+}
+
+struct ProjectRun: Codable, Equatable, Hashable {
+    var command: String?
+    var url: String?
+    var notes: String?
+}
+
 struct RuleItem: Codable, Equatable, Identifiable, Hashable {
     var text: String
     var meta: String
@@ -163,6 +199,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
     case routines = "定时巡检"
     case hiring = "招聘规划"
     case rules = "规则与文档"
+    case projects = "项目"
 
     var id: String { rawValue }
 
@@ -175,6 +212,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
         case .routines: return "clock.arrow.2.circlepath"
         case .hiring: return "person.badge.plus"
         case .rules: return "checklist"
+        case .projects: return "folder"
         }
     }
 
@@ -183,6 +221,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
         case .overview, .roster, .tasks: return "工作台"
         case .rooms, .routines: return "协作与运维"
         case .hiring, .rules: return "组织与规则"
+        case .projects: return "项目"
         }
     }
 }

@@ -18,3 +18,14 @@ node_modules/
 *.xcuserstate
 超级工作台应用/mac-app/SuperWorkbench/Assets/AppIcon.iconset/
 超级工作台应用/mac-app/preview/
+
+# 智能日程管理（体积大，不整仓提交 node_modules/dist/本地库）
+智能日程管理/node_modules/
+智能日程管理/client/node_modules/
+智能日程管理/dist/
+智能日程管理/client/dist/
+智能日程管理/**/*.db
+智能日程管理/**/*.db-wal
+智能日程管理/**/*.db-shm
+智能日程管理/.env
+智能日程管理/.env.*

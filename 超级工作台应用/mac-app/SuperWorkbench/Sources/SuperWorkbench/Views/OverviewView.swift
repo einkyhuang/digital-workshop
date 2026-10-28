@@ -20,7 +20,7 @@ struct OverviewView: View {
             }
 
             ForEach(groupOrder, id: \.self) { g in
-                let items = store.filteredBots.filter { $0.group == g }
+                let items = store.filteredBots.filter { $0.belongs(to: g) }
                 if !items.isEmpty {
                     HStack {
                         Text(g).font(.headline)

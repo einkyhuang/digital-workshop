@@ -7,7 +7,7 @@ struct RosterGridView: View {
 
     private var groupOrder: [String] {
         if let o = store.data.groupsOrder, !o.isEmpty { return o }
-        return ["网站项目","服装外贸","运营管理","战略决策","视觉设计","外贸营销","个人成长","内容营销","管理中枢"]
+        return ["管理中枢","网站项目","服装外贸","运营管理","战略决策","视觉设计","外贸营销","个人成长","内容营销"]
     }
 
     private var chips: [String] { ["全部"] + groupOrder }
@@ -15,7 +15,7 @@ struct RosterGridView: View {
     private var bots: [Bot] {
         let base = store.filteredBots
         if groupFilter == "全部" { return base }
-        return base.filter { ($0.group ?? "") == groupFilter }
+        return base.filter { $0.belongs(to: groupFilter) }
     }
 
     var body: some View {
@@ -23,7 +23,7 @@ struct RosterGridView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(chips, id: \.self) { g in
-                        let count = g == "全部" ? store.data.bots.count : store.data.bots.filter { $0.group == g }.count
+                        let count = g == "全部" ? store.data.bots.count : store.data.bots.filter { $0.belongs(to: g) }.count
                         Button("\(g) \(count)") { groupFilter = g }
                             .buttonStyle(.plain)
                             .padding(.horizontal, 12)
@@ -38,7 +38,7 @@ struct RosterGridView: View {
 
             if groupFilter == "全部" {
                 ForEach(groupOrder, id: \.self) { g in
-                    let items = bots.filter { $0.group == g }
+                    let items = bots.filter { $0.belongs(to: g) }
                     if !items.isEmpty {
                         section(g, items)
                     }

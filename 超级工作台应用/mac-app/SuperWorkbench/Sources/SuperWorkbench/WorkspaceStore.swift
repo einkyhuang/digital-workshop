@@ -6,7 +6,7 @@ import AppKit
 final class WorkspaceStore: ObservableObject {
     @Published var data: WorkspaceData = WorkspaceData(
         version: 2, updatedAt: nil, timezone: "Asia/Shanghai",
-        bots: [], tasks: [], vacancies: [], groups: [], routines: [], rules: [], groupsOrder: nil
+        bots: [], tasks: [], vacancies: [], groups: [], routines: [], rules: [], groupsOrder: nil, projects: nil
     )
     @Published var selectedSection: SidebarSection = .overview
     @Published var selectedBotId: String?
@@ -145,6 +145,20 @@ final class WorkspaceStore: ObservableObject {
             }
         }
         return urls.sorted { $0.path < $1.path }
+    }
+
+    func projectAbsoluteURL(_ project: WorkbenchProject) -> URL {
+        repoRoot.appendingPathComponent(project.localPath)
+    }
+
+    func revealProject(_ project: WorkbenchProject) {
+        NSWorkspace.shared.activateFileViewerSelecting([projectAbsoluteURL(project)])
+    }
+
+    func openProjectURL(_ project: WorkbenchProject) {
+        if let s = project.run?.url, let u = URL(string: s) {
+            NSWorkspace.shared.open(u)
+        }
     }
 
     func revealBotFolder(_ bot: Bot) {

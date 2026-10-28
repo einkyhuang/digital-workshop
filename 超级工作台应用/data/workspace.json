@@ -1,6 +1,6 @@
 {
-  "version": 4,
-  "updatedAt": "2026-10-29T03:00:00+08:00",
+  "version": 5,
+  "updatedAt": "2026-10-29T03:05:00+08:00",
   "timezone": "Asia/Shanghai",
   "bots": [
     {
@@ -24,7 +24,10 @@
       "weekly": "本周：完成群聊协作测试与工作台搭建；下步：等用户确认反调官与公司 MOQ 信息。",
       "emoji": "🧠",
       "group": "管理中枢",
-      "folder": "管理中枢/最强大脑"
+      "folder": "管理中枢/最强大脑",
+      "groups": [
+        "管理中枢"
+      ]
     },
     {
       "id": "strategy",
@@ -47,7 +50,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "♟️",
       "group": "战略决策",
-      "folder": "战略决策/战略官"
+      "folder": "战略决策/战略官",
+      "groups": [
+        "战略决策"
+      ]
     },
     {
       "id": "coo",
@@ -70,7 +76,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "📋",
       "group": "运营管理",
-      "folder": "运营管理/COO"
+      "folder": "运营管理/COO",
+      "groups": [
+        "运营管理"
+      ]
     },
     {
       "id": "finance",
@@ -93,7 +102,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "💹",
       "group": "运营管理",
-      "folder": "运营管理/财务官"
+      "folder": "运营管理/财务官",
+      "groups": [
+        "运营管理"
+      ]
     },
     {
       "id": "critic",
@@ -116,7 +128,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "⚔️",
       "group": "战略决策",
-      "folder": "战略决策/反调官"
+      "folder": "战略决策/反调官",
+      "groups": [
+        "战略决策"
+      ]
     },
     {
       "id": "director",
@@ -139,7 +154,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "🎬",
       "group": "视觉设计",
-      "folder": "视觉设计/视频导演"
+      "folder": "视觉设计/视频导演",
+      "groups": [
+        "视觉设计"
+      ]
     },
     {
       "id": "knowledge",
@@ -162,7 +180,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "📚",
       "group": "内容营销",
-      "folder": "内容营销/知识官"
+      "folder": "内容营销/知识官",
+      "groups": [
+        "内容营销"
+      ]
     },
     {
       "id": "designer",
@@ -185,7 +206,11 @@
       "weekly": "本周：入册待命。",
       "emoji": "🎨",
       "group": "视觉设计",
-      "folder": "视觉设计/设计师"
+      "folder": "视觉设计/设计师",
+      "groups": [
+        "网站项目",
+        "视觉设计"
+      ]
     },
     {
       "id": "writer",
@@ -208,7 +233,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "✍️",
       "group": "内容营销",
-      "folder": "内容营销/主笔"
+      "folder": "内容营销/主笔",
+      "groups": [
+        "内容营销"
+      ]
     },
     {
       "id": "hoppi",
@@ -231,7 +259,10 @@
       "weekly": "本周：待命。",
       "emoji": "📕",
       "group": "内容营销",
-      "folder": "内容营销/小红书助理Hoppi"
+      "folder": "内容营销/小红书助理Hoppi",
+      "groups": [
+        "内容营销"
+      ]
     },
     {
       "id": "negotiator",
@@ -254,7 +285,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "🤝",
       "group": "外贸营销",
-      "folder": "外贸营销/谈判专家"
+      "folder": "外贸营销/谈判专家",
+      "groups": [
+        "外贸营销"
+      ]
     },
     {
       "id": "strategist",
@@ -277,7 +311,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "🗺️",
       "group": "战略决策",
-      "folder": "战略决策/兵法策略师"
+      "folder": "战略决策/兵法策略师",
+      "groups": [
+        "战略决策"
+      ]
     },
     {
       "id": "intel",
@@ -300,7 +337,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "🕵️",
       "group": "外贸营销",
-      "folder": "外贸营销/情报官"
+      "folder": "外贸营销/情报官",
+      "groups": [
+        "外贸营销"
+      ]
     },
     {
       "id": "lead-hunt",
@@ -323,7 +363,10 @@
       "weekly": "本周：交付洛杉矶女装批发商名单 3 家。",
       "emoji": "🔍",
       "group": "服装外贸",
-      "folder": "服装外贸/外贸客户挖掘"
+      "folder": "服装外贸/外贸客户挖掘",
+      "groups": [
+        "服装外贸"
+      ]
     },
     {
       "id": "threadway",
@@ -346,7 +389,10 @@
       "weekly": "本周：完成三家分层 + Shop 17 开发信草稿。",
       "emoji": "🧵",
       "group": "服装外贸",
-      "folder": "服装外贸/Threadway"
+      "folder": "服装外贸/Threadway",
+      "groups": [
+        "服装外贸"
+      ]
     },
     {
       "id": "seo",
@@ -369,7 +415,10 @@
       "weekly": "本周：待命。",
       "emoji": "📈",
       "group": "网站项目",
-      "folder": "网站项目/Super-SEO-Hub"
+      "folder": "网站项目/Super-SEO-Hub",
+      "groups": [
+        "网站项目"
+      ]
     },
     {
       "id": "mail",
@@ -392,7 +441,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "✉️",
       "group": "外贸营销",
-      "folder": "外贸营销/超级邮件助手"
+      "folder": "外贸营销/超级邮件助手",
+      "groups": [
+        "外贸营销"
+      ]
     },
     {
       "id": "coach",
@@ -415,7 +467,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "🎙️",
       "group": "个人成长",
-      "folder": "个人成长/表达教练"
+      "folder": "个人成长/表达教练",
+      "groups": [
+        "个人成长"
+      ]
     },
     {
       "id": "patrol",
@@ -438,7 +493,10 @@
       "weekly": "本周：入册待命。",
       "emoji": "🛡️",
       "group": "管理中枢",
-      "folder": "管理中枢/巡逻官"
+      "folder": "管理中枢/巡逻官",
+      "groups": [
+        "管理中枢"
+      ]
     }
   ],
   "tasks": [
@@ -465,6 +523,15 @@
       "note": "架构建议优先；待用户确认",
       "executor": "最强大脑",
       "reviewer": "用户"
+    },
+    {
+      "id": "t-sph-1",
+      "title": "智能日程管理：搜搜主导站点审计与上线检查清单",
+      "status": "待办",
+      "note": "项目 smart-plan-hub；协作画眉/墨墨/小运",
+      "executor": "搜搜-SEO专家",
+      "reviewer": "大可可-最强大脑",
+      "projectId": "smart-plan-hub"
     }
   ],
   "vacancies": [],
@@ -548,6 +615,7 @@
     }
   ],
   "groupsOrder": [
+    "管理中枢",
     "网站项目",
     "服装外贸",
     "运营管理",
@@ -555,7 +623,45 @@
     "视觉设计",
     "外贸营销",
     "个人成长",
-    "内容营销",
-    "管理中枢"
+    "内容营销"
+  ],
+  "projects": [
+    {
+      "id": "smart-plan-hub",
+      "name": "智能日程管理",
+      "shortName": "SmartPlan Hub",
+      "category": "网站项目",
+      "status": "进行中",
+      "summary": "macOS 智能项目管理与日程系统：AI 建日程、提醒事项双向同步、Kanban/日历、客户网站档案。",
+      "techStack": [
+        "Electron",
+        "Express",
+        "better-sqlite3",
+        "Vite",
+        "React",
+        "Tailwind CSS"
+      ],
+      "localPath": "智能日程管理",
+      "absolutePathHint": "~/Library/Mobile Documents/com~apple~CloudDocs/超级工作台/智能日程管理",
+      "run": {
+        "command": "./start.sh",
+        "url": "http://localhost:3300",
+        "notes": "需本机 Node.js；首次会 build 前端"
+      },
+      "readmePath": "智能日程管理/README.md",
+      "pointerDoc": "projects/网站项目/智能日程管理/README.md",
+      "ownerBotId": "seo",
+      "collabBotIds": [
+        "designer",
+        "writer",
+        "coo"
+      ],
+      "relatedTaskHints": [
+        "SEO/GEO 审计",
+        "UI 打磨",
+        "产品文案",
+        "进度排期"
+      ]
+    }
   ]
 }

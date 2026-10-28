@@ -75,6 +75,7 @@ struct ContentView: View {
         case .routines: RoutinesView()
         case .hiring: HiringView()
         case .rules: RulesView()
+        case .projects: ProjectsView()
         }
     }
 
@@ -102,6 +103,7 @@ struct TopBar: View {
         case .routines: return "规划中的定时巡检（尚未启用）"
         case .hiring: return "待招岗位 · 本地标记不会真正创建 Bot"
         case .rules: return "协作铁律与审批边界"
+        case .projects: return "网站与业务项目档案"
         }
     }
 
@@ -173,8 +175,13 @@ struct TopBar: View {
         case .tasks: return "任务看板与待办"
         case .roster: return "员工档案"
         case .overview: return "工作台总览"
+        case .projects: return selectedProjectTitle
         default: return title
         }
+    }
+
+    private var selectedProjectTitle: String {
+        "项目"
     }
 }
 

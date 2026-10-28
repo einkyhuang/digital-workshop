@@ -1,0 +1,47 @@
+{
+  "name": "smart-plan-hub",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Smart Project & Schedule Management with AI & macOS Reminders Bidirectional Sync",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "server": "node --watch server/index.js",
+    "client": "cd client && npm run dev",
+    "dev": "npm run server & npm run client",
+    "build": "cd client && npm run build",
+    "electron": "electron .",
+    "dist": "npm run build && electron-builder --mac --arm64 --dir"
+  },
+  "build": {
+    "appId": "com.smartplan.hub",
+    "productName": "SmartPlan Hub",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.icns",
+      "target": [
+        "dir"
+      ],
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "identity": null
+    },
+    "files": [
+      "electron-main.js",
+      "package.json",
+      "server/**/*",
+      "client/dist/**/*"
+    ],
+    "asar": false
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.7",
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3"
+  }
+}

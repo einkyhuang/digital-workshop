@@ -1,6 +1,6 @@
 (function () {
   const LS_KEY = "digital-workshop-v2";
-  const TABS = ["总览", "员工档案", "任务看板", "群聊协作", "定时巡检", "招聘规划", "规则与文档"];
+  const TABS = ["总览", "员工档案", "项目", "任务看板", "群聊协作", "定时巡检", "招聘规划", "规则与文档"];
   const COLS = ["待办", "进行中", "验收", "完成"];
   const state = {
     tab: "总览",
@@ -92,6 +92,12 @@
     state.editTaskId = (state.data.tasks[0] && state.data.tasks[0].id) || null;
   }
 
+  function botGroups(b) {
+    if (b.groups && b.groups.length) return b.groups;
+    if (b.group) return [b.group];
+    return ["其他"];
+  }
+  function botInGroup(b, g) { return botGroups(b).indexOf(g) >= 0; }
   function displayNick(n) {
     if (!n) return "";
     const i = n.indexOf("-");
@@ -110,7 +116,7 @@
   function groupOrder() {
     return (state.data.groupsOrder && state.data.groupsOrder.length)
       ? state.data.groupsOrder
-      : ["网站项目","服装外贸","运营管理","战略决策","视觉设计","外贸营销","个人成长","内容营销","管理中枢"];
+      : ["管理中枢","网站项目","服装外贸","运营管理","战略决策","视觉设计","外贸营销","个人成长","内容营销"];
   }
   function esc(s) {
     return String(s == null ? "" : s)
@@ -263,7 +269,7 @@
       </button>`;
     let groupsHtml = "";
     for (const g of order) {
-      const items = bots.filter((b) => (b.group||"") === g);
+      const items = bots.filter((b) => botInGroup(b, g));
       if (!items.length) continue;
       groupsHtml += `<div class="group-block"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid">${items.map(card).join("")}</div></div>`;
     }
@@ -286,7 +292,7 @@ function renderRoster() {
     const botsAll = state.data.bots || [];
     const q = (state.searchText||"").trim().toLowerCase();
     const match = (b) => !q || (b.name+b.role+(b.group||"")).toLowerCase().includes(q);
-    const bots = botsAll.filter(match).filter((b) => filter === "全部" || (b.group||"") === filter);
+    const bots = botsAll.filter(match).filter((b) => filter === "全部" || botInGroup(b, filter));
     const shortName = (n) => displayNick(n);
     const spaced = (code) => {
       if (!code) return "—";
@@ -304,7 +310,7 @@ function renderRoster() {
     let body = "";
     if (filter === "全部") {
       for (const g of order) {
-        const items = bots.filter((b) => (b.group||"") === g);
+        const items = bots.filter((b) => botInGroup(b, g));
         if (!items.length) continue;
         body += `<div class="group-block"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid">${items.map(card).join("")}</div></div>`;
       }
@@ -315,11 +321,44 @@ function renderRoster() {
     return `
       <h2 class="section-title">员工档案</h2>
       <div class="tabs" style="margin-bottom:12px">${chips.map((l) => {
-        const count = l==="全部"?botsAll.length:botsAll.filter(b=>b.group===l).length;
+        const count = l==="全部"?botsAll.length:botsAll.filter(b=>botInGroup(b,l)).length;
         return `<button type="button" class="${filter === l ? "active" : ""}" data-layer="${esc(l)}">${esc(l)} ${count}</button>`;
       }).join("")}</div>
       ${body}
       <div class="callout" style="margin-top:16px"><strong>${esc(sel.name)} · ${esc(sel.code||"")} · ${esc(sel.group||"")}</strong>${esc(sel.role)}<br/>工具/模型：${esc(sel.tools)}<br/>职责：${esc(sel.duty)}</div>`;
+  }
+
+function renderProjects() {
+    const projects = state.data.projects || [];
+    if (!projects.length) return `<h2 class="section-title">项目</h2><p class="muted">暂无项目</p>`;
+    if (!state.selectedProjectId) state.selectedProjectId = projects[0].id;
+    const p = projects.find(x => x.id === state.selectedProjectId) || projects[0];
+    const owner = (state.data.bots||[]).find(b => b.id === p.ownerBotId);
+    const collabs = (p.collabBotIds||[]).map(id => (state.data.bots||[]).find(b => b.id === id)).filter(Boolean);
+    const tagOf = (b) => b.id==="designer"?"UI": b.id==="writer"?"文案": b.id==="coo"?"进度":"协作";
+    return `
+      <h2 class="section-title">项目</h2>
+      <div class="layout-2">
+        <div class="list">${projects.map(x => `
+          <button type="button" class="${x.id===p.id?"active":""}" data-project="${esc(x.id)}">
+            ${esc(x.name)}<br/><span class="muted">${esc(x.category)} · ${esc(x.status)}</span>
+          </button>`).join("")}</div>
+        <div>
+          <h3>${esc(p.name)} <span class="badge">${esc(p.shortName||"")}</span></h3>
+          <p>${esc(p.summary)}</p>
+          <p><strong>技术栈：</strong>${(p.techStack||[]).map(t=>`<span class="emp-pill" style="display:inline-block;margin:2px">${esc(t)}</span>`).join(" ")}</p>
+          <div class="callout"><strong>路径</strong>仓库根目录 <code>${esc(p.localPath)}</code>（未移动；node_modules/dist 约 883MB，已 gitignore）</div>
+          <div class="callout"><strong>启动</strong><code>${esc((p.run&&p.run.command)||"")}</code> → <a href="${esc((p.run&&p.run.url)||"#")}" target="_blank">${esc((p.run&&p.run.url)||"")}</a><br/>${esc((p.run&&p.run.notes)||"")}</div>
+          <h4>负责人</h4>
+          ${owner?`<div class="emp-card" style="min-height:auto;align-items:flex-start;padding:12px" data-bot="${esc(owner.id)}"><strong>${esc(displayNick(owner.name))}</strong> · ${esc(displayTitle(owner.name,owner.role))} <span class="emp-pill">负责人</span></div>`:""}
+          <h4>协作</h4>
+          <div class="emp-grid">${collabs.map(b=>`<button type="button" class="emp-card" data-bot="${esc(b.id)}" style="min-height:120px">
+            <div class="emp-avatar-wrap"><img class="emp-avatar-img" src="${avatarSrc(b)}" alt=""/></div>
+            <div class="emp-name">${esc(displayNick(b.name))}</div>
+            <div class="emp-role">${esc(displayTitle(b.name,b.role))} · ${esc(tagOf(b))}</div>
+          </button>`).join("")}</div>
+        </div>
+      </div>`;
   }
 
 function renderKanban() {
@@ -432,6 +471,7 @@ function renderKanban() {
       "定时巡检": renderRoutines,
       "招聘规划": renderHire,
       "规则与文档": renderRules,
+      "项目": renderProjects,
     };
     document.getElementById("main").innerHTML = (map[state.tab] || renderOverview)();
     bindMain();
