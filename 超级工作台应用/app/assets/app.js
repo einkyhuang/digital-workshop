@@ -92,6 +92,18 @@
     state.editTaskId = (state.data.tasks[0] && state.data.tasks[0].id) || null;
   }
 
+  function displayNick(n) {
+    if (!n) return "";
+    const i = n.indexOf("-");
+    return i >= 0 ? n.slice(0, i) : n;
+  }
+  function displayTitle(n, role) {
+    if (n && n.indexOf("-") >= 0) {
+      const t = n.slice(n.indexOf("-") + 1);
+      if (t) return t;
+    }
+    return role || "";
+  }
   function avatarSrc(b) {
     return "./avatars/" + encodeURIComponent(b.id) + ".png";
   }
@@ -235,7 +247,7 @@
     const inProg = tasks.filter((t) => t.status === "进行中").length;
     const delivered = bots.filter((b) => b.lastDelivery && b.lastDelivery !== "暂无").length;
     const order = groupOrder();
-    const shortName = (n) => (n.includes("|") ? n.split("|")[0].trim() : n);
+    const shortName = (n) => displayNick(n);
     const spaced = (code) => {
       if (!code) return "—";
       if (code.length >= 2 && /[A-Za-z]/.test(code[0])) return code[0] + " " + code.slice(1);
@@ -246,8 +258,8 @@
         <div class="emp-code">${esc(spaced(b.code||""))}</div>
         <div class="emp-dots"><span class="dot ${b.status==="在线"?"ok":""}"></span><span class="dot"></span><span class="dot"></span></div>
         <div class="emp-meta"><span class="emp-pill">${esc(b.code||"—")}</span><span class="emp-layer">${esc(b.group||"")}</span></div>
-        <div class="emp-name">${esc(shortName(b.name))}</div>
-        <div class="emp-role">${esc(b.role)}</div>
+        <div class="emp-name">${esc(displayNick(b.name))}</div>
+        <div class="emp-role">${esc(displayTitle(b.name, b.role))}</div>
       </button>`;
     let groupsHtml = "";
     for (const g of order) {
@@ -275,7 +287,7 @@ function renderRoster() {
     const q = (state.searchText||"").trim().toLowerCase();
     const match = (b) => !q || (b.name+b.role+(b.group||"")).toLowerCase().includes(q);
     const bots = botsAll.filter(match).filter((b) => filter === "全部" || (b.group||"") === filter);
-    const shortName = (n) => (n.includes("|") ? n.split("|")[0].trim() : n);
+    const shortName = (n) => displayNick(n);
     const spaced = (code) => {
       if (!code) return "—";
       if (code.length >= 2 && /[A-Za-z]/.test(code[0])) return code[0] + " " + code.slice(1);
@@ -286,8 +298,8 @@ function renderRoster() {
         <div class="emp-code">${esc(spaced(b.code||""))}</div>
         <div class="emp-dots"><span class="dot ${b.status==="在线"?"ok":""}"></span><span class="dot"></span><span class="dot"></span></div>
         <div class="emp-meta"><span class="emp-pill">${esc(b.code||"—")}</span><span class="emp-layer">${esc(b.group||b.layer||"")}</span></div>
-        <div class="emp-name">${esc(shortName(b.name))}</div>
-        <div class="emp-role">${esc(b.role)}</div>
+        <div class="emp-name">${esc(displayNick(b.name))}</div>
+        <div class="emp-role">${esc(displayTitle(b.name, b.role))}</div>
       </button>`;
     let body = "";
     if (filter === "全部") {

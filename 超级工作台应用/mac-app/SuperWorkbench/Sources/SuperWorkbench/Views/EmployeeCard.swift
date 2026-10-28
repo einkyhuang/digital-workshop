@@ -51,11 +51,11 @@ struct EmployeeCard: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(shortName(bot.name))
+                Text(displayNick(bot.name))
                     .font(.system(size: compact ? 18 : 20, weight: .bold))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                Text(bot.role)
+                Text(displayTitle(bot.name, bot.role))
                     .font(.system(size: 12))
                     .foregroundStyle(Color(white: 0.45))
                     .lineLimit(1)
@@ -101,9 +101,20 @@ struct EmployeeCard: View {
         return code
     }
 
-    private func shortName(_ name: String) -> String {
-        if name.contains("|") { return name.components(separatedBy: "|").first!.trimmingCharacters(in: .whitespaces) }
-        if name.count > 10 { return String(name.prefix(10)) }
+    private func displayNick(_ name: String) -> String {
+        if let idx = name.firstIndex(of: "-") {
+            return String(name[..<idx])
+        }
         return name
     }
+
+    private func displayTitle(_ name: String, _ role: String) -> String {
+        if let idx = name.firstIndex(of: "-") {
+            let t = String(name[name.index(after: idx)...])
+            if !t.isEmpty { return t }
+        }
+        return role
+    }
+
+    private func shortName(_ name: String) -> String { displayNick(name) }
 }
