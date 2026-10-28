@@ -491,51 +491,18 @@ struct OverviewView: View {
 
     // MARK: - Roster (v1 cards unchanged)
 
-    /// Compact overview card keeps original roster width (no stretch).
-    private let overviewCardWidth: CGFloat = SWTheme.Roster.cardMinWidth
-
     private func rosterBoard(minWidth: CGFloat) -> some View {
-        let groups = groupOrder.compactMap { g -> (String, [Bot])? in
+        let groups = groupOrder.compactMap { g -> (title: String, bots: [Bot])? in
             let items = store.filteredBots.filter { $0.belongs(to: g) }
-            return items.isEmpty ? nil : (g, items)
+            return items.isEmpty ? nil : (title: g, bots: items)
         }
         return VStack(alignment: .leading, spacing: 12) {
             sectionHead("员工看板", badge: "\(store.data.bots.count)")
-            // Group boxes flow-wrap by natural width; cards inside stay one fixed-size row.
-            OverviewFlowLayout(spacing: 16, rowSpacing: 16) {
-                ForEach(groups, id: \.0) { pair in
-                    let g = pair.0
-                    let items = pair.1
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            Text(g).font(.system(size: 15, weight: .semibold))
-                            Text("\(items.count)")
-                                .font(.caption2.weight(.bold))
-                                .padding(.horizontal, 7).padding(.vertical, 2)
-                                .background(Color.black.opacity(0.06)).clipShape(Capsule())
-                        }
-                        HStack(alignment: .top, spacing: 10) {
-                            ForEach(items) { bot in
-                                Button {
-                                    store.selectedBotId = bot.id
-                                    store.selectedSection = .roster
-                                    store.showingBotDetail = true
-                                } label: {
-                                    EmployeeCard(bot: bot, compact: true)
-                                }
-                                .buttonStyle(.plain)
-                                .frame(width: overviewCardWidth, alignment: .top)
-                            }
-                        }
-                    }
-                    .padding(12)
-                    .fixedSize(horizontal: true, vertical: false)
-                    .background(SWTheme.card)
-                    .clipShape(RoundedRectangle(cornerRadius: SWTheme.Radius.group, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: SWTheme.Radius.group).stroke(SWTheme.borderGroup))
-                }
+            RosterGroupBoard(groups: groups, cardWidth: SWTheme.Roster.cardMinWidth) { bot in
+                store.selectedBotId = bot.id
+                store.selectedSection = .roster
+                store.showingBotDetail = true
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 

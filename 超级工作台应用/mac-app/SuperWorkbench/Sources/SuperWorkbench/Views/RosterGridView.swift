@@ -44,59 +44,15 @@ struct RosterGridView: View {
                 }
             }
 
-            LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: SWTheme.Roster.groupMinWidth), spacing: SWTheme.Roster.groupGap, alignment: .top)],
-                alignment: .leading,
-                spacing: SWTheme.Roster.groupGap
-            ) {
-                ForEach(visibleGroups, id: \.0) { title, items in
-                    groupShell(title, items)
-                }
+            RosterGroupBoard(
+                groups: visibleGroups.map { (title: $0.0, bots: $0.1) },
+                cardWidth: SWTheme.Roster.cardMinWidth
+            ) { bot in
+                store.selectedBotId = bot.id
+                store.showingBotDetail = true
             }
             Spacer(minLength: 80)
         }
-    }
-
-    private func groupShell(_ title: String, _ items: [Bot]) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                Text(title).font(.system(size: 15, weight: .semibold)).foregroundStyle(SWTheme.text)
-                Text("\(items.count)")
-                    .font(.system(size: 11, weight: .bold))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(Color.black.opacity(0.06))
-                    .foregroundStyle(SWTheme.textMuted)
-                    .clipShape(Capsule())
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 4)
-
-            LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: SWTheme.Roster.cardMinWidth), spacing: SWTheme.Roster.cardGap)],
-                spacing: SWTheme.Roster.cardGap
-            ) {
-                ForEach(items) { bot in
-                    Button {
-                        store.selectedBotId = bot.id
-                        store.showingBotDetail = true
-                    } label: {
-                        EmployeeCard(bot: bot, compact: true, dense: false)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-        .padding(.horizontal, SWTheme.Roster.groupPadding)
-        .padding(.top, SWTheme.Roster.groupPadding)
-        .padding(.bottom, 16)
-        .frame(maxWidth: .infinity, alignment: .topLeading)
-        .background(SWTheme.card)
-        .clipShape(RoundedRectangle(cornerRadius: SWTheme.Radius.group, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: SWTheme.Radius.group, style: .continuous)
-                .stroke(SWTheme.borderGroup, lineWidth: 1)
-        )
     }
 }
 

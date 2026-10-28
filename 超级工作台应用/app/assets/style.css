@@ -146,16 +146,19 @@ header {
 .import-btn { display: inline-flex; align-items: center; cursor: pointer; }
 main { max-width: 1120px; margin: 0 auto; padding: 20px; }
 /* Overview v2 full-width: do not cap at 1120 */
-main:has(.overview-main) {
+main:has(.overview-main),
+main:has(.roster-groups-ov) {
   max-width: none;
   margin: 0;
   padding: 20px 32px 48px;
 }
 @media (min-width: 1920px) {
-  main:has(.overview-main) { padding: 24px 40px 56px; }
+  main:has(.overview-main),
+  main:has(.roster-groups-ov) { padding: 24px 40px 56px; }
 }
 @media (min-width: 2560px) {
-  main:has(.overview-main) { padding: 28px 48px 64px; }
+  main:has(.overview-main),
+  main:has(.roster-groups-ov) { padding: 28px 48px 64px; }
 }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 16px 0; }

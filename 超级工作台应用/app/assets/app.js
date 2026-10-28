@@ -667,7 +667,8 @@ function renderRoster() {
       const n = g==="全部" ? all.length : all.filter(b => botInGroup(b,g)).length;
       return `<button type="button" class="chip ${filter===g?"active":""}" data-layer="${esc(g)}">${esc(g)} ${n}</button>`;
     }).join("");
-    const denseCard = (b) => `
+    // Same card + group shell markup as overview 员工看板
+    const rosterCard = (b) => `
       <button type="button" class="emp-card dense" data-bot="${esc(b.id)}">
         <div class="emp-avatar-wrap dense"><img class="emp-avatar-img dense" src="${avatarSrc(b)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="emp-avatar-fallback dense" style="display:none">${esc((b.name||'?')[0])}</div></div>
         <div class="emp-meta dense"><span class="emp-pill">${esc(b.code||"—")}</span><span class="dot ok"></span></div>
@@ -677,12 +678,12 @@ function renderRoster() {
     const groups = (filter==="全部" ? order : [filter]).map(g => {
       const items = all.filter(b => botInGroup(b,g));
       if (!items.length) return "";
-      return `<div class="group-shell group-box"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid dense">${items.map(denseCard).join("")}</div></div>`;
+      return `<div class="group-shell"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid dense ov-row">${items.map(rosterCard).join("")}</div></div>`;
     }).join("");
     return `
       <h2 class="section-title">员工档案 <span class="badge">${all.length}</span></h2>
       <div class="filters">${chipHtml}</div>
-      <div class="roster-groups group-masonry">${groups}</div>`;
+      <div class="roster-groups-ov">${groups}</div>`;
   }
 
   function renderProjects() {
