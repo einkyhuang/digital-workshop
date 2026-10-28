@@ -1,38 +1,45 @@
 import SwiftUI
 
+private struct OverviewWidthKey: PreferenceKey {
+    static var defaultValue: CGFloat = 1200
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
+}
+
 struct OverviewView: View {
     @EnvironmentObject var store: WorkspaceStore
+    /// Measured via background GeometryReader — ContentView already wraps us in ScrollView,
+    /// so an outer GeometryReader here collapses to ~0 height (blank overview).
+    @State private var contentWidth: CGFloat = 1200
 
     private var groupOrder: [String] {
         store.data.groupsOrder ?? ["管理中枢","网站项目","服装外贸","运营管理","战略决策","视觉设计","短剧组","外贸营销","个人成长","内容营销"]
     }
 
     var body: some View {
-        GeometryReader { geo in
-            let w = geo.size.width
-            let pad: CGFloat = w >= 2560 ? 48 : (w >= 1920 ? 40 : (w >= 1440 ? 32 : 24))
-            let stackGap: CGFloat = w >= 2560 ? 32 : (w >= 1920 ? 28 : 24)
-            let kpiCols = kpiColumnCount(w)
-            let goalCols = goalColumnCount(w)
-            let emailCols = emailColumnCount(w)
-            let rosterMin: CGFloat = w >= 2560 ? 420 : (w >= 1920 ? 400 : 340)
+        let w = contentWidth
+        let stackGap: CGFloat = w >= 2560 ? 32 : (w >= 1920 ? 28 : 24)
+        let kpiCols = kpiColumnCount(w)
+        let goalCols = goalColumnCount(w)
+        let emailCols = emailColumnCount(w)
+        let rosterMin: CGFloat = w >= 2560 ? 420 : (w >= 1920 ? 400 : 340)
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: stackGap) {
-                    if let err = store.loadError {
-                        Text(err).foregroundStyle(.red).padding().swCard()
-                    }
-                    websiteBoard(kpiCols: kpiCols, goalCols: goalCols)
-                    scheduleBoard
-                    emailBoard(cols: emailCols)
-                    rosterBoard(minWidth: rosterMin)
-                    Spacer(minLength: 80)
-                }
-                .padding(.horizontal, pad)
-                .padding(.vertical, 20)
-                .frame(maxWidth: .infinity, alignment: .leading) // FULL WIDTH — no 1680 cap
+        VStack(alignment: .leading, spacing: stackGap) {
+            if let err = store.loadError {
+                Text(err).foregroundStyle(.red).padding().swCard()
             }
+            websiteBoard(kpiCols: kpiCols, goalCols: goalCols)
+            scheduleBoard
+            emailBoard(cols: emailCols)
+            rosterBoard(minWidth: rosterMin)
+            Spacer(minLength: 80)
         }
+        .frame(maxWidth: .infinity, alignment: .leading) // FULL WIDTH — no 1680 cap
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(key: OverviewWidthKey.self, value: geo.size.width)
+            }
+        )
+        .onPreferenceChange(OverviewWidthKey.self) { contentWidth = max($0, 320) }
     }
 
     /// FULL-WIDTH: ≥2560 gets more columns instead of centering/capping.
