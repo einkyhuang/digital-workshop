@@ -1,0 +1,21 @@
+{
+  "a": {
+    "label": "baseline",
+    "html_ms": 5,
+    "bots": 22,
+    "projects": 53,
+    "build_ms": 3,
+    "roster_chars": 756,
+    "page_chars": 1125
+  },
+  "b": {
+    "label": "stress",
+    "html_ms": 1,
+    "bots": 100,
+    "projects": 200,
+    "build_ms": 5,
+    "roster_chars": 3290,
+    "page_chars": 990
+  },
+  "generatedAt": "2026-10-29T16:49:11.202Z"
+}

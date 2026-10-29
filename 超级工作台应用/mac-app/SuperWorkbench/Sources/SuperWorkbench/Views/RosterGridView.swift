@@ -26,10 +26,7 @@ struct RosterGridView: View {
 
     private var visibleGroups: [(String, [Bot])] {
         if groupFilter != "全部" { return [(groupFilter, bots)] }
-        return groupOrder.compactMap { g in
-            let items = bots.filter { $0.belongs(to: g) }
-            return items.isEmpty ? nil : (g, items)
-        }
+        return store.groupedBots(order: groupOrder, from: bots).map { ($0.title, $0.bots) }
     }
 
     var body: some View {
@@ -37,7 +34,7 @@ struct RosterGridView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(chips, id: \.self) { g in
-                        let count = g == "全部" ? store.data.bots.count : store.data.bots.filter { $0.belongs(to: g) }.count
+                        let count = g == "全部" ? store.data.bots.count : (store.botsByGroup[g]?.count ?? 0)
                         Button("\(g) \(count)") { groupFilter = g }
                             .buttonStyle(.plain)
                             .padding(.horizontal, 12)

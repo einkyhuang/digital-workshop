@@ -37,3 +37,8 @@ node_modules/
 
 # WeDrive 印花产品图库 images (synced locally; do not commit binaries)
 projects/印花产品图库/images/
+
+# Local stress fixtures (never publish)
+**/stress-workspace.local.json
+/tmp/sw-stress-workspace.json
+

@@ -21,6 +21,13 @@ final class WorkspaceStore: ObservableObject {
     @Published var targetsFile: OverviewMetrics.TargetsFile? = nil
     @Published var smartPlanTasks: [OverviewMetrics.SmartPlanTask] = []
     @Published var expandedEmailDate: String? = nil
+    /// First paint ready (workspace.json applied). Auxiliaries may still be loading.
+    @Published var isCoreLoaded: Bool = false
+    @Published private(set) var botById: [String: Bot] = [:]
+    @Published private(set) var botsByGroup: [String: [Bot]] = [:]
+    private var cachedWebsiteKPI: OverviewMetrics.KPI?
+    private var cachedKPIProjectsToken: Int = 0
+
 
     /// Repo root: iCloud/超级工作台 (git clone)
     var repoRoot: URL {
@@ -48,53 +55,134 @@ final class WorkspaceStore: ObservableObject {
         loadAsync(showBlockingError: true)
     }
 
-    /// Non-blocking launch path: decode JSON + sqlite off the main thread so the window can appear immediately.
+    /// Non-blocking launch path: core JSON first (first screen), then auxiliaries + optional stress fixture.
     func loadAsync(showBlockingError: Bool = false) {
-        let url = dataFileURL
+        let url = resolveDataURL()
         let privateURL = privateWebsiteProjectsURL
         let targetsURL = repoRoot.appendingPathComponent("超级工作台应用/data/private/targets.local.json")
         let emailDir = repoRoot.appendingPathComponent("bots/外贸营销/超级邮件助手/deliverables/email-daily")
         let emailAgg = repoRoot.appendingPathComponent("超级工作台应用/data/email-daily.json")
         let dbURL = repoRoot.appendingPathComponent("智能日程管理/server/smart_plan.db")
+        let stressURL = Self.stressFixtureURL()
 
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self else { return }
-            let result: Result<(WorkspaceData, OverviewMetrics.TargetsFile?, [OverviewMetrics.EmailDaily], [OverviewMetrics.SmartPlanTask]), Error> = {
-                do {
-                    guard FileManager.default.fileExists(atPath: url.path) else {
-                        return .failure(NSError(domain: "SW", code: 1, userInfo: [NSLocalizedDescriptionKey: "找不到数据文件：\(url.path)"]))
-                    }
-                    let raw = try Data(contentsOf: url)
-                    var decoded = try JSONDecoder().decode(WorkspaceData.self, from: raw)
-                    if let full = Self.readPrivateWebsiteProjects(at: privateURL) {
-                        decoded.websiteProjects = full
-                    }
-                    let targets = Self.readTargets(at: targetsURL)
-                    let emails = Self.readEmailDaily(dir: emailDir, agg: emailAgg)
-                    let smart = Self.readSmartPlanTasks(db: dbURL)
-                    return .success((decoded, targets, emails, smart))
-                } catch {
-                    return .failure(error)
+            do {
+                guard FileManager.default.fileExists(atPath: url.path) else {
+                    throw NSError(domain: "SW", code: 1, userInfo: [NSLocalizedDescriptionKey: "找不到数据文件：\(url.path)"])
                 }
-            }()
-
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let (decoded, targets, emails, smart)):
-                    self.data = decoded
-                    if self.selectedBotId == nil { self.selectedBotId = decoded.bots.first?.id }
-                    if self.selectedTaskId == nil { self.selectedTaskId = decoded.tasks.first?.id }
+                let raw = try Data(contentsOf: url)
+                var decoded = try JSONDecoder().decode(WorkspaceData.self, from: raw)
+                if let full = Self.readPrivateWebsiteProjects(at: privateURL) {
+                    decoded.websiteProjects = full
+                }
+                if let stressURL, let overlay = Self.readStressOverlay(at: stressURL) {
+                    decoded = Self.mergeStress(decoded, overlay: overlay)
+                }
+                DispatchQueue.main.async {
+                    self.applyCore(decoded)
+                }
+                let targets = Self.readTargets(at: targetsURL)
+                let emails = Self.readEmailDaily(dir: emailDir, agg: emailAgg)
+                let smart = Self.readSmartPlanTasks(db: dbURL)
+                DispatchQueue.main.async {
                     self.targetsFile = targets
                     self.emailDaily = emails
                     if self.expandedEmailDate == nil { self.expandedEmailDate = emails.first?.date }
                     self.smartPlanTasks = smart
-                    self.loadError = nil
-                case .failure(let error):
+                    self.cachedWebsiteKPI = nil
+                }
+            } catch {
+                DispatchQueue.main.async {
                     if showBlockingError || self.data.bots.isEmpty {
                         self.loadError = "读取失败：\(error.localizedDescription)"
                     }
                 }
             }
+        }
+    }
+
+    /// Prefer UserDefaults SWStressFixture / env SW_STRESS_FIXTURE (local /tmp only — never committed).
+    private func resolveDataURL() -> URL {
+        if let stress = Self.stressFixtureURL(), FileManager.default.fileExists(atPath: stress.path) {
+            // Stress fixture is an overlay merged onto workspace; still load real workspace as base.
+        }
+        return dataFileURL
+    }
+
+    private static func stressFixtureURL() -> URL? {
+        if let s = UserDefaults.standard.string(forKey: "SWStressFixture"), !s.isEmpty {
+            return URL(fileURLWithPath: s)
+        }
+        if let s = ProcessInfo.processInfo.environment["SW_STRESS_FIXTURE"], !s.isEmpty {
+            return URL(fileURLWithPath: s)
+        }
+        // Local opt-in: touch /tmp/sw-enable-stress (fixture lives only under /tmp)
+        let enable = "/tmp/sw-enable-stress"
+        let fixture = "/tmp/sw-stress-workspace.json"
+        if FileManager.default.fileExists(atPath: enable),
+           FileManager.default.fileExists(atPath: fixture) {
+            return URL(fileURLWithPath: fixture)
+        }
+        return nil
+    }
+
+    private nonisolated static func readStressOverlay(at url: URL) -> WorkspaceData? {
+        guard let raw = try? Data(contentsOf: url) else { return nil }
+        return try? JSONDecoder().decode(WorkspaceData.self, from: raw)
+    }
+
+    private nonisolated static func mergeStress(_ base: WorkspaceData, overlay: WorkspaceData) -> WorkspaceData {
+        var out = base
+        if !overlay.bots.isEmpty { out.bots = overlay.bots }
+        if let wp = overlay.websiteProjects, !wp.isEmpty { out.websiteProjects = wp }
+        if let go = overlay.groupsOrder, !go.isEmpty { out.groupsOrder = go }
+        return out
+    }
+
+    private func applyCore(_ decoded: WorkspaceData) {
+        data = decoded
+        if selectedBotId == nil { selectedBotId = decoded.bots.first?.id }
+        if selectedTaskId == nil { selectedTaskId = decoded.tasks.first?.id }
+        rebuildIndexes()
+        isCoreLoaded = true
+        loadError = nil
+        cachedWebsiteKPI = nil
+        if decoded.bots.contains(where: { $0.id.hasPrefix("stress-bot") }) {
+            syncMessage = "压测夹具：\(decoded.bots.count) 员工 · \((decoded.websiteProjects ?? []).count) 网站项目（本地 /tmp，未入库）"
+        }
+    }
+
+    func rebuildIndexes() {
+        var byId: [String: Bot] = [:]
+        byId.reserveCapacity(data.bots.count)
+        var byGroup: [String: [Bot]] = [:]
+        for b in data.bots {
+            byId[b.id] = b
+            for g in b.displayGroups {
+                byGroup[g, default: []].append(b)
+            }
+        }
+        botById = byId
+        botsByGroup = byGroup
+    }
+
+    func bots(inGroup name: String) -> [Bot] {
+        if let hit = botsByGroup[name] { return hit }
+        return data.bots.filter { $0.belongs(to: name) }
+    }
+
+    func groupedBots(order: [String], from bots: [Bot]? = nil) -> [(title: String, bots: [Bot])] {
+        let source = bots ?? filteredBots
+        if bots == nil, searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return order.compactMap { g in
+                let items = botsByGroup[g] ?? []
+                return items.isEmpty ? nil : (title: g, bots: items)
+            }
+        }
+        return order.compactMap { g in
+            let items = source.filter { $0.belongs(to: g) }
+            return items.isEmpty ? nil : (title: g, bots: items)
         }
     }
 
@@ -292,7 +380,12 @@ final class WorkspaceStore: ObservableObject {
     }
 
     func websiteKPI() -> OverviewMetrics.KPI {
-        OverviewMetrics.compute(projects: data.websiteProjects ?? [], targets: targetsFile)
+        let token = (data.websiteProjects?.count ?? 0) &+ (targetsFile?.websiteProjects?.yearly?.year ?? 0)
+        if let cached = cachedWebsiteKPI, cachedKPIProjectsToken == token { return cached }
+        let kpi = OverviewMetrics.compute(projects: data.websiteProjects ?? [], targets: targetsFile)
+        cachedWebsiteKPI = kpi
+        cachedKPIProjectsToken = token
+        return kpi
     }
 
     // MARK: - Website project privacy (local full / public redacted)
@@ -375,12 +468,15 @@ final class WorkspaceStore: ObservableObject {
     }
 
     func bot(id: String?) -> Bot? {
-        data.bots.first { $0.id == id }
+        guard let id else { return nil }
+        if let hit = botById[id] { return hit }
+        return data.bots.first { $0.id == id }
     }
 
     func updateBot(_ bot: Bot) {
         guard let i = data.bots.firstIndex(where: { $0.id == bot.id }) else { return }
         data.bots[i] = bot
+        rebuildIndexes()
         save()
     }
 
@@ -530,6 +626,7 @@ final class WorkspaceStore: ObservableObject {
 
     func saveWebsiteProjects(_ items: [WebsiteProject]) {
         data.websiteProjects = items
+        cachedWebsiteKPI = nil
         save()
     }
 
@@ -541,6 +638,7 @@ final class WorkspaceStore: ObservableObject {
             list.insert(item, at: 0)
         }
         data.websiteProjects = list
+        cachedWebsiteKPI = nil
         save()
     }
 

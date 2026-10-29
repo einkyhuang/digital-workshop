@@ -17,12 +17,20 @@ struct ContentView: View {
                         onNew: { handleNew() },
                         onSync: { store.syncGit() }
                     )
-                    ScrollView {
+                    // Projects (and similar) own a Lazy ScrollView — nesting breaks laziness at scale.
+                    if store.selectedSection == .projects {
                         sectionBody
                             .padding(24)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                            .background(SWTheme.pageBg)
+                    } else {
+                        ScrollView {
+                            sectionBody
+                                .padding(24)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .background(SWTheme.pageBg)
                     }
-                    .background(SWTheme.pageBg)
                 }
             }
 

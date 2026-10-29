@@ -40,7 +40,29 @@
     emailDaily: [],
     expandedEmail: null,
     uiConfig: null,
+    webPageSize: 40,
+    webShown: 40,
+    botById: {},
+    botsByGroup: {},
+    kpiCache: null,
   };
+
+  function rebuildIndexes() {
+    const bots = (state.data && state.data.bots) || [];
+    const byId = Object.create(null);
+    const byGroup = Object.create(null);
+    for (const b of bots) {
+      byId[b.id] = b;
+      const gs = botGroups(b);
+      for (const g of gs) {
+        if (!byGroup[g]) byGroup[g] = [];
+        byGroup[g].push(b);
+      }
+    }
+    state.botById = byId;
+    state.botsByGroup = byGroup;
+    state.kpiCache = null;
+  }
 
   function toast(msg) {
     const el = document.getElementById("toast");
@@ -134,6 +156,7 @@
           }
           state.selectedId = (cached && cached.selectedId) || state.data.bots[0].id;
           state.editTaskId = (state.data.tasks[0] && state.data.tasks[0].id) || null;
+          rebuildIndexes();
           return;
         }
       } catch (_) {}
@@ -156,6 +179,32 @@
       state.selectedId = base.bots[0].id;
     }
     state.editTaskId = (state.data.tasks[0] && state.data.tasks[0].id) || null;
+    rebuildIndexes();
+  }
+
+
+  async function maybeApplyStressOverlay() {
+    try {
+      const q = new URLSearchParams(location.search || "");
+      if (q.get("stress") !== "1") return;
+      // Local / CI harness only — never shipped as public data.
+      const host = location.hostname || "";
+      if (host && host !== "localhost" && host !== "127.0.0.1") return;
+      const res = await fetch("/tmp/sw-stress-workspace.json", { cache: "no-store" }).catch(() => null);
+      // Also try sibling path served by stress harness
+      let json = null;
+      if (res && res.ok) json = await res.json();
+      if (!json) {
+        const res2 = await fetch("./data/stress-workspace.local.json", { cache: "no-store" }).catch(() => null);
+        if (res2 && res2.ok) json = await res2.json();
+      }
+      if (!json) return;
+      if (Array.isArray(json.bots) && json.bots.length) state.data.bots = json.bots;
+      if (Array.isArray(json.websiteProjects) && json.websiteProjects.length) state.data.websiteProjects = json.websiteProjects;
+      if (Array.isArray(json.groupsOrder) && json.groupsOrder.length) state.data.groupsOrder = json.groupsOrder;
+      state.source = (state.source || "") + " + stress";
+      rebuildIndexes();
+    } catch (_) {}
   }
 
   function botGroups(b) {
@@ -626,7 +675,7 @@
       </button>`;
     let roster = "";
     for (const g of order) {
-      const items = bots.filter(b => botInGroup(b, g));
+      const items = state.botsByGroup[g] || bots.filter(b => botInGroup(b, g));
       if (!items.length) continue;
       roster += `<div class="group-shell"><div class="group-head"><h3>${esc(g)}</h3><span class="badge">${items.length}</span></div><div class="emp-grid dense ov-row">${items.map(shortCard).join("")}</div></div>`;
     }
@@ -706,7 +755,9 @@ function renderRoster() {
     if (!state.webCat) state.webCat = "全部";
     if (!state.webTab) state.webTab = "crm";
     const sync = state.data.smartplanSync || {};
-    const cats = ["全部"].concat(Array.from(new Set(webs.map(w => w.category))).sort());
+    const catCount = Object.create(null);
+    for (const w of webs) catCount[w.category] = (catCount[w.category] || 0) + 1;
+    const cats = ["全部"].concat(Object.keys(catCount).sort());
     const filtered = webs.filter(w => state.webCat === "全部" || w.category === state.webCat)
       .slice().sort((a,b) => {
         const ua=a.updatedAt||"", ub=b.updatedAt||"";
@@ -723,7 +774,7 @@ function renderRoster() {
           <button type="button" class="chip ${state.webView==="cards"?"active":""}" data-webview="cards">卡片</button>
         </div>
         <div class="filters">${cats.map(c=>{
-          const n=c==="全部"?webs.length:webs.filter(x=>x.category===c).length;
+          const n=c==="全部"?webs.length:(catCount[c]||0);
           return `<button type="button" class="chip ${state.webCat===c?"active":""}" data-webcat="${esc(c)}">${esc(c)} ${n}</button>`;
         }).join("")}</div>
         <span class="muted">SmartPlan ${esc(sync.source||"—")} · ${webs.length}</span>
@@ -731,14 +782,20 @@ function renderRoster() {
         ${productLink}
       </div>`;
 
+    if (!state.webShown || state.webShown < state.webPageSize) state.webShown = state.webPageSize;
+    const page = filtered.slice(0, state.webShown);
+    const hasMore = filtered.length > page.length;
     let body = "";
     if (state.webView === "cards") {
-      body = `<div class="web-card-grid">${filtered.map(w => webCard(w)).join("")}</div>`;
+      body = `<div class="web-card-grid">${page.map(w => webCard(w)).join("")}</div>`;
     } else {
       body = `<div class="web-table-wrap"><table class="web-table">
         <thead><tr><th>项目</th><th>客户</th><th>状态</th><th>进度</th><th>截止</th><th>负责人</th></tr></thead>
-        <tbody>${filtered.map(w => webListRow(w)).join("")}</tbody>
+        <tbody>${page.map(w => webListRow(w)).join("")}</tbody>
       </table></div>`;
+    }
+    if (hasMore) {
+      body += `<div style="text-align:center;padding:16px"><button type="button" class="btn" id="webLoadMore">加载更多（已显示 ${page.length}/${filtered.length}）</button></div>`;
     }
     const modal = state.selectedWebId ? webDetailModal(webs.find(x=>x.id===state.selectedWebId)) : "";
     return `<h2 class="section-title">网站项目</h2>${toolbar}${body}${modal}`;
@@ -751,11 +808,11 @@ function renderRoster() {
     return (WEBSITE_UI.statusMap[s]||{}).label || s;
   }
   function ownerName(id) {
-    const b = (state.data.bots||[]).find(x=>x.id===id);
+    const b = (id && state.botById[id]) || (state.data.bots||[]).find(x=>x.id===id);
     return b ? displayNick(b.name) : "—";
   }
   function webListRow(w) {
-    const owner = (state.data.bots||[]).find(b=>b.id===(w.ownerBotId||""));
+    const owner = state.botById[w.ownerBotId||""] || (state.data.bots||[]).find(b=>b.id===(w.ownerBotId||""));
     const av = owner ? `<img class="web-owner" src="${avatarSrc(owner)}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.style.display='none'"/>` : `<span class="web-owner empty">—</span>`;
     const pill = (WEBSITE_UI.statusMap[w.status]||{}).pill || "hold";
     const pay = w.paymentStatus==="fully_paid"?"已结清":w.paymentStatus==="deposit_paid"?"已付定金":"待付款";
@@ -1009,6 +1066,9 @@ function renderKanban() {
       el.onclick = () => setTab(el.getAttribute("data-tab"));
     });
     renderMain();
+    const more = document.getElementById("webLoadMore");
+    if (more) more.onclick = () => { state.webShown = (state.webShown || state.webPageSize) + state.webPageSize; render(); };
+    // Reset paging when switching category/view via chips (handled below)
   }
 
   async function boot() {
@@ -1040,9 +1100,11 @@ function renderKanban() {
         state.selectedId = base.bots[0].id;
       }
       state.editTaskId = (state.data.tasks[0] && state.data.tasks[0].id) || null;
+      rebuildIndexes();
       render();
     } catch (_) {}
     await loadData();
+    await maybeApplyStressOverlay();
     await loadOverviewExtras();
     render();
   }

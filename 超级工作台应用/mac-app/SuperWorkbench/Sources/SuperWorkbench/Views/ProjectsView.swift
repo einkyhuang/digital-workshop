@@ -15,6 +15,12 @@ struct ProjectsView: View {
     private var websites: [WebsiteProject] { store.data.websiteProjects ?? [] }
     private var products: [WorkbenchProject] { store.data.projects ?? [] }
     private var categories: [String] { ["全部"] + Array(Set(websites.map(\.category))).sorted() }
+    private var categoryCounts: [String: Int] {
+        var m: [String: Int] = [:]
+        m.reserveCapacity(16)
+        for w in websites { m[w.category, default: 0] += 1 }
+        return m
+    }
 
     private var filtered: [WebsiteProject] {
         let q = store.searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -66,7 +72,7 @@ struct ProjectsView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
                     ForEach(categories, id: \.self) { c in
-                        let n = c == "全部" ? websites.count : websites.filter { $0.category == c }.count
+                        let n = c == "全部" ? websites.count : (categoryCounts[c] ?? 0)
                         chip("\(c) \(n)", active: categoryFilter == c) { categoryFilter = c }
                     }
                     chip("含 SEO/GEO", active: seoOnly) { seoOnly.toggle() }
@@ -163,7 +169,7 @@ struct WebsiteListRow: View {
     let project: WebsiteProject
     private var owner: Bot? {
         guard let id = project.ownerBotId, !id.isEmpty else { return nil }
-        return store.data.bots.first { $0.id == id }
+        return store.bot(id: id)
     }
     private var gradIndex: Int { abs(project.name.hashValue) % SWTheme.iconGradients.count }
     private var isOverdue: Bool {

@@ -492,10 +492,8 @@ struct OverviewView: View {
     // MARK: - Roster (v1 cards unchanged)
 
     private func rosterBoard(minWidth: CGFloat) -> some View {
-        let groups = groupOrder.compactMap { g -> (title: String, bots: [Bot])? in
-            let items = store.filteredBots.filter { $0.belongs(to: g) }
-            return items.isEmpty ? nil : (title: g, bots: items)
-        }
+        // Indexed grouping — same flow-wrap RosterGroupBoard visuals.
+        let groups = store.groupedBots(order: groupOrder)
         return VStack(alignment: .leading, spacing: 12) {
             sectionHead("员工看板", badge: "\(store.data.bots.count)")
             RosterGroupBoard(groups: groups, cardWidth: SWTheme.Roster.cardMinWidth) { bot in
