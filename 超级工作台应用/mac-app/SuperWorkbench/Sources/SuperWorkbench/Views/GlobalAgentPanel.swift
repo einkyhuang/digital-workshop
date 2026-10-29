@@ -49,7 +49,7 @@ struct GlobalAgentPanel: View {
             inputFocused = true
         }
         .onExitCommand { isPresented = false }
-        .alert("确认执行（L2）", isPresented: $vm.showConfirm) {
+        .alert("确认执行", isPresented: $vm.showConfirm) {
             Button("取消", role: .cancel) { vm.resolveConfirm(false) }
             Button("执行", role: .destructive) { vm.resolveConfirm(true) }
         } message: {
@@ -61,7 +61,7 @@ struct GlobalAgentPanel: View {
         HStack {
             Image(systemName: "sparkles")
             Text("全局 Agent").font(.headline)
-            Text("P1 · 导航 + 任务 CRUD").font(.caption).foregroundStyle(.secondary)
+            Text("P2 · CRM + 确认").font(.caption).foregroundStyle(.secondary)
             Spacer()
             Button("设置") { vm.showSettings = true }
                 .buttonStyle(.borderless)
@@ -155,7 +155,7 @@ final class GlobalAgentViewModel: ObservableObject {
             return await self.askConfirm(name: name, summary: summary)
         }
         if messages.isEmpty {
-            messages.append(AgentChatMessage(role: .assistant, content: "全局 Agent P1：P0 导航/快照 + 任务 CRUD（删除需确认）+ 本地审计/撤销。配置 Key 后流式 tool-calling；无 Key 本地指令。"))
+            messages.append(AgentChatMessage(role: .assistant, content: "全局 Agent P2：CRM 搜索/跟进/报价草稿(L2)/外发拦截(L3)。配置 Key 流式 tools；无 Key 本地指令（例：搜客户 菲律宾）。"))
         }
     }
 

@@ -7,6 +7,9 @@ enum AgentRisk: String {
         case "task.delete", "crm.create_quote": return .L2
         case "crm.send_email", "external.publish": return .L3
         case "task.create", "task.update", "task.set_status", "agent.undo_last", "crm.upsert_followup": return .L1
+        case "crm.search_customers", "crm.open_customer", "context.get_snapshot",
+             "nav.open_section", "nav.switch_workbench", "schedule.open_day", "daily.open_report":
+            return .L0
         default: return .L0
         }
     }
@@ -24,7 +27,13 @@ final class AgentExecutor {
         let risk = AgentRisk.of(name)
         if !skipConfirm, risk == .L2 || risk == .L3 {
             let summary = Self.summarize(params)
-            let okConfirm = await (confirmHandler?(name, summary, params) ?? false)
+            let recap: String
+            if risk == .L3 {
+                recap = "【L3 外发/不可逆 — 请核对】\n" + summary + "\n确认后仍不会真发外网，仅记录拦截结果。"
+            } else {
+                recap = "【L2 需确认】\n" + summary
+            }
+            let okConfirm = await (confirmHandler?(name, recap, params) ?? false)
             if !okConfirm {
                 return AgentStepEvent(name: name, argsSummary: summary, ok: false, detail: "用户取消", ms: 0)
             }
@@ -35,7 +44,7 @@ final class AgentExecutor {
         let result = perform(name: name, params: params)
         let ms = Int(Date().timeIntervalSince(t0) * 1000)
         let after = taskSnapshotJSON()
-        let undoable = ["task.create", "task.update", "task.set_status", "task.delete"].contains(name) && result.0
+        let undoable = ["task.create", "task.update", "task.set_status", "task.delete", "crm.upsert_followup", "crm.create_quote"].contains(name) && result.0
         let entry = AgentAuditEntry(
             id: UUID(), at: Date(), action: name, paramsSummary: summary,
             ok: result.0, detail: String(result.1.prefix(500)), undoable: undoable,
@@ -111,6 +120,27 @@ final class AgentExecutor {
             return (true, "deleted \(id)")
         case "agent.undo_last":
             return undoLast()
+        case "crm.search_customers":
+            guard let store else { return (false, "no store") }
+            let query = params["query"] as? String ?? ""
+            let page = params["page"] as? Int ?? 0
+            let limit = params["limit"] as? Int ?? 20
+            return AgentCRM.searchCustomers(repoRoot: store.repoRoot, query: query, page: page, limit: limit)
+        case "crm.open_customer":
+            guard let store, let id = params["customerId"] as? String else { return (false, "missing customerId") }
+            return AgentCRM.openCustomer(store: store, customerId: id)
+        case "crm.upsert_followup":
+            guard let store,
+                  let id = params["customerId"] as? String,
+                  let note = params["note"] as? String else { return (false, "missing customerId/note") }
+            return AgentCRM.upsertFollowup(repoRoot: store.repoRoot, customerId: id, note: note)
+        case "crm.create_quote":
+            guard let store else { return (false, "no store") }
+            return AgentCRM.createQuoteDraft(repoRoot: store.repoRoot, params: params)
+        case "crm.send_email":
+            return AgentCRM.blockedSendEmail(params: params)
+        case "external.publish":
+            return AgentCRM.blockedPublish(params: params)
         default:
             return (false, "未实现或未知动作: \(name)")
         }

@@ -232,6 +232,156 @@
         "type": "object",
         "properties": {}
       }
+    },
+    {
+      "name": "crm.search_customers",
+      "risk": "L0",
+      "undoable": false,
+      "platforms": [
+        "mac"
+      ],
+      "description": "本地搜索客户（private CRM 分页索引）",
+      "params": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    {
+      "name": "crm.open_customer",
+      "risk": "L0",
+      "undoable": false,
+      "platforms": [
+        "mac"
+      ],
+      "description": "打开客户管理并定位客户",
+      "params": {
+        "type": "object",
+        "required": [
+          "customerId"
+        ],
+        "properties": {
+          "customerId": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "crm.upsert_followup",
+      "risk": "L1",
+      "undoable": true,
+      "platforms": [
+        "mac"
+      ],
+      "description": "追加跟进记录到本地 timeline",
+      "params": {
+        "type": "object",
+        "required": [
+          "customerId",
+          "note"
+        ],
+        "properties": {
+          "customerId": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "crm.create_quote",
+      "risk": "L2",
+      "undoable": true,
+      "platforms": [
+        "mac"
+      ],
+      "description": "创建报价草稿（需确认）",
+      "params": {
+        "type": "object",
+        "required": [
+          "customerId"
+        ],
+        "properties": {
+          "customerId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "crm.send_email",
+      "risk": "L3",
+      "undoable": false,
+      "platforms": [
+        "mac"
+      ],
+      "description": "外发邮件（L3 仅演练/拦截，不真发）",
+      "params": {
+        "type": "object",
+        "required": [
+          "to",
+          "subject"
+        ],
+        "properties": {
+          "to": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "external.publish",
+      "risk": "L3",
+      "undoable": false,
+      "platforms": [
+        "mac"
+      ],
+      "description": "外发/发布（L3 拦截）",
+      "params": {
+        "type": "object",
+        "required": [
+          "channel",
+          "summary"
+        ],
+        "properties": {
+          "channel": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          }
+        }
+      }
     }
   ]
 }

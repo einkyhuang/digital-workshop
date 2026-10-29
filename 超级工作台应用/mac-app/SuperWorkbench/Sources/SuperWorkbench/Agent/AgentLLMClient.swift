@@ -86,7 +86,13 @@ actor AgentLLMClient {
             tool("task.update", "更新任务", ["id": ["type": "string"], "title": ["type": "string"], "note": ["type": "string"]], ["id"]),
             tool("task.set_status", "改任务状态", ["id": ["type": "string"], "status": ["type": "string"]], ["id", "status"]),
             tool("task.delete", "删除任务(需确认)", ["id": ["type": "string"]], ["id"]),
-            tool("agent.undo_last", "撤销上次可逆写", [String: Any](), [])
+            tool("agent.undo_last", "撤销上次可逆写", [String: Any](), []),
+            tool("crm.search_customers", "本地搜索客户", ["query": ["type": "string"], "page": ["type": "integer"], "limit": ["type": "integer"]], []),
+            tool("crm.open_customer", "打开客户", ["customerId": ["type": "string"]], ["customerId"]),
+            tool("crm.upsert_followup", "追加跟进", ["customerId": ["type": "string"], "note": ["type": "string"]], ["customerId", "note"]),
+            tool("crm.create_quote", "报价草稿(L2)", ["customerId": ["type": "string"], "title": ["type": "string"], "amount": ["type": "string"], "currency": ["type": "string"], "note": ["type": "string"]], ["customerId"]),
+            tool("crm.send_email", "发信(L3拦截)", ["to": ["type": "string"], "subject": ["type": "string"], "body": ["type": "string"]], ["to", "subject"]),
+            tool("external.publish", "发布(L3拦截)", ["channel": ["type": "string"], "summary": ["type": "string"]], ["channel", "summary"])
         ]
     }
 
