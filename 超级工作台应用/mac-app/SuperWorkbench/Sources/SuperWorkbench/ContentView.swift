@@ -5,8 +5,16 @@ struct ContentView: View {
     @State private var showNewTask = false
     @FocusState private var searchFocused: Bool
 
+    private var isTradeWorkbench: Bool {
+        store.activeWorkbenchId == "trade"
+    }
+
     var body: some View {
         ZStack(alignment: .bottom) {
+            if isTradeWorkbench {
+                // Full MagicHub UI fills the content area; keep segmented switcher in host chrome.
+                TradeMagicHubHost()
+            } else {
             HStack(spacing: 0) {
                 SidebarView()
                     .frame(width: SWTheme.sidebarWidth)
@@ -36,6 +44,7 @@ struct ContentView: View {
 
             FloatingCommandBar()
                 .padding(.bottom, 18)
+            }
         }
         .background(SWTheme.pageBg)
         .alert("同步", isPresented: Binding(

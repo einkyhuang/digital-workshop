@@ -17,6 +17,10 @@ chmod +x "$APP_OUT/Contents/MacOS/超级工作台"
 if [[ -f "$ROOT/Assets/AppIcon.icns" ]]; then
   cp "$ROOT/Assets/AppIcon.icns" "$APP_OUT/Contents/Resources/AppIcon.icns"
 fi
+BRIDGE_JS="$ROOT/Sources/SuperWorkbench/magichub-bridge.js"
+if [[ -f "$BRIDGE_JS" ]]; then
+  cp "$BRIDGE_JS" "$APP_OUT/Contents/Resources/magichub-bridge.js"
+fi
 
 cat > "$APP_OUT/Contents/Info.plist" << PLIST
 <?xml version="1.0" encoding="UTF-8"?>

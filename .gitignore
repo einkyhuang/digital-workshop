@@ -56,3 +56,15 @@ bots/*/*/deliverables/email-daily-private/
 超级工作台应用/crm-magichub/dist/
 超级工作台应用/crm-magichub/dist_electron/
 超级工作台应用/crm-magichub/scratch/
+
+# MagicHub runtime (local private links + install)
+超级工作台应用/crm-magichub/node_modules/
+超级工作台应用/crm-magichub/dist/
+超级工作台应用/crm-magichub/dist_electron/
+超级工作台应用/app/magichub/*.pdf
+超级工作台应用/app/magichub/product-images
+超级工作台应用/app/magichub/products_imported.json
+超级工作台应用/app/magichub/seeds
+超级工作台应用/app/magichub/thumbs
+超级工作台应用/app/magichub/external_reports
+超级工作台应用/app/magichub/icon.png

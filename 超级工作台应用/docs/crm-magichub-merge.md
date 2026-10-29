@@ -1,22 +1,18 @@
-# MagicHub CRM 合并进外贸工作台（优化版）
+# MagicHub 完整内嵌 · 外贸工作台
 
-## 原则
+## 方案
 
-- **不拖慢工作台启动**：不嵌入 Electron 整包；启动不读 1.9 万客户全文 / 大 PDF / 原图。
-- **私有数据**在 `超级工作台应用/data/private/crm/`（gitignore）；派生缩略图/分页亦然。
-- **公开仓**仅 `超级工作台应用/data/crm/*-index.json` 与脱敏样例。
+切换到「外贸工作台」时，内容区改为 **完整 MagicHub Vue UI**（驾驶舱/客户/营销/…），顶部保留工作台分段切换。
 
-## 目录
+- **Mac**：`TradeMagicHubHost` + `WKWebView` 加载 `超级工作台应用/app/magichub/`；`MagicHubBridge`（WKScriptMessageHandler）替代 Electron IPC；设置与客户数据写入 `data/private/crm/settings/`（gitignore）。
+- **Web 本地**：iframe 挂载 `./magichub/` + `magichub-bridge-web.js`（localStorage）。
+- **Pages**：不发布客户明细；展示隐私降级说明。
 
-| 路径 | 内容 |
-|------|------|
-| `crm-magichub/` | 源码参考（无 node_modules / dist / 大图 / 大 PDF / leads_seed） |
-| `data/private/crm/leads/` | `leads.sqlite` + `page-XXXX.json` |
-| `data/private/crm/products/` | 原图 + `products.sqlite` |
-| `data/private/crm/thumbs/products/` | WebP 缩略图（原图按需） |
-| `data/private/crm/pdfs/` | 原 PDF + 索引 |
-| `data/crm/` | 公开索引 |
+## 构建
 
-## 入口
+```bash
+cd 超级工作台应用/crm-magichub
+./build-for-workbench.sh   # 产出 app/magichub（不含大图/PDF，运行时 symlink private）
+```
 
-- 模块 id：`crmCustomers` →「客户管理」（外贸工作台）
+原目录 `/Users/ky/Desktop/网站标准/通用版外贸客户管理` **只读**，改动仅在 `crm-magichub/` 副本。

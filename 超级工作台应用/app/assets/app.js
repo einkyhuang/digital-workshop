@@ -367,6 +367,30 @@
       </div>`;
   }
 
+
+  function isTradeWorkbench() {
+    return state.activeWorkbenchId === "trade";
+  }
+
+  function renderTradeMagicHub() {
+    const hosted = isHostedPages();
+    if (hosted) {
+      return `<div class="section-title-row"><h2 class="section-title">外贸工作台</h2>${renderWorkbenchSegment()}</div>
+        <div class="callout warn" style="margin:16px">
+          <strong>隐私降级（Pages）</strong>
+          MagicHub 客户/订单/产品等明细仅存本机 <code>data/private/crm</code>，不会发布到 Pages。
+          请在 Mac「超级工作台」应用内打开外贸工作台以使用完整 MagicHub（驾驶舱、客户管理、智能营销等）。
+        </div>
+        <div class="daily-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+          <div class="daily-card"><div class="muted">公开线索索引</div><div style="font-size:28px;font-weight:700">${(state.tradeIndex&&state.tradeIndex.counts&&state.tradeIndex.counts.leadsTotal)!=null?state.tradeIndex.counts.leadsTotal:"—"}</div></div>
+          <div class="daily-card"><div class="muted">CRM 客户（本地）</div><div style="font-size:28px;font-weight:700">${(state.crmLeadsIndex&&state.crmLeadsIndex.total)||"—"}</div></div>
+        </div>`;
+    }
+    // Local web: full-page iframe; bridge via sibling magichub-bridge-web.js
+    return `<div class="section-title-row" style="padding:8px 12px"><h2 class="section-title" style="margin:0">外贸工作台</h2>${renderWorkbenchSegment()}</div>
+      <iframe id="magichubFrame" title="MagicHub" src="./magichub/index.html" style="border:0;width:100%;height:calc(100vh - 120px);background:#f3f4f6"></iframe>`;
+  }
+
   function renderTradeModule(kind) {
     const c = (state.tradeIndex && state.tradeIndex.counts) || {};
     const act = (state.tradeIndex && state.tradeIndex.latestActivity) || "—";
@@ -1296,7 +1320,11 @@ function renderKanban() {
       "规则与文档": renderRules,
       "网站项目": renderProjects,
     };
-    document.getElementById("main").innerHTML = (map[state.tab] || renderOverview)();
+    if (isTradeWorkbench()) {
+      document.getElementById("main").innerHTML = renderTradeMagicHub();
+    } else {
+      document.getElementById("main").innerHTML = (map[state.tab] || renderOverview)();
+    }
     bindMain();
   }
 
