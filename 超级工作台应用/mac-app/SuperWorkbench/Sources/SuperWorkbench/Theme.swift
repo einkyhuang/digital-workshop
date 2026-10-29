@@ -18,7 +18,7 @@ enum SWTheme {
     static let focus = Color(red: 59/255, green: 130/255, blue: 246/255)
     static let bg = pageBg
     static let muted = Color.secondary
-    static let sidebarWidth: CGFloat = 260
+    static let sidebarWidth: CGFloat = 280
 
     // Overview v2
     static let shadowElevated = Color.black.opacity(0.06)
@@ -43,6 +43,22 @@ enum SWTheme {
         static let panel: CGFloat = 16
         static let modal: CGFloat = 20
         static let badge: CGFloat = 8
+    }
+
+
+    enum Type {
+        /// Sidebar / secondary nav label
+        static let nav: CGFloat = 15
+        static let navIcon: CGFloat = 17
+        static let navLine: CGFloat = 1.45
+        /// Body copy (团队日报等)
+        static let body: CGFloat = 15.5
+        static let bodyLine: CGFloat = 1.62
+        static let h1: CGFloat = 26
+        static let h2: CGFloat = 20
+        static let h3: CGFloat = 17
+        static let caption: CGFloat = 13
+        static let captionLine: CGFloat = 1.45
     }
 
     enum Space {
