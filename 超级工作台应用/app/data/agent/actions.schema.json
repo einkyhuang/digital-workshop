@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "actions": [
+    {
+      "name": "context.get_snapshot",
+      "risk": "L0",
+      "undoable": false,
+      "platforms": ["mac", "web"],
+      "description": "只读快照：当前工作台、导航、任务摘要",
+      "params": { "type": "object", "properties": { "scope": { "type": "string", "enum": ["brief", "full"] } } }
+    },
+    {
+      "name": "nav.open_section",
+      "risk": "L0",
+      "undoable": false,
+      "platforms": ["mac", "web"],
+      "description": "打开侧栏模块",
+      "params": {
+        "type": "object",
+        "required": ["sectionId"],
+        "properties": { "sectionId": { "type": "string" } }
+      }
+    },
+    {
+      "name": "nav.switch_workbench",
+      "risk": "L0",
+      "undoable": false,
+      "platforms": ["mac", "web"],
+      "description": "切换超级/外贸工作台",
+      "params": {
+        "type": "object",
+        "required": ["workbenchId"],
+        "properties": { "workbenchId": { "type": "string" } }
+      }
+    },
+    {
+      "name": "schedule.open_day",
+      "risk": "L0",
+      "undoable": false,
+      "platforms": ["mac", "web"],
+      "description": "打开日程某日",
+      "params": { "type": "object", "required": ["date"], "properties": { "date": { "type": "string" } } }
+    },
+    {
+      "name": "daily.open_report",
+      "risk": "L0",
+      "undoable": false,
+      "platforms": ["mac", "web"],
+      "description": "打开团队日报",
+      "params": { "type": "object", "required": ["date"], "properties": { "date": { "type": "string" } } }
+    }
+  ]
+}

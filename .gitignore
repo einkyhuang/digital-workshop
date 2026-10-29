@@ -72,3 +72,7 @@ bots/*/*/deliverables/email-daily-private/
 # Bot feeds with PII
 超级工作台应用/data/private/feeds/
 超级工作台应用/app/data/private/feeds/
+
+# Global Agent audit (local only)
+超级工作台应用/data/private/agent-audit/
+超级工作台应用/app/data/private/agent-audit/

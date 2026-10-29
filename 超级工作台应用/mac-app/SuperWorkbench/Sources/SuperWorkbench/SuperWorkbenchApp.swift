@@ -42,6 +42,10 @@ struct SuperWorkbenchApp: App {
                     .keyboardShortcut("r", modifiers: [.command])
                 Button("同步到 GitHub") { store.syncGit() }
                     .keyboardShortcut("s", modifiers: [.command, .shift])
+                Button(store.showGlobalAgent ? "关闭全局 Agent" : "打开全局 Agent") {
+                    store.showGlobalAgent.toggle()
+                }
+                .keyboardShortcut("k", modifiers: [.command])
             }
         }
     }
