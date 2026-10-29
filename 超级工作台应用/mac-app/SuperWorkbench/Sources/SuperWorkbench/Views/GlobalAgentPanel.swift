@@ -49,13 +49,19 @@ struct GlobalAgentPanel: View {
             inputFocused = true
         }
         .onExitCommand { isPresented = false }
+        .alert("确认执行（L2）", isPresented: $vm.showConfirm) {
+            Button("取消", role: .cancel) { vm.resolveConfirm(false) }
+            Button("执行", role: .destructive) { vm.resolveConfirm(true) }
+        } message: {
+            Text(vm.confirmText)
+        }
     }
 
     private var header: some View {
         HStack {
             Image(systemName: "sparkles")
             Text("全局 Agent").font(.headline)
-            Text("P0 · 只读快照 / 导航").font(.caption).foregroundStyle(.secondary)
+            Text("P1 · 导航 + 任务 CRUD").font(.caption).foregroundStyle(.secondary)
             Spacer()
             Button("设置") { vm.showSettings = true }
                 .buttonStyle(.borderless)
@@ -143,9 +149,32 @@ final class GlobalAgentViewModel: ObservableObject {
     func attach(store: WorkspaceStore) {
         self.store = store
         executor.store = store
-        if messages.isEmpty {
-            messages.append(AgentChatMessage(role: .assistant, content: "全局 Agent P0：可快照上下文、切换工作台、打开侧栏模块/日程/日报。配置 Base URL + Key 后走流式 tool-calling；无 Key 时用本地指令解析。"))
+        executor.audit = AgentAuditLog(repoRoot: store.repoRoot)
+        executor.confirmHandler = { [weak self] name, summary, _ in
+            guard let self else { return false }
+            return await self.askConfirm(name: name, summary: summary)
         }
+        if messages.isEmpty {
+            messages.append(AgentChatMessage(role: .assistant, content: "全局 Agent P1：P0 导航/快照 + 任务 CRUD（删除需确认）+ 本地审计/撤销。配置 Key 后流式 tool-calling；无 Key 本地指令。"))
+        }
+    }
+
+    @Published var confirmText: String = ""
+    private var confirmContinuation: CheckedContinuation<Bool, Never>? = nil
+    @Published var showConfirm = false
+
+    func askConfirm(name: String, summary: String) async -> Bool {
+        await withCheckedContinuation { cont in
+            self.confirmText = "\(name)\n\(summary)"
+            self.confirmContinuation = cont
+            self.showConfirm = true
+        }
+    }
+
+    func resolveConfirm(_ ok: Bool) {
+        showConfirm = false
+        confirmContinuation?.resume(returning: ok)
+        confirmContinuation = nil
     }
 
     func saveSettings() {
@@ -172,25 +201,39 @@ final class GlobalAgentViewModel: ObservableObject {
     }
 
     private func runLocal(userText: String) async {
-        let q = userText.lowercased()
+        let q = userText
+        let ql = q.lowercased()
         var actions: [(String, [String: Any])] = []
-        if q.contains("快照") || q.contains("现在") || q.contains("状态") {
+        if q.contains("撤销") { actions.append(("agent.undo_last", [:])) }
+        if q.contains("快照") || q.contains("状态") {
             actions.append(("context.get_snapshot", ["scope": "brief"]))
         }
         if q.contains("外贸") { actions.append(("nav.switch_workbench", ["workbenchId": "trade"])) }
         if q.contains("超级") || q.contains("综合") { actions.append(("nav.switch_workbench", ["workbenchId": "general"])) }
         if q.contains("日报") || q.contains("每日总结") { actions.append(("nav.open_section", ["sectionId": "dailySummary"])) }
-        if q.contains("看板") || q.contains("任务") { actions.append(("nav.open_section", ["sectionId": "tasks"])) }
+        if q.contains("看板") { actions.append(("nav.open_section", ["sectionId": "tasks"])) }
         if q.contains("日程") { actions.append(("nav.open_section", ["sectionId": "scheduleCenter"])) }
         if q.contains("员工") { actions.append(("nav.open_section", ["sectionId": "roster"])) }
         if q.contains("总览") { actions.append(("nav.open_section", ["sectionId": "overview"])) }
-        if q.contains("seo") { actions.append(("nav.open_section", ["sectionId": "dailySeo"])) }
+        if ql.contains("seo") { actions.append(("nav.open_section", ["sectionId": "dailySeo"])) }
+        if q.hasPrefix("建任务") || q.hasPrefix("创建任务") || q.contains("新建任务") {
+            let title = q.replacingOccurrences(of: "建任务", with: "")
+                .replacingOccurrences(of: "创建任务", with: "")
+                .replacingOccurrences(of: "新建任务", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            if !title.isEmpty { actions.append(("task.create", ["title": title])) }
+        }
+        if q.hasPrefix("完成任务") || q.contains("标为完成") {
+            if let id = store?.scopedTasks.first?.id {
+                actions.append(("task.set_status", ["id": id, "status": "完成"]))
+            }
+        }
         if actions.isEmpty {
             actions.append(("context.get_snapshot", ["scope": "brief"]))
         }
         var lines: [String] = ["（本地模式 · 未配置 API Key）"]
         for (name, params) in actions {
-            let step = executor.execute(name: name, params: params)
+            let step = await executor.execute(name: name, params: params)
             steps.append(step)
             messages.append(AgentChatMessage(role: .tool, content: step.detail, toolName: name, toolArgsSummary: step.argsSummary, ok: step.ok, ms: step.ms))
             lines.append("• \(name): \(step.ok ? "OK" : "FAIL")")
@@ -199,7 +242,7 @@ final class GlobalAgentViewModel: ObservableObject {
     }
 
     private func runLLM(userText: String, apiKey: String) async {
-        let snap = executor.execute(name: "context.get_snapshot", params: ["scope": "brief"])
+        let snap = await executor.execute(name: "context.get_snapshot", params: ["scope": "brief"])
         steps.append(snap)
         let system = """
         你是超级工作台全局 Agent。只使用提供的 tools 操控工作台。当前上下文：
@@ -239,7 +282,7 @@ final class GlobalAgentViewModel: ObservableObject {
                           let name = fn["name"] as? String else { continue }
                     let argStr = fn["arguments"] as? String ?? "{}"
                     let params = (try? JSONSerialization.jsonObject(with: Data(argStr.utf8))) as? [String: Any] ?? [:]
-                    let step = executor.execute(name: name, params: params)
+                    let step = await executor.execute(name: name, params: params)
                     steps.append(step)
                     messages.append(AgentChatMessage(role: .tool, content: step.detail, toolName: name, toolArgsSummary: step.argsSummary, ok: step.ok, ms: step.ms))
                     apiMessages.append([

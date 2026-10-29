@@ -81,7 +81,12 @@ actor AgentLLMClient {
             tool("nav.open_section", "打开模块", ["sectionId": ["type": "string"]], ["sectionId"]),
             tool("nav.switch_workbench", "切换工作台", ["workbenchId": ["type": "string"]], ["workbenchId"]),
             tool("schedule.open_day", "打开日程日", ["date": ["type": "string"]], ["date"]),
-            tool("daily.open_report", "打开日报", ["date": ["type": "string"]], ["date"])
+            tool("daily.open_report", "打开日报", ["date": ["type": "string"]], ["date"]),
+            tool("task.create", "创建任务", ["title": ["type": "string"], "note": ["type": "string"], "executor": ["type": "string"], "reviewer": ["type": "string"], "status": ["type": "string"]], ["title"]),
+            tool("task.update", "更新任务", ["id": ["type": "string"], "title": ["type": "string"], "note": ["type": "string"]], ["id"]),
+            tool("task.set_status", "改任务状态", ["id": ["type": "string"], "status": ["type": "string"]], ["id", "status"]),
+            tool("task.delete", "删除任务(需确认)", ["id": ["type": "string"]], ["id"]),
+            tool("agent.undo_last", "撤销上次可逆写", [String: Any](), [])
         ]
     }
 
