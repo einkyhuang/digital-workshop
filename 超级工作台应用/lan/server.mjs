@@ -7,7 +7,7 @@
  * - Does NOT touch Desktop 超级工作台.app
  *
  * Env:
- *   SW_LAN_PORT (default 8787)
+ *   SW_LAN_PORT (default 18787)
  *   SW_LAN_HOST (default 0.0.0.0)
  *   SW_LAN_REPO  absolute path to repo root (iCloud 超级工作台)
  *   SW_LAN_PASSCODE_FILE  override passcode path
@@ -20,7 +20,7 @@ import crypto from "crypto";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = Number(process.env.SW_LAN_PORT || 8787);
+const PORT = Number(process.env.SW_LAN_PORT || 18787);
 const HOST = process.env.SW_LAN_HOST || "0.0.0.0";
 
 function detectRepo() {

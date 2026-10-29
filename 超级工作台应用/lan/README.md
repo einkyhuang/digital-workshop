@@ -4,7 +4,7 @@
 
 ## 安全
 
-- 监听 `0.0.0.0:8787`，但 **拒绝非 RFC1918 / 非本机** 客户端
+- 监听 `0.0.0.0:18787`，但 **拒绝非 RFC1918 / 非本机** 客户端
 - 访问口令：`超级工作台应用/data/private/lan/passcode`（gitignore，`chmod 600`）
 - 登录后 HttpOnly Session Cookie；无端口转发 / 隧道
 
@@ -15,7 +15,7 @@ cd 超级工作台应用/lan
 ./install-launchagent.sh
 ```
 
-手机连同一 Wi‑Fi，Safari 打开 `http://<Mac局域网IP>:8787/`，输入口令；可「添加到主屏幕」。
+手机连同一 Wi‑Fi，Safari 打开 `http://<Mac局域网IP>:18787/`，输入口令；可「添加到主屏幕」。
 
 ## 日志
 

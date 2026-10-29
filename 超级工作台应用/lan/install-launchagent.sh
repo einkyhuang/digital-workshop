@@ -41,4 +41,4 @@ launchctl kickstart -k "gui/$(id -u)/${LABEL}" 2>/dev/null || launchctl start "$
 echo "Installed LaunchAgent: $DEST"
 echo "Label: $LABEL"
 echo "Passcode file (chmod 600): $LAN_DIR/passcode"
-echo "Do NOT print passcode. curl http://127.0.0.1:8787/login"
+echo "Do NOT print passcode. curl http://127.0.0.1:18787/login"
