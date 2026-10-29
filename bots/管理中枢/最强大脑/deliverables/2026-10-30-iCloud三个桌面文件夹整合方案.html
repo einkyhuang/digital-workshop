@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>iCloud三个桌面文件夹整合方案 · 2026-10-30</title>
+<style>
+:root { color-scheme: light dark; }
+body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  margin: 0 auto; padding: 16px 14px 48px; max-width: 820px; line-height: 1.55; font-size: 15px; }
+h1 { font-size: 1.45rem; margin: 0.2em 0 0.6em; }
+h2 { font-size: 1.2rem; margin: 1.4em 0 0.5em; border-bottom: 1px solid #8883; padding-bottom: .25em; }
+h3 { font-size: 1.05rem; margin: 1.1em 0 0.4em; }
+p { margin: .45em 0; }
+ul, ol { padding-left: 1.25em; margin: .4em 0; }
+li { margin: .25em 0; }
+code { font-family: ui-monospace, Menlo, monospace; font-size: .88em;
+  background: #8882; padding: .1em .35em; border-radius: 4px; word-break: break-all; }
+pre { background: #8881; padding: 10px 12px; border-radius: 8px; overflow-x: auto; font-size: 12px; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: .6em 0; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { border: 1px solid #8884; padding: 6px 8px; vertical-align: top; text-align: left; }
+th { background: #8882; }
+hr { border: none; border-top: 1px solid #8884; margin: 1.2em 0; }
+.badge { display:inline-block; background:#0a7; color:#fff; padding:2px 8px; border-radius:999px; font-size:12px; }
+.note { background:#8881; border-radius:8px; padding:10px 12px; margin: .8em 0; }
+</style>
+</head>
+<body>
+<p><span class="badge">只读方案</span> Asia/Shanghai · 2026-10-30 · 大可可-最强大脑</p>
+<div class="note"><strong>结论：</strong>三堆旧桌面共约 90G+；两个已进 <code>iCloud旧存档</code>，系统 <code>Desktop</code>（61G）仍在顶层。跨夹重复约 0.16G（21 组），内部重复约 2G。明天迁 Desktop 内容再分类；不删，重复进「待确认重复」。</div>
+<h1>iCloud 三个「桌面」文件夹整合方案</h1>
+
+<p><strong>日期</strong>：2026-10-30（Asia/Shanghai）  </p>
+<p><strong>作者</strong>：大可可-最强大脑  </p>
+<p><strong>范围</strong>：只读分析 + 方案；<strong>本文件不执行任何移动</strong>。不含密钥；客户相关文件夹只写数量与类型，不展开联系人内容。</p>
+
+<hr>
+
+<h2>0. 两分钟结论</h2>
+
+<p>iCloud 里其实有三堆「旧桌面」：<code>新mac mini 桌面</code>（约 2.4–2.6GB，网站报价/字体/插件，偏 2025 春）、<code>Desktop</code>（约 <strong>61GB</strong>，另一台机器曾经同步上来的桌面，<strong>不是</strong>你现在这台 Mac 的 <code>~/Desktop</code>）、<code>桌面为整理</code>（约 <strong>28–32GB</strong>，里面一层叫「桌面」，偏 2011–2023 的照明/外贸历史资料）。  </p>
+<p>今晚已获准把前两个整包挪进 <code>iCloud旧存档/</code>；<strong>实测</strong>：<code>新mac mini 桌面</code> 与 <code>桌面为整理</code> 已在归档夹内，<strong><code>Desktop</code> 仍停在 iCloud 顶层</strong>（系统 iCloud 桌面同步夹，整夹改名常会失败，需按「迁内容、留空壳」处理）。  </p>
+<p>跨三堆「同名+同大小」重复约 <strong>21 组 / 约 0.16GB</strong>（抽检 19 组 md5 内容相同）；各堆内部重复约 <strong>2664 组 / 约 2GB</strong>（多为主题包、案例图双份、梯子安装包）。  </p>
+<p>建议明天：先把 <code>Desktop</code> 的内容并入 <code>iCloud旧存档/Desktop/</code>，再按下方结构重分类；<strong>一律不删</strong>，重复件进「待确认重复」；标注「勿动」的项先跳过。</p>
+
+<hr>
+
+<h2>1. 路径对照（用户口误 → 实际名 → 当前位置）</h2>
+
+<div class="table-wrap"><table>
+<tr><th>用户说法</th><th>iCloud 实际名</th><th>当前路径（2026-10-30 04:48 后）</th><th>体量（du）</th><th>顶层项</th></tr>
+<tr><td>C Mac mini桌面</td><td><code>新mac mini 桌面</code></td><td><code>…/iCloud旧存档/新mac mini 桌面</code></td><td><strong>2.4G</strong></td><td>41</td></tr>
+<tr><td>桌面</td><td><code>Desktop</code></td><td>仍在 <code>…/CloudDocs/Desktop</code>（<strong>未进旧存档</strong>）</td><td><strong>61G</strong></td><td>64</td></tr>
+<tr><td>桌面未整理</td><td><code>桌面为整理</code>（「为」应为「未」）</td><td><code>…/iCloud旧存档/桌面为整理</code></td><td><strong>28G</strong></td><td>1（内含「桌面」）</td></tr>
+</table></div>
+
+<p>完整根：</p>
+
+<pre><code>
+~/Library/Mobile Documents/com~apple~CloudDocs/
+
+  iCloud旧存档/
+
+    新mac mini 桌面/          ← 已迁入
+
+    桌面为整理/               ← 已迁入（内层：桌面/）
+
+  Desktop/                    ← 仍在顶层，待迁入内容
+
+</code></pre>
+
+<p><strong>重要</strong>：本机 <code>~/Desktop</code> <strong>没有</strong>打开「桌面与文稿」同步到 iCloud；<code>CloudDocs/Desktop</code> 是<strong>另一台旧机器留下的同步桌面</strong>，内容和今天的 Mac 桌面不同。本机另有 <code>~/Desktop/桌面未整理</code>、<code>~/Desktop/桌面归档</code>、<code>~/Desktop/网站项目</code>——<strong>不在本次三夹合并范围内</strong>，只做重叠提示。</p>
+
+<p>云占位符 <code>*.icloud</code>：三夹扫描均为 <strong>0</strong>（内容都在本地）。</p>
+
+<hr>
+
+<h2>2. 各原文件夹装了什么（顶层清单 + 合并后结构位置）</h2>
+
+<h3>2.1 <code>iCloud旧存档/新mac mini 桌面</code>（41 项 · ~2.4G · 707 文件 / 118 子目录）</h3>
+
+<ul>
+<li><strong>时间跨度</strong>：最旧约 2015-08，最新约 2025-12（主体 2025-03 前后）。  </li>
+<li><strong>类型</strong>：jpg/png 为主，夹杂 php（插件解压）、pdf、字体包、zip。  </li>
+<li><strong>气质</strong>：做网站时的报价稿、案例截图、TheGem/字体、少量客户站点素材。</li>
+</ul>
+
+<p><strong>顶层（41）</strong>  </p>
+<p>文件夹：<code>Eros_v1.0</code>、<code>ancorli-…font…</code>、<code>doubly</code>、<code>gendy-…font…</code>、<code>logo-dna-chip-…</code>、<code>things-…font…</code>、<code>卓凌电商网站</code>、<code>威派素材</code>、<code>投影仪</code>、<code>李火火</code>、<code>深圳新维度SEO</code>、<code>深圳美洛客</code>、<code>网站报价方案</code>、<code>茶文化</code>、<code>许翔</code>  </p>
+<p>文件：含 <code>SEO全年方案.pdf</code>、<code>TheGem_Elementor.zip</code>、<code>Zhian网站诊断报告.*</code>、<code>woo-bulk-editor.zip</code>、<code>授权书.pdf</code>、<code>破解版-unlimited-elements-…zip</code>、若干截屏与 logo、<code>钜楷威.pdf</code> 等。</p>
+
+<p><strong>建议并入</strong>：<code>网站资料/报价与案例</code>（网站报价方案）、<code>网站资料/主题插件</code>（TheGem/doubly/Eros/zip）、<code>设计素材/字体</code>、<code>设计素材/图片与截屏</code>、客户相关子夹（约 2 个顶层）→ <code>历史项目素材/客户站-摘要</code>（整夹搬、不展开）。</p>
+
+<h3>2.2 <code>CloudDocs/Desktop</code>（64 项 · ~61G · ~5.7 万文件 / ~7500 子目录）— 仍在顶层</h3>
+
+<ul>
+<li><strong>时间跨度</strong>：标记上有 1980 占位，主体约 2023–2025；文件夹 mtime 多在 2024–2026。  </li>
+<li><strong>大头</strong>：<code>未整理</code> ~20G、<code>桌面 - Mac mini</code> ~10G、<code>自有穿戴甲资料</code> ~8G、<code>LEVI</code> ~7.3G，其余为 WP 主题/插件、客户站素材、发票、梯子等。  </li>
+<li><strong>气质</strong>：旧 Mac 的「整桌面快照」+ 主题仓库 + 产品图库。</li>
+</ul>
+
+<p><strong>顶层文件夹（33）</strong>  </p>
+<p><code>20250221</code>、<code>Afbless</code>、<code>ai测试素材</code>、<code>ELE PRO</code>、<code>fapiao</code>、<code>jia</code>、<code>Jukaiwtec</code>、<code>LEVI</code>、<code>moremorepet</code>、<code>NBB</code>、<code>Thegem</code>、<code>thezhentea products</code>、<code>WP</code>、<code>Wujasmine</code>、<code>Wujasmines编绳手链</code>、<code>上海Tourz China</code>、<code>专业版-张家佳字体…</code>、<code>亚马逊相关资料</code>（空）、<code>北京客户</code>、<code>成人</code>、<code>未命名5</code>、<code>未整理</code>、<code>桌面 - Mac mini</code>、<code>梯子</code>、<code>沃瑞贸易</code>（空）、<code>深圳市毅拓建筑工程有限公司</code>、<code>独立站主题</code>、<code>知识有成</code>、<code>网站报价方案</code>、<code>网站案例</code>、<code>自有穿戴甲资料</code>、<code>软件不能删</code>、<code>钜楷威</code></p>
+
+<p><strong>顶层散文件（31）</strong>  </p>
+<p>含大 Keynote <code>thezhentea products.key</code>、视频 <code>genrises video.mp4</code> / <code>MateView.mp4</code>、与 <code>新mac</code> 重复的 <code>授权书.pdf</code> / <code>破解版-…zip</code> / <code>doubly.zip</code>、若干截屏与建站图等。</p>
+
+<p><strong><code>Desktop/桌面 - Mac mini</code>（约 63 顶层 · ~10G）</strong>  </p>
+<p>含若干 <code>.app</code>、站点备份 zip（如 formorelighting / 鸿泰等）、WP 主题包、截屏、Clash 安装包等——这是「更早一台 Mac mini 桌面」的嵌套副本。</p>
+
+<p><strong><code>Desktop/未整理</code>（~20G）</strong>  </p>
+<p>散落图片、主题解压包、教程、yaml 等，与本机 <code>~/Desktop</code> 仅有极少数同名（如曾出现「临时文件」「常用工具」名碰撞，内容未等同）。</p>
+
+<p><strong>建议并入</strong>：见 §4；<strong>勿动</strong>：<code>软件不能删</code>、<code>梯子</code>（见 §6）。</p>
+
+<h3>2.3 <code>iCloud旧存档/桌面为整理</code>（1 顶层 · ~28G）</h3>
+
+<p>内层唯一文件夹：<code>桌面/</code>（约 506 顶层 · ~1.9 万文件）。</p>
+
+<ul>
+<li><strong>时间跨度</strong>：约 2011-11 → 2025-12（主体更早）。  </li>
+<li><strong>类型</strong>：jpg 海量（含「1.5万张广交会现场名片」图集）、pdf/xlsx/psd、视频、压缩包。  </li>
+<li><strong>顶层分类约</strong>：文档 ~291 / 3.2G；视频 ~25 / 7.6G；压缩包 ~19 / 5.8G；设计原件 ~25 / 1.6G；图片散文件 ~103；<strong>子文件夹 29 个 ~13.6G</strong>。  </li>
+<li><strong>客户/名录类顶层</strong>：约 <strong>41</strong> 个名称命中「客户/贸易/公司/报价」等（只计数量）；另有约 9 个名录类表、8 个报价/授权类 pdf。</li>
+</ul>
+
+<p><strong>内层主要子文件夹（29）</strong>  </p>
+<p><code>home</code>(~4.4G)、<code>塔罗亚</code>(~3.3G)、<code>2018.09.25_奶泡机</code>(~2.9G)、<code>港荣相关资料</code>(~1.1G)、<code>1.5万张广交会现场名片</code>(~0.75G)、<code>haier果汁原汁机设计首图</code>、<code>068127-gift-card-mockup-09</code>、<code>未整理</code>、<code>迭代研习社资料</code>、<code>【重构零售实验室】…</code>、<code>果果模卡</code>、<code>优臣团队相关照片</code>、<code>SSD HUB产品设计</code>、<code>智能盐盖</code>、<code>帽子模特图</code>、<code>跨境案例-电脑支架</code>、<code>亚马逊缝纫机视频</code>、<code>182水壶</code>、<code>世界地图</code>、<code>2020发票</code>、<code>嘉冠runyu名片</code>、<code>抖店品牌创建资料</code>、<code>二姐</code>、<code>壁灯</code>、<code>展会营销</code>、<code>社交媒体运营报价</code>、<code>外贸职业能力评估表</code>、两个 <code>.mindnode</code> 包等。</p>
+
+<p><strong>建议并入</strong>：<code>历史业务档案/</code>（按产品/年份子夹保留原名）、名片图集单独 <code>历史业务档案/广交会名片图集/</code>、大视频 → <code>视频与录屏/</code>、大压缩包 → <code>压缩包/</code>。</p>
+
+<h3>2.4 今晚「整包迁入」后的合并结构（实况）</h3>
+
+<pre><code>
+iCloud旧存档/                          ← 已建
+
+├── 新mac mini 桌面/                   ← 已在（内容未动）
+
+├── 桌面为整理/                        ← 已在（内容未动）
+
+│   └── 桌面/                          ← 真正的大杂烩
+
+└── （缺）Desktop/                     ← 建议下一步迁入的目标名
+
+</code></pre>
+
+<p><code>Desktop</code> 因系统同步夹特性，<strong>不要</strong>对 <code>CloudDocs/Desktop</code> 本身 <code>mv</code> 改名；应：</p>
+
+<ol>
+<li>在 <code>iCloud旧存档/</code> 下新建 <code>Desktop/</code>（或 <code>Desktop-旧同步桌面/</code>）；  </li>
+<li>把现有 <code>CloudDocs/Desktop/*</code> <strong>逐项</strong> <code>mv -n</code> 进去；  </li>
+<li>顶层留下空的系统 <code>Desktop</code>（或仅保留系统需要的结构）。</li>
+</ol>
+
+<hr>
+
+<h2>3. 分夹处置表（保留 / 合并 / 归档）</h2>
+
+<h3>3.1 <code>新mac mini 桌面</code></h3>
+
+<div class="table-wrap"><table>
+<tr><th>处置</th><th>项</th><th>说明</th></tr>
+<tr><td>合并</td><td><code>网站报价方案/</code></td><td>与 Desktop 同名夹 <strong>高度重复</strong>（md5 已确认多份案例图相同）→ 保留 Desktop 侧较全的一份为「主」，本夹进待确认或直接合并后主夹</td></tr>
+<tr><td>归档</td><td>字体包 4 个、<code>威派素材</code>、截屏、psd/avif/png</td><td>→ 设计素材</td></tr>
+<tr><td>归档</td><td><code>TheGem_Elementor.zip</code>、<code>doubly*</code>、<code>Eros_v1.0</code>、<code>woo-bulk-editor.zip</code></td><td>→ 网站资料/主题插件（Desktop 已有同内容 TheGem）</td></tr>
+<tr><td>待确认重复</td><td><code>授权书.pdf</code>、<code>破解版-unlimited-…zip</code>、<code>doubly.zip</code></td><td>与 Desktop 顶层 <strong>md5 相同</strong></td></tr>
+<tr><td>整夹归档</td><td>客户相关顶层约 2 个、<code>深圳美洛客</code>、<code>茶文化</code> 等</td><td>→ 历史项目素材（不改内部）</td></tr>
+<tr><td>备注</td><td><code>破解版-…</code></td><td>仅归档位置建议；不传播、不启用</td></tr>
+</table></div>
+
+<h3>3.2 <code>Desktop</code>（旧同步桌面）</h3>
+
+<div class="table-wrap"><table>
+<tr><th>处置</th><th>项</th><th>说明</th></tr>
+<tr><td><strong>勿动</strong></td><td><code>软件不能删/</code></td><td>名称明示；内含 AppCleaner / SideNotes 等</td></tr>
+<tr><td><strong>勿动（先）</strong></td><td><code>梯子/</code></td><td>工具安装包；也与本机 <code>网站项目</code> 存在<strong>同名</strong>碰撞风险，先原样迁入旧存档再议</td></tr>
+<tr><td>归档主仓</td><td><code>独立站主题/</code>、<code>WP/</code>、<code>Thegem/</code>、<code>ELE PRO/</code></td><td>→ 网站资料/主题插件</td></tr>
+<tr><td>归档</td><td><code>网站报价方案/</code>、<code>网站案例/</code></td><td>→ 网站资料/报价与案例（作主副本）</td></tr>
+<tr><td>归档</td><td><code>LEVI/</code>、<code>自有穿戴甲资料/</code>、<code>thezhentea products/</code>、品牌图夹</td><td>→ 设计素材/产品图库</td></tr>
+<tr><td>归档</td><td><code>fapiao/</code>、<code>知识有成/</code></td><td>→ 历史业务档案/财务与课程</td></tr>
+<tr><td>归档</td><td><code>桌面 - Mac mini/</code></td><td>→ <code>来源快照/Mac-mini桌面-2024/</code>（整夹保留）</td></tr>
+<tr><td>拆分整理</td><td><code>未整理/</code> (~20G)</td><td>第二阶段按扩展名分流；先整夹迁入 <code>待整理/Desktop-未整理/</code></td></tr>
+<tr><td>空壳可标</td><td><code>亚马逊相关资料</code>、<code>沃瑞贸易</code>、部分空客户夹</td><td>保留空夹或并入待确认（不删）</td></tr>
+<tr><td>客户夹</td><td><code>北京客户</code>、<code>上海Tourz China</code>、公司名夹等（约 4 个顶层命中）</td><td>整夹 → 历史项目素材；不展开</td></tr>
+</table></div>
+
+<h3>3.3 <code>桌面为整理/桌面</code></h3>
+
+<div class="table-wrap"><table>
+<tr><th>处置</th><th>项</th><th>说明</th></tr>
+<tr><td>归档</td><td>29 个子文件夹</td><td>整夹进 <code>历史业务档案/</code>，保留原名</td></tr>
+<tr><td>归档</td><td>广交会名片图集</td><td>单独子目录，体积大、文件极多</td></tr>
+<tr><td>归档</td><td>顶层视频/PSD/压缩包</td><td>按类型进视频、设计、压缩包</td></tr>
+<tr><td>待确认重复</td><td><code>方来未艾-一站式外贸服务.pdf</code>（~85MB）</td><td>与 <code>Desktop/未整理/</code> <strong>md5 相同</strong> → 留 Desktop 侧，本份进待确认</td></tr>
+<tr><td>待确认重复</td><td>内层多份同名产品图 / <code>精通买家搜索.key</code> 等</td><td>进待确认重复</td></tr>
+<tr><td>注意</td><td>名录/海关/名片类文件约数十</td><td><strong>仅归档、不上传公开仓库、不在报告展开内容</strong></td></tr>
+</table></div>
+
+<hr>
+
+<h2>4. 建议最终结构</h2>
+
+<p>在 <code>iCloud旧存档/</code> 下（可与现有两个整包并存，第二阶段再摊平）：</p>
+
+<pre><code>
+iCloud旧存档/
+
+├── _来源快照/                 ← 可选：暂存未拆的整包
+
+│   ├── 新mac mini 桌面/       ← 已在（可稍后拆）
+
+│   ├── 桌面为整理/            ← 已在
+
+│   └── Desktop-旧同步桌面/    ← 待迁入 Desktop 内容
+
+├── 网站资料/
+
+│   ├── 报价与案例/
+
+│   ├── 主题插件/
+
+│   └── 站点备份zip/
+
+├── 设计素材/
+
+│   ├── 字体/
+
+│   ├── 产品图库/
+
+│   └── 图片与截屏/
+
+├── 历史业务档案/              ← 桌面为整理 主体
+
+│   └── 广交会名片图集/
+
+├── 视频与录屏/
+
+├── 压缩包与安装包/
+
+├── 软件保留/                  ← 从 软件不能删 迁入后改名更清晰
+
+├── 待整理/                    ← Desktop/未整理 先整夹放这里
+
+├── 待确认重复/                ← 规则：不删，只搬副本到这里
+
+└── 杂项/
+
+</code></pre>
+
+<p>与本机 <code>~/Desktop/桌面归档/</code>（已有 图片/文档/压缩包/视频/杂项）<strong>职责分开</strong>：  </p>
+<ul>
+<li>本机桌面归档 = <strong>当前 Mac 桌面</strong>日常清理；  </li>
+<li><code>iCloud旧存档</code> = <strong>旧机器 / 旧桌面快照</strong>长期冷数据。</li>
+</ul>
+
+<hr>
+
+<h2>5. 命名规则</h2>
+
+<ol>
+<li><strong>不删、不覆盖</strong>：一律 <code>mv -n</code>；撞名则后缀 <code>-来自新mac</code> / <code>-来自Desktop</code> / <code>-来自桌面为整理</code>。  </li>
+<li><strong>重复件</strong>：确认 md5 相同后，<strong>保留「主位置」一份</strong>，其余移入 <code>待确认重复/YYYY-MM/</code>，文件名加来源前缀。  </li>
+<li><strong>来源快照</strong>：在彻底拆散前，可先保留整包，拆完再把空来源夹移入 <code>_来源快照/已拆完/</code>。  </li>
+<li><strong>客户/合同夹</strong>：只整夹移动，不重命名内部文件。  </li>
+<li><strong>系统 Desktop</strong>：不重命名 <code>CloudDocs/Desktop</code> 文件夹本身。</li>
+</ol>
+
+<hr>
+
+<h2>6. 重复清单（跨夹 · 建议保留哪份）</h2>
+
+<p>跨三夹「同名+同大小」<strong>21 组</strong>，冗余约 <strong>0.16GB</strong>；对全部 &amp;lt;200MB 组做了 md5：<strong>19 组内容相同，2 组同名同大小但内容不同</strong>（<code>客户跟进情况表.xls</code>、大量主题自带的 <code>index.php</code>/<code>GPL.txt</code> 类——后者可忽略）。</p>
+
+<div class="table-wrap"><table>
+<tr><th>文件</th><th>建议保留</th><th>其余去向</th></tr>
+<tr><td><code>方来未艾-一站式外贸服务.pdf</code> (~85MB)</td><td><code>Desktop/未整理/</code></td><td>桌面为整理 份 → 待确认重复</td></tr>
+<tr><td><code>TheGem_Elementor.zip</code></td><td><code>Desktop/Thegem/</code>（或 独立站主题 主仓一份）</td><td>新mac 顶层 + WP 内多份 → 待确认</td></tr>
+<tr><td><code>破解版-unlimited-elements-…zip</code></td><td>Desktop 顶层任留 1</td><td>新mac 顶层 → 待确认</td></tr>
+<tr><td><code>授权书.pdf</code></td><td>Desktop 顶层</td><td>新mac → 待确认</td></tr>
+<tr><td><code>网站报价方案/</code> 下多张案例 png/pdf</td><td><strong>Desktop/网站报价方案/</strong> 作主</td><td>新mac 对应文件 → 待确认</td></tr>
+<tr><td><code>SEO全年方案.pdf</code> / <code>基础定制网站报价方案.pdf</code></td><td>Desktop/网站报价方案</td><td>新mac 顶层重复 → 待确认</td></tr>
+<tr><td><code>woo-bulk-editor.zip</code></td><td>Desktop/WP/… 主仓</td><td>新mac 顶层 → 待确认</td></tr>
+<tr><td><code>西班牙客户列表.pdf</code></td><td>待你指定主位置（两侧各一）</td><td>另一份 → 待确认（客户资料，勿公开）</td></tr>
+<tr><td><code>GPL.txt</code> / <code>index.php</code> 海量</td><td>忽略（主题包标准文件）</td><td>—</td></tr>
+</table></div>
+
+<p><strong>内部重复</strong>（约 2664 组 / ~2GB）：主要在 <code>网站报价方案/网站案例/案例/</code> 与分类子夹双份图、<code>WP</code>↔<code>独立站主题</code>↔<code>未整理</code> 主题 zip 双份、<code>梯子</code> 教程树与主树安装包三份。第二阶段按「主题主仓只留 <code>独立站主题</code>+<code>WP</code>」规则收。</p>
+
+<hr>
+
+<h2>7. 与本机桌面的重叠（勿混）</h2>
+
+<div class="table-wrap"><table>
+<tr><th>对照</th><th>结论</th></tr>
+<tr><td><code>~/Desktop</code> vs <code>CloudDocs/Desktop</code></td><td><strong>不是同一桌面</strong>；本机未开桌面同步</td></tr>
+<tr><td><code>~/Desktop/桌面归档</code></td><td>今晚网站扁平化日志所在；与 iCloud 三夹 <strong>无同名顶层重叠</strong></td></tr>
+<tr><td><code>~/Desktop/网站项目</code></td><td>与 iCloud Desktop 仅发现同名 <strong><code>梯子</code></strong>（需人工确认是否同义）；网站工程以本机 <code>网站项目/{进行中,已交付,…}</code> 为准</td></tr>
+<tr><td><code>~/Desktop/桌面未整理</code></td><td><strong>本机另一堆</strong>，不在本次三夹内；以后可单独做方案</td></tr>
+</table></div>
+
+<hr>
+
+<h2>8. 勿动清单（进行中 / bot / 明示保留）</h2>
+
+<div class="table-wrap"><table>
+<tr><th>项</th><th>原因</th></tr>
+<tr><td><code>Desktop/软件不能删/</code></td><td>明示保留</td></tr>
+<tr><td><code>Desktop/梯子/</code></td><td>工具包；先原样进旧存档，确认无进程占用再整理</td></tr>
+<tr><td><code>Desktop/桌面 - Mac mini/solar.formorelighting.com_*</code> 及同类站点备份</td><td>可能仍被建站回顾引用；整夹进「站点备份zip」，拆包需你点头</td></tr>
+<tr><td><code>~/Desktop/网站项目/**</code>、<code>照明客户</code>、<code>超级工作台*</code>、Skills 等</td><td><strong>不在本次范围</strong>，禁止顺手动</td></tr>
+<tr><td>客户名录 / 海关数据 / 名片图集</td><td>可搬家归档，<strong>禁止</strong>进公开 Git、禁止报告贴正文</td></tr>
+</table></div>
+
+<hr>
+
+<h2>9. 执行清单（明天逐步；全程不删）</h2>
+
+<ol>
+<li><strong>确认现状</strong>：打开 <code>iCloud旧存档</code>，看到 <code>新mac mini 桌面</code>、<code>桌面为整理</code>；确认 <code>CloudDocs/Desktop</code> 仍在顶层。  </li>
+<li><strong>迁 Desktop 内容</strong>（推荐）：  </li>
+</ol>
+<p>   <code>mkdir -p &quot;…/iCloud旧存档/Desktop-旧同步桌面&quot;</code>  </p>
+<p>   对 <code>CloudDocs/Desktop</code> 下每一项 <code>mv -n</code> 到上述目录（跳过 <code>.DS_Store</code>；<strong>跳过</strong>若有系统正在写的项）。  </p>
+<ol>
+<li><strong>建目标子目录</strong>：按 §4 在 <code>iCloud旧存档</code> 建 <code>网站资料/设计素材/…/待确认重复</code>。  </li>
+<li><strong>先处理已确认重复（§6 表）</strong>：副本进 <code>待确认重复/2026-10/</code>，主份留在建议位置。  </li>
+<li><strong>拆 <code>新mac mini 桌面</code></strong>：报价方案合并到 Desktop 主仓；字体/截屏/插件归类。  </li>
+<li><strong>拆 <code>桌面为整理/桌面</code></strong>：29 个子夹整迁 <code>历史业务档案/</code>；大视频/压缩包按类型；名片图集单独。  </li>
+<li><strong><code>Desktop/未整理</code></strong>：先整夹进 <code>待整理/</code>，不要第一天就按文件拆 20G。  </li>
+<li><strong>写移动日志</strong>：仿桌面归档，留 <code>icloud-archive-move-log-YYYY-MM-DD.json</code>（旧→新）。  </li>
+<li><strong>你过目 <code>待确认重复</code></strong>：确认后，仍不删，可再缩成「冷备份压缩包」或继续留着。  </li>
+<li><strong>本机 <code>~/Desktop/桌面未整理</code></strong>：另开任务，避免和 iCloud 旧桌面搞混。</li>
+</ol>
+
+<hr>
+
+<h2>10. 关键数字摘要</h2>
+
+<div class="table-wrap"><table>
+<tr><th>来源</th><th>路径状态</th><th>约体积</th><th>文件数</th><th>子目录数</th><th>顶层</th><th>新旧时间</th></tr>
+<tr><td>新mac mini 桌面</td><td>已在旧存档</td><td>2.4–2.6G</td><td>707</td><td>118</td><td>41</td><td>2015 → 2025-12</td></tr>
+<tr><td>Desktop</td><td>仍在 iCloud 顶层</td><td>61G</td><td>~57287</td><td>~7521</td><td>64</td><td>主体 2023–2025</td></tr>
+<tr><td>├ 桌面 - Mac mini</td><td>（Desktop 内）</td><td>~10G</td><td>~25574</td><td>~3507</td><td>~63</td><td>~2024</td></tr>
+<tr><td>└ 未整理</td><td>（Desktop 内）</td><td>~20G</td><td>~6260</td><td>~1034</td><td>很多</td><td>杂</td></tr>
+<tr><td>桌面为整理</td><td>已在旧存档</td><td>28–32G</td><td>18947</td><td>421</td><td>1→内 506</td><td>2011 → 2025</td></tr>
+<tr><td>跨夹重复</td><td>—</td><td>冗余 ~0.16G</td><td>21 组</td><td>—</td><td>—</td><td>19/21 md5 相同</td></tr>
+<tr><td>内部重复</td><td>—</td><td>冗余 ~2G</td><td>2664 组</td><td>—</td><td>—</td><td>主题/案例/梯子为主</td></tr>
+<tr><td>云占位符</td><td>—</td><td>—</td><td>0</td><td>—</td><td>—</td><td>均已本地下载</td></tr>
+</table></div>
+
+<hr>
+
+<h2>11. 分析说明</h2>
+
+<ul>
+<li>机器：<code>machineId 88b9804f-…</code>（MateView Mac）；全程只读扫描（<code>ls</code> / <code>du</code> / <code>os.walk</code> / <code>md5</code>），<strong>本报告撰写过程未再移动任何文件</strong>。  </li>
+<li>「整包迁入旧存档」由用户批准的先前操作完成；本报告记录迁入后的实况差异（Desktop 未进档）。  </li>
+<li>公开仓库仅提交本方案 md/html，不含客户表内容与密钥。</li>
+</ul>
+</body>
+</html>
