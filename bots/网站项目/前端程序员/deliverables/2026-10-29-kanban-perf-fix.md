@@ -29,7 +29,7 @@
 
 ## 修复后耗时
 - **Mac**：窗口出现约 **1.4–3.2s**（修复前 30s+ 仍为 0）；截图可见总览已加载 workspace。
-- **Web（本地 8766 验证）**：index TTFB ≈3ms；25 张头像合计 2.49MB、串行下载 ≈0.02s。Pages 部署后以线上为准。
+- **Web（本地 8766 验证）**：index TTFB ≈3ms；25 张头像合计 2.49MB、串行下载 ≈0.02s。Pages 已上线：HTML TTFB≈0.085s；`avatars/patrol.png`≈93KB（修复前同目录单张可达 ~0.3–1.1MB）；线上截图 `sw-web-live-after.png`。
 
 ## 截图
 - Mac：`bots/网站项目/前端程序员/deliverables/sw-mac-after.png`
