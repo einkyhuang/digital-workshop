@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO & GEO 双重体检完整报告 - www.formorelightings.com</title>
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #f1f5f9;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-page); color: var(--text-main); padding: 40px 20px; line-height: 1.5; }
+        .container { max-width: 1060px; margin: 0 auto; }
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            color: #ffffff; border-radius: var(--radius-lg); padding: 36px 40px; margin-bottom: 32px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px;
+        }
+        .hero-left h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+        .hero-meta { font-size: 13px; color: #c7d2fe; display: flex; gap: 16px; flex-wrap: wrap; }
+        .score-gauges { display: flex; gap: 20px; }
+        .gauge-card {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: var(--radius-md);
+            padding: 16px 22px; text-align: center; min-width: 130px;
+        }
+        .gauge-score { font-size: 38px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+        .gauge-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #e0e7ff; font-weight: 600; }
+        .section-title { font-size: 20px; font-weight: 700; margin: 40px 0 8px 0; display: flex; align-items: center; gap: 8px; }
+        .section-desc { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+        .cards-grid { display: flex; flex-direction: column; gap: 20px; }
+        .pillar-card {
+            background: var(--bg-card); border: 1px solid #e2e8f0; border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm); overflow: hidden;
+        }
+        .pillar-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 24px; border-bottom: 1px solid var(--border-color);
+        }
+        .pillar-title-group { display: flex; align-items: center; gap: 10px; }
+        .pillar-bar { width: 4px; height: 18px; border-radius: 4px; }
+        .pillar-title { font-size: 16px; font-weight: 600; color: #1e293b; }
+        .pillar-help-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 18px; height: 18px; border-radius: 50%; background: #f1f5f9; color: #94a3b8; font-size: 11px;
+        }
+        .pillar-score-badge { padding: 3px 12px; border-radius: 9999px; font-weight: 700; font-size: 13px; }
+        .audit-item { display: flex; padding: 14px 24px; border-bottom: 1px solid var(--border-color); gap: 14px; align-items: flex-start; }
+        .audit-item:last-child { border-bottom: none; }
+        .item-icon { width: 22px; height: 22px; margin-top: 1px; flex-shrink: 0; }
+        .item-content { flex: 1; }
+        .item-title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; flex-wrap: wrap; }
+        .item-name { font-size: 15px; font-weight: 600; color: #1e293b; }
+        .val-badge {
+            font-size: 12px; background: #f1f5f9; color: #475569; padding: 1px 8px;
+            border-radius: 4px; font-family: monospace; font-weight: 500;
+        }
+        .item-desc { font-size: 14px; color: #64748b; line-height: 1.45; }
+        .action-card {
+            background: #ffffff; border: 1px solid #e2e8f0; border-radius: var(--radius-md);
+            padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow-sm);
+        }
+        .action-card.priority-p0 { border-left: 5px solid #ef4444; }
+        .action-card.priority-p1 { border-left: 5px solid #f59e0b; }
+        .action-card.priority-p2 { border-left: 5px solid #3b82f6; }
+        .action-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .priority-pill { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+        .priority-pill.priority-p0 { background: #fee2e2; color: #991b1b; }
+        .priority-pill.priority-p1 { background: #fef3c7; color: #92400e; }
+        .priority-pill.priority-p2 { background: #dbeafe; color: #1e40af; }
+        .action-title { font-size: 16px; font-weight: 600; color: #1e293b; }
+        .action-reason { font-size: 14px; color: #64748b; margin-bottom: 12px; }
+        .code-container { background: #0f172a; border-radius: 8px; overflow: hidden; margin-top: 10px; }
+        .code-header { background: #1e293b; padding: 7px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #94a3b8; }
+        .copy-btn { background: rgba(255,255,255,0.1); color: #ffffff; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        pre { padding: 14px; overflow-x: auto; color: #e2e8f0; font-family: monospace; font-size: 12px; line-height: 1.45; }
+        .track-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 700;
+            text-transform: uppercase; margin-bottom: 12px;
+        }
+        .track-seo { background: #e0f2fe; color: #0369a1; }
+        .track-geo { background: #ede9fe; color: #6d28d9; }
+        footer { margin-top: 50px; text-align: center; font-size: 12px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <div class="hero-left">
+                <h1>SEO & GEO 双重体检完整诊断报告</h1>
+                <div class="hero-meta">
+                    <span>🌐 目标：<strong>https://www.formorelightings.com</strong></span>
+                    <span>🕒 时间：2026-10-30 02:21:18</span>
+                    <span>⚡ TTFB：923.9ms</span>
+                    <span>📦 源码：101.7KB</span>
+                    <span>🖼️ 图片：30张</span>
+                    <span>🔗 内链：29个</span>
+                </div>
+            </div>
+            <div class="score-gauges">
+                <div class="gauge-card">
+                    <div class="gauge-score" style="color: #10b981;">91.5</div>
+                    <div class="gauge-label">SEO 传统得分</div>
+                </div>
+                <div class="gauge-card">
+                    <div class="gauge-score" style="color: #f59e0b;">71.5</div>
+                    <div class="gauge-label">GEO AI 准备度</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 1: TRADITIONAL SEO MATRIX (6 DIMENSIONS) -->
+        <span class="track-badge track-seo">TRACK 1 · TRADITIONAL TECHNICAL & ON-PAGE SEO</span>
+        <h2 class="section-title">🌐 传统 SEO 全景深度问题清单 (6 大维度 33 项诊断指标)</h2>
+        <p class="section-desc">深度剖析服务器传输、爬虫协议、URL 规范化、CWV 性能指标、On-Page 元标签与站内拓扑图谱：</p>
+
+        <div class="cards-grid">
+            
+            <div class="pillar-card">
+                <div class="pillar-header">
+                    <div class="pillar-title-group">
+                        <span class="pillar-bar" style="background: #0284c7;"></span>
+                        <h3 class="pillar-title">1. 网络传输与服务器健康 (Server & Network)</h3>
+                        <span class="pillar-help-icon" title="技术指标详情">?</span>
+                    </div>
+                    <div class="pillar-score-badge" style="background-color: #fef2f2; color: #b91c1c;">
+                        50
+                    </div>
+                </div>
+                <div class="pillar-items">
+                    
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">首字节响应时间 (TTFB)</span>
+                            <span class="val-badge">923.9ms</span>
+                        </div>
+                        <div class="item-desc">TTFB 耗时严重超过 Google 推荐的 600ms 门槛（理想 < 200ms）。动态回源性能过慢，直接拉低搜索引擎体验分。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">HTTPS 安全协议与证书</span>
+                            <span class="val-badge">TLS/HTTPS</span>
+                        </div>
+                        <div class="item-desc">全站强制通过安全 HTTPS 协议传输。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">HSTS 传输安全标头</span>
+                            <span class="val-badge">Enforced</span>
+                        </div>
+                        <div class="item-desc">已配置 Strict-Transport-Security，防范 SSL 降级中间人攻击。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">HTTP 安全防护标头</span>
+                            <span class="val-badge">Incomplete</span>
+                        </div>
+                        <div class="item-desc">缺失 X-Content-Type-Options / X-Frame-Options 标头。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">网络内容压缩 (Gzip/Brotli)</span>
+                            <span class="val-badge">Uncompressed</span>
+                        </div>
+                        <div class="item-desc">未启用 HTTP 压缩传输。</div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="pillar-card">
+                <div class="pillar-header">
+                    <div class="pillar-title-group">
+                        <span class="pillar-bar" style="background: #0284c7;"></span>
+                        <h3 class="pillar-title">2. 抓取收录与协议规范 (Crawlability & Protocols)</h3>
+                        <span class="pillar-help-icon" title="技术指标详情">?</span>
+                    </div>
+                    <div class="pillar-score-badge" style="background-color: #ecfdf5; color: #059669;">
+                        100
+                    </div>
+                </div>
+                <div class="pillar-items">
+                    
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">Robots.txt 协议解析与类型</span>
+                            <span class="val-badge">Valid text/plain</span>
+                        </div>
+                        <div class="item-desc">robots.txt 文件可正常访问且语法格式合法。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">XML Sitemap 站点地图声明</span>
+                            <span class="val-badge">Declared</span>
+                        </div>
+                        <div class="item-desc">Sitemap 入口已在 robots.txt 中清晰声明。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">页面可索引性指令 (Indexability)</span>
+                            <span class="val-badge">indexable</span>
+                        </div>
+                        <div class="item-desc">允许搜索引擎正常爬取收录。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">HTTP 响应状态码</span>
+                            <span class="val-badge">HTTP 200</span>
+                        </div>
+                        <div class="item-desc">首包返回正常 200 成功状态码，无多层无序重定向链。</div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="pillar-card">
+                <div class="pillar-header">
+                    <div class="pillar-title-group">
+                        <span class="pillar-bar" style="background: #0284c7;"></span>
+                        <h3 class="pillar-title">3. URL 架构与规范化 (Architecture & Canonical)</h3>
+                        <span class="pillar-help-icon" title="技术指标详情">?</span>
+                    </div>
+                    <div class="pillar-score-badge" style="background-color: #ecfdf5; color: #059669;">
+                        100
+                    </div>
+                </div>
+                <div class="pillar-items">
+                    
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">规范网址标签 (Canonical Tag)</span>
+                            <span class="val-badge">https://www.formorelightings.com</span>
+                        </div>
+                        <div class="item-desc">自引用规范网址正确配置，权重锁定唯一定位。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">URL 语义化与路径规范</span>
+                            <span class="val-badge">Clean Slug</span>
+                        </div>
+                        <div class="item-desc">语义化扁平 URL。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">HTML 语言环境声明 (lang)</span>
+                            <span class="val-badge">lang="en"</span>
+                        </div>
+                        <div class="item-desc">已正确声明语言代码 (en)，便于搜索地域路由。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">多语言与区域标记 (hreflang)</span>
+                            <span class="val-badge">1 Tags</span>
+                        </div>
+                        <div class="item-desc">配置了多语言/多国家 alternate 标签。</div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="pillar-card">
+                <div class="pillar-header">
+                    <div class="pillar-title-group">
+                        <span class="pillar-bar" style="background: #0284c7;"></span>
+                        <h3 class="pillar-title">4. 性能体验与 Core Web Vitals (Speed & CWV)</h3>
+                        <span class="pillar-help-icon" title="技术指标详情">?</span>
+                    </div>
+                    <div class="pillar-score-badge" style="background-color: #ecfdf5; color: #059669;">
+                        100
+                    </div>
+                </div>
+                <div class="pillar-items">
+                    
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">图片懒加载策略 (Lazy Loading)</span>
+                            <span class="val-badge">Optimized</span>
+                        </div>
+                        <div class="item-desc">图片加载策略健康 (30 张图片)。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">现代图片格式采纳 (WebP/AVIF)</span>
+                            <span class="val-badge">Modern Formats</span>
+                        </div>
+                        <div class="item-desc">主流图片采用 WebP/AVIF/SVG 等轻量高效格式。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">固有宽高属性与防抖 (CLS)</span>
+                            <span class="val-badge">Dimensioned</span>
+                        </div>
+                        <div class="item-desc">图片均有尺寸占位，有效防范 CLS 布局偏移。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">渲染阻塞脚本与异步 (INP)</span>
+                            <span class="val-badge">Async/Defer Ready</span>
+                        </div>
+                        <div class="item-desc">脚本异步控制优良 (4 脚本)。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">HTML 源码初始体积</span>
+                            <span class="val-badge">101.7 KB</span>
+                        </div>
+                        <div class="item-desc">首包 HTML 源码净重处于健康区间 (<100KB)。</div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="pillar-card">
+                <div class="pillar-header">
+                    <div class="pillar-title-group">
+                        <span class="pillar-bar" style="background: #0284c7;"></span>
+                        <h3 class="pillar-title">5. On-Page 元标签与 SERP 展现 (Metadata & CTR)</h3>
+                        <span class="pillar-help-icon" title="技术指标详情">?</span>
+                    </div>
+                    <div class="pillar-score-badge" style="background-color: #ecfdf5; color: #059669;">
+                        90
+                    </div>
+                </div>
+                <div class="pillar-items">
+                    
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">页面标题完整度 (Title Tag)</span>
+                            <span class="val-badge">77 Chars</span>
+                        </div>
+                        <div class="item-desc">标题长度为 77 字符（最佳范围 35-60 字符）："Architectural LED Lighting Manufacturer & Sourcing Partner | Formore Lighting"。过长会在 Google 结果中被省略号截断。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">Meta 描述标签与行动号召 (CTR)</span>
+                            <span class="val-badge">152 Chars (Optimal)</span>
+                        </div>
+                        <div class="item-desc">描述详实且长度标准，包含清晰业务价值主张。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">Open Graph 社交分享元数据</span>
+                            <span class="val-badge">Complete</span>
+                        </div>
+                        <div class="item-desc">og:title, og:description, og:image, og:site_name 齐全。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">Twitter Card 展现卡片</span>
+                            <span class="val-badge">Card: summary_large_image</span>
+                        </div>
+                        <div class="item-desc">已配置 Twitter Card 标签。</div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="pillar-card">
+                <div class="pillar-header">
+                    <div class="pillar-title-group">
+                        <span class="pillar-bar" style="background: #0284c7;"></span>
+                        <h3 class="pillar-title">6. 站内拓扑、内容与链接图谱 (Architecture & Content)</h3>
+                        <span class="pillar-help-icon" title="技术指标详情">?</span>
+                    </div>
+                    <div class="pillar-score-badge" style="background-color: #ecfdf5; color: #059669;">
+                        100
+                    </div>
+                </div>
+                <div class="pillar-items">
+                    
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">主标题唯一性 (Single H1)</span>
+                            <span class="val-badge">1 H1 ("Architectural LED Lighting  Ma...")</span>
+                        </div>
+                        <div class="item-desc">主标题唯一定义，主题清晰明确。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">标题层级逻辑顺级 (Heading Hierarchy)</span>
+                            <span class="val-badge">Sequential</span>
+                        </div>
+                        <div class="item-desc">标题层级严格遵循 H1→H2→H3 逻辑递进。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">站内链接拓扑与孤岛深度 (Internal Linking)</span>
+                            <span class="val-badge">29 Internal Links</span>
+                        </div>
+                        <div class="item-desc">站内内链网络丰富，蜘蛛抓取深度通畅。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">图片 Alt 无障碍与图片搜索 (Alt Text)</span>
+                            <span class="val-badge">30/100% Alt Ready</span>
+                        </div>
+                        <div class="item-desc">全站 30 张图片全部配置了描述性 Alt 属性。</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-title-row">
+                            <span class="item-name">正文有效文本厚度 (Content Depth)</span>
+                            <span class="val-badge">704 Words</span>
+                        </div>
+                        <div class="item-desc">正文内容体量充实，在黄金有效阅读区间。</div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- SECTION 2: GEO 5 PILLARS -->
+        <div style="margin-top: 50px;">
+            <span class="track-badge track-geo">TRACK 2 · GEO (AI SEARCH READY)</span>
+            <h2 class="section-title">🤖 GEO 生成式引擎优化：五大支柱深度体检</h2>
+            <p class="section-desc">测试站点在 ChatGPT Search、Perplexity、Claude、Google AI Overviews 等大模型中的可发现性与引用采纳率：</p>
+
+            <div class="cards-grid">
+                
+            <div class="pillar-card">
+                <div class="pillar-header">
+                    <div class="pillar-title-group">
+                        <span class="pillar-bar" style="background: #6366f1;"></span>
+                        <h3 class="pillar-title">1. AI Crawler Access (AI 爬虫访问与权限)</h3>
+                        <span class="pillar-help-icon" title="查看评测维度">?</span>
+                    </div>
+                    <div class="pillar-score-badge" style="background-color: #ecfdf5; color: #059669;">
+                        100
+                    </div>
+                </div>
+                <div class="pillar-items">
+                    
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">AI Search Crawlers</div>
+                        <div class="item-desc">All citation-critical crawlers (OpenAI, Anthropic, Perplexity, Google, Bing) may access this page.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">AI Training Crawlers</div>
+                        <div class="item-desc">Training crawlers (GPTBot, Google-Extended, CCBot, ...) are allowed — content may inform future AI model knowledge.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">AI Assistant Fetchers</div>
+                        <div class="item-desc">User-triggered fetchers (ChatGPT-User, Claude-User, Perplexity-User) get your real content.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Indexability</div>
+                        <div class="item-desc">No noindex directive — the prerequisite for appearing in AI Overviews and AI answers.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Snippet Controls</div>
+                        <div class="item-desc">No snippet restrictions — AI engines may quote the page content in answers.</div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="pillar-card">
+                <div class="pillar-header">
+                    <div class="pillar-title-group">
+                        <span class="pillar-bar" style="background: #6366f1;"></span>
+                        <h3 class="pillar-title">2. Machine Readability (机器可读性与架构)</h3>
+                        <span class="pillar-help-icon" title="查看评测维度">?</span>
+                    </div>
+                    <div class="pillar-score-badge" style="background-color: #fffbeb; color: #b45309;">
+                        72
+                    </div>
+                </div>
+                <div class="pillar-items">
+                    
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Server-Rendered Content</div>
+                        <div class="item-desc">Moderate server-rendered text (704 words).</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Title, H1 & Description in HTML</div>
+                        <div class="item-desc">Title, H1 and description all ship in the server HTML — visible to every AI crawler.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">llms.txt</div>
+                        <div class="item-desc">Missing /llms.txt. Add standardized llms.txt to guide AI search agents directly to key pages.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">XML Sitemap</div>
+                        <div class="item-desc">Sitemap declared in robots.txt — AI crawlers can discover your pages efficiently.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Canonical URL</div>
+                        <div class="item-desc">Self-referencing canonical — AI engines attribute citations to the right URL.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Language Declaration</div>
+                        <div class="item-desc">Language declared (lang="en") — engines can route content to the right locale.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">URL Structure</div>
+                        <div class="item-desc">Clean, stable URL — easy for AI engines to store and cite.</div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="pillar-card">
+                <div class="pillar-header">
+                    <div class="pillar-title-group">
+                        <span class="pillar-bar" style="background: #6366f1;"></span>
+                        <h3 class="pillar-title">3. Structured Data (结构化数据与实体图谱)</h3>
+                        <span class="pillar-help-icon" title="查看评测维度">?</span>
+                    </div>
+                    <div class="pillar-score-badge" style="background-color: #fef2f2; color: #b91c1c;">
+                        55
+                    </div>
+                </div>
+                <div class="pillar-items">
+                    
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">JSON-LD Markup</div>
+                        <div class="item-desc">JSON-LD found (BreadcrumbList, WebSite, Organization) — content is machine-readable.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Entity Schema</div>
+                        <div class="item-desc">Organization/Person schema with name and url — AI engines can attribute this content to your brand.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Content Schema</div>
+                        <div class="item-desc">Missing content-specific schema (FAQPage, Product, HowTo). Limits rich AI citation answer boxes.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">sameAs Entity Links</div>
+                        <div class="item-desc">No sameAs links found. Essential for connecting your brand with Wikipedia, Wikidata, and industry profiles.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Author & Date Markup</div>
+                        <div class="item-desc">Schema lacks author and dateModified timestamps. AI cannot machine-verify freshness.</div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="pillar-card">
+                <div class="pillar-header">
+                    <div class="pillar-title-group">
+                        <span class="pillar-bar" style="background: #6366f1;"></span>
+                        <h3 class="pillar-title">4. Content & Citability (内容结构与 AI 引用采纳率)</h3>
+                        <span class="pillar-help-icon" title="查看评测维度">?</span>
+                    </div>
+                    <div class="pillar-score-badge" style="background-color: #fef2f2; color: #b91c1c;">
+                        51
+                    </div>
+                </div>
+                <div class="pillar-items">
+                    
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Heading Hierarchy</div>
+                        <div class="item-desc">Sequential heading levels (H1 → H2 → H3) keep sections extractable.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Question-Style Headings</div>
+                        <div class="item-desc">3 question-style headings found. Matches user search prompts directly.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Citations & Quotations</div>
+                        <div class="item-desc">No outbound citations to authoritative industry sources. Ground claims with third-party evidence.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">H1 Heading</div>
+                        <div class="item-desc">Exactly one H1 ("Architectural LED Lighting  Manufac...") — page topic is unambiguous.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Answer-First Structure</div>
+                        <div class="item-desc">Answers buried deep in paragraphs. Lead sections with direct, standalone 40-word definitions (BLUF).</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Lists & Tables</div>
+                        <div class="item-desc">Low count of comparison tables (0) and structured lists (0). Tables yield 75% higher extraction accuracy.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Statistics & Data Points</div>
+                        <div class="item-desc">Moderate statistical density (11 figures).</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Content Depth</div>
+                        <div class="item-desc">704 words — in the citable sweet spot (300-3,000 words of extractable text).</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Section Sizing</div>
+                        <div class="item-desc">~12 words per section inside optimal extraction window.</div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            <div class="pillar-card">
+                <div class="pillar-header">
+                    <div class="pillar-title-group">
+                        <span class="pillar-bar" style="background: #6366f1;"></span>
+                        <h3 class="pillar-title">5. Trust & E-E-A-T (信任体系与权威背书)</h3>
+                        <span class="pillar-help-icon" title="查看评测维度">?</span>
+                    </div>
+                    <div class="pillar-score-badge" style="background-color: #fffbeb; color: #b45309;">
+                        73
+                    </div>
+                </div>
+                <div class="pillar-items">
+                    
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Brand Consistency</div>
+                        <div class="item-desc">Consistent brand naming ("Formore Lighting") across metadata and title.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Author Signals</div>
+                        <div class="item-desc">Author/corporate entity attributed — a core E-E-A-T signal AI engines verify.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Freshness Signals</div>
+                        <div class="item-desc">Fresh, machine-readable dates present (2026-10-30) — recency AI platforms can verify.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">About & Contact</div>
+                        <div class="item-desc">Missing prominent About Us or Contact Us links in navigation/footer.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Privacy & Terms</div>
+                        <div class="item-desc">Missing direct links to Privacy Policy or Terms of Service.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">Social & OG Metadata</div>
+                        <div class="item-desc">Open Graph and Twitter Card metadata complete — consistent previews everywhere.</div>
+                    </div>
+                </div>
+                
+                <div class="audit-item">
+                    <div class="item-icon-wrapper"><svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+                    <div class="item-content">
+                        <div class="item-name">HTTPS</div>
+                        <div class="item-desc">Served over HTTPS — baseline trust and security requirement.</div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+            
+            </div>
+        </div>
+
+        <!-- SECTION 3: ACTION PLANS -->
+        <div style="margin-top: 50px;">
+            <h2 class="section-title">🚀 双轨落地优化方案说明与行动明细 (Action Blueprint)</h2>
+            <p class="section-desc">针对 www.formorelightings.com 实测缺陷定制的工程化落地清单，区分传统 SEO 技术加固与 GEO 生成式引用强化：</p>
+
+            <h3 style="font-size: 17px; font-weight: 700; color: #0369a1; margin: 24px 0 12px 0;">🅰️ 传统 SEO 专项优化方案与实操配置代码</h3>
+            <div class="actions-list">
+                
+            <div class="action-card priority-p1">
+                <div class="action-header">
+                    <span class="priority-pill priority-p1">P1</span>
+                    <span class="action-title">1. 【性能 SEO】开启 Cloudflare 边缘页面全缓存，压降 TTFB（现为 923.9ms）</span>
+                </div>
+                <p class="action-reason">TTFB > 600ms 会触发搜索引擎响应迟缓判定。开启边缘缓存可将全球首字节延迟直接压降至 150ms 以内。</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>推荐配置 / 改造代码</span>
+                        <button class="copy-btn" onclick="copySnippet(this)">复制代码</button>
+                    </div>
+                    <pre><code># Cloudflare 页面规则 (Page Rules) 配置
+URL Pattern: https://example.com/*
+Setting 1: Cache Level -&gt; Cache Everything
+Setting 2: Edge Cache TTL -&gt; 2 hours
+Setting 3: Browser Cache TTL -&gt; 1 hour</code></pre>
+                </div>
+                
+            </div>
+            
+            </div>
+
+            <h3 style="font-size: 17px; font-weight: 700; color: #6d28d9; margin: 32px 0 12px 0;">🅱️ GEO 生成式引擎专项优化方案与实操代码</h3>
+            <div class="actions-list">
+                
+            <div class="action-card priority-p1">
+                <div class="action-header">
+                    <span class="priority-pill priority-p1">P1</span>
+                    <span class="action-title">1. 【GEO 引导】在网站根目录部署 /llms.txt 标准文档</span>
+                </div>
+                <p class="action-reason">提供专门供 LLM 消费的网站摘要与核心索引，提升 Perplexity、ChatGPT Search 优先召回率。</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>推荐配置 / 改造代码</span>
+                        <button class="copy-btn" onclick="copySnippet(this)">复制代码</button>
+                    </div>
+                    <pre><code># Formore Lighting
+&gt; High-performance outdoor gear, technical camping equipment, and custom OEM/ODM solutions engineered for extreme durability.
+
+## Core Products &amp; Sourcing
+- [Outdoor Gear Collection](https://www.formorelightings.com/): Rugged camping equipment, tactical accessories, and modular outdoor gear.
+- [OEM/ODM Supply Chain](https://www.formorelightings.com/): End-to-end prototyping, material testing, and industrial production for outdoor brands.
+- [Quality Testing &amp; Standards](https://www.formorelightings.com/): Laboratory strength ratings, tear resistance, and weatherproofing benchmarks.</code></pre>
+                </div>
+                
+            </div>
+            
+            <div class="action-card priority-p2">
+                <div class="action-header">
+                    <span class="priority-pill priority-p2">P2</span>
+                    <span class="action-title">2. 【GEO 引用率翻倍】在核心 H2（"Solar Items"）正下方实施“结论先行 (BLUF)”重构</span>
+                </div>
+                <p class="action-reason">在标题下方第一句话（40-60词）直接给出精准定义与核心参数，直接引用率可提升近 2 倍。</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span>推荐配置 / 改造代码</span>
+                        <button class="copy-btn" onclick="copySnippet(this)">复制代码</button>
+                    </div>
+                    <pre><code>&lt;h2&gt;Solar Items&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;[产品/品牌名]&lt;/strong&gt; 专注于提供 [核心服务/产品定义]，符合 [权威行业认证]，为全球客户提供 [核心技术指标与数据支撑] 的一站式解决方案。&lt;/p&gt;</code></pre>
+                </div>
+                
+            </div>
+            
+            </div>
+        </div>
+
+        <footer>
+            Generated by SeoHub v2.3 Enterprise Dual-Track Engine · 33 项 SEO 全维矩阵 + 5 大 GEO 支柱协同诊断
+        </footer>
+    </div>
+
+    <script>
+        function copySnippet(btn) {
+            const pre = btn.closest('.code-container').querySelector('pre code');
+            navigator.clipboard.writeText(pre.innerText).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = '已复制!';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>每日 SEO 例程规范（草稿 · 格式 · 日检）</title>
+<style>
+:root { --bg:#f8fafc; --card:#fff; --ink:#0f172a; --muted:#64748b; --brand:#1e1b4b; --accent:#4f46e5; --ok:#059669; --warn:#d97706; --bad:#dc2626; }
+* { box-sizing:border-box; }
+body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; background:var(--bg); color:var(--ink); line-height:1.65; }
+.hero { background:linear-gradient(135deg,#1e1b4b,#312e81 60%,#4f46e5); color:#fff; padding:48px 24px 56px; }
+.hero .wrap, .main { max-width:960px; margin:0 auto; }
+.hero h1 { margin:0 0 8px; font-size:1.75rem; }
+.hero p { margin:0; opacity:.9; }
+.scores { display:flex; gap:16px; flex-wrap:wrap; margin-top:28px; }
+.score { background:rgba(255,255,255,.12); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.2); border-radius:16px; padding:16px 22px; min-width:140px; }
+.score .n { font-size:2rem; font-weight:700; }
+.score .l { font-size:.85rem; opacity:.85; }
+.main { padding:28px 20px 64px; }
+.card { background:var(--card); border-radius:16px; padding:24px 28px; margin:18px 0; box-shadow:0 1px 3px rgba(15,23,42,.06); border:1px solid #e2e8f0; }
+h1 { font-size:1.5rem; } h2 { font-size:1.25rem; margin-top:1.6em; border-left:4px solid var(--accent); padding-left:12px; } h3 { font-size:1.05rem; color:#312e81; }
+p, li { color:#334155; }
+a { color:var(--accent); }
+.table-wrap { overflow-x:auto; margin:12px 0; }
+table { width:100%; border-collapse:collapse; font-size:.92rem; }
+th, td { border:1px solid #e2e8f0; padding:8px 10px; text-align:left; vertical-align:top; }
+th { background:#f1f5f9; }
+blockquote { margin:12px 0; padding:10px 14px; background:#eef2ff; border-left:4px solid var(--accent); color:#3730a3; border-radius:0 8px 8px 0; }
+code { background:#f1f5f9; padding:1px 6px; border-radius:4px; font-size:.9em; }
+.code-wrap { position:relative; margin:14px 0; }
+.code-wrap .copy { position:absolute; right:8px; top:8px; background:#312e81; color:#fff; border:0; border-radius:6px; padding:4px 10px; cursor:pointer; font-size:12px; }
+pre { background:#0f172a; color:#e2e8f0; padding:16px; border-radius:12px; overflow-x:auto; font-size:.85rem; }
+pre code { background:transparent; color:inherit; padding:0; }
+hr { border:0; border-top:1px solid #e2e8f0; margin:28px 0; }
+.pill { display:inline-block; padding:2px 10px; border-radius:999px; font-size:.75rem; font-weight:600; }
+.pill.ok { background:#d1fae5; color:var(--ok); }
+.pill.warn { background:#fef3c7; color:var(--warn); }
+.pill.bad { background:#fee2e2; color:var(--bad); }
+.footer { text-align:center; color:var(--muted); font-size:.85rem; padding:24px; }
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <p style="opacity:.75;font-size:.85rem;margin-bottom:8px">SeoHub · Formore Lighting · Asia/Shanghai</p>
+  <h1>每日 SEO 例程规范（草稿 · 格式 · 日检）</h1>
+  <p>seo-drafts 分支 · content/insights/drafts · articles.tsx · daily-seo-check</p>
+  <div class="scores">
+    <div class="score"><div class="n">—</div><div class="l">传统 SEO / 100</div></div>
+    <div class="score"><div class="n">—</div><div class="l">GEO / 100</div></div>
+  </div>
+</div></header>
+<main class="main"><div class="card"><h1>Formore Lighting 每日 SEO 例程规范（草稿目录 · 内容格式 · 日检命令）</h1>
+<blockquote>适用站点：https://www.formorelightings.com  </blockquote>
+<blockquote>源码仓库：<code>einkyhuang/formorelighting2.0</code>（本机克隆可放 <code>/workspace/formorelighting2.0</code>）  </blockquote>
+<blockquote>约束：<strong>禁止自动合并到 <code>main</code>、禁止自动部署/上线</strong>；发布须用户明确批准。  </blockquote>
+<blockquote>协作：SEO 专家出关键词简报 → 墨墨-主笔写英文文章 → SEO 专家审稿并转成站点格式 → 用户批准后才合并。</blockquote>
+<hr/>
+<h2>1. 草稿存放位置（分支 + 目录）</h2>
+<div class="table-wrap"><table><thead><tr><th>项</th><th>约定</th></tr></thead><tbody>
+<tr><td>Git 分支</td><td><strong><code>seo-drafts</code></strong>（从最新 <code>main</code> 拉取创建；长期存在，不直接推生产）</td></tr>
+<tr><td>Markdown 草稿目录</td><td><strong><code>content/insights/drafts/</code></strong>（按日期+slug 命名）</td></tr>
+<tr><td>简报目录（可选）</td><td><code>content/insights/briefs/YYYY-MM-DD-&lt;slug&gt;.brief.md</code></td></tr>
+<tr><td>日检报告目录</td><td>仓库内 <code>reports/seo/YYYY-MM-DD.md</code>（由 <code>daily-seo-check.mjs</code> 写出）</td></tr>
+<tr><td>工作台交付归档</td><td><code>超级工作台/bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/</code></td></tr>
+</tbody></table></div>
+<h3>草稿文件命名</h3>
+<div class="code-wrap"><button class="copy" onclick="navigator.clipboard.writeText(this.nextElementSibling.innerText)">复制</button><pre><code>content/insights/drafts/YYYY-MM-DD-&lt;slug&gt;.md
+# 例：content/insights/drafts/2026-11-04-what-is-cri-in-lighting.md</code></pre></div>
+<p><code>slug</code> 须与上线后 URL <code>/insights/&lt;slug&gt;</code> 一致（小写、连字符）。</p>
+<h3>从草稿到生产的路径（重要）</h3>
+<p>线上 Insights <strong>实际渲染源</strong>是：</p>
+<ul>
+<li><strong>主路径（生产）</strong>：<code>src/data/articles.tsx</code> 中的 <code>ARTICLES</code> 数组（<code>BlogPost</code>，<code>content</code> 为 React 节点）</li>
+<li><strong>本地回退</strong>：<code>utils/contentLookup.ts</code> → <code>getLocalArticles()</code> 读上述数组</li>
+<li><strong>可选远程 CMS</strong>：<code>services/cmsApi.ts</code>（<code>VITE_ENABLE_REMOTE_CMS</code>）；字段见下文 CmsArticle</li>
+<li><strong>遗留/辅助</strong>：<code>content/insights/{tech,design,trends}/*.md</code> + <code>_TEMPLATE.md</code>（模板仍有效，但<strong>不能</strong>单独靠放 md 就上线）</li>
+</ul>
+<p>因此每日流程是：</p>
+<ol>
+<li>墨墨在 <code>seo-drafts</code> 分支写 Markdown 草稿（见第 2 节 frontmatter）。</li>
+<li>SEO 专家审稿通过后，把定稿 <strong>转换/写入</strong> <code>src/data/articles.tsx</code>（或经用户批准的 CMS），并补 Related Products / 商业回流模块。</li>
+<li>跑 <code>npm run sitemap</code>（或完整 <code>npm run build</code> 中的 generate-sitemap）更新 sitemap。</li>
+<li><strong>开 PR → 用户批准 → 合并 main → 部署</strong>。未批准不得推 main、不得发布。</li>
+</ol>
+<hr/>
+<h2>2. 文章必须遵守的内容格式</h2>
+<h3>2.1 Markdown 草稿 Frontmatter（必填）</h3>
+<p>与 <code>content/insights/_TEMPLATE.md</code> 对齐，并扩展 SEO 字段：</p>
+<div class="code-wrap"><button class="copy" onclick="navigator.clipboard.writeText(this.nextElementSibling.innerText)">复制</button><pre><code>---
+title: &quot;Article Title Here&quot;           # H1 / SERP 标题基础，建议 ≤60 字符含主词
+author: &quot;Formore Research&quot;            # 或具体人名；须与 Schema author 一致
+date: &quot;YYYY-MM-DD&quot;                    # 发布日
+category: &quot;Technical&quot;                 # Trends | Design | Technical | Projects | Company News
+readTime: &quot;7 min&quot;
+image: &quot;/insights image/insights feature images/&lt;file&gt;.webp&quot;
+excerpt: &quot;120–160 字符摘要，含主关键词与行动主张&quot;
+tags: [&quot;Tag1&quot;, &quot;Tag2&quot;, &quot;Tag3&quot;]
+featured: false
+# —— 以下为 SEO 例程扩展字段（草稿必填；转入 articles.tsx 时同步）——
+slug: &quot;what-is-cri-in-lighting&quot;       # = id；URL /insights/&lt;slug&gt;
+primaryKeyword: &quot;what is cri in lighting&quot;
+secondaryKeywords: [&quot;cri 90 led&quot;, &quot;color rendering index&quot;]
+searchIntent: &quot;informational&quot;         # informational | commercial | transactional | navigational
+internalLinks:
+  - anchor: &quot;LED linear lights&quot;
+    url: &quot;/products&quot;
+  - anchor: &quot;China lighting sourcing&quot;
+    url: &quot;/sourcing&quot;
+businessReturnUrl: &quot;/products&quot;        # 商业回流页
+faq:
+  - q: &quot;What is CRI in lighting?&quot;
+    a: &quot;CRI measures how accurately a light source reveals colors compared with daylight.&quot;
+schemaType: &quot;Article&quot;                 # Article | FAQPage (附加) | HowTo
+status: &quot;draft&quot;                       # draft | review | approved | published
+---</code></pre></div>
+<p>正文要求（GEO）：</p>
+<ol>
+<li><strong>单一 H1</strong>（可用 frontmatter title；正文勿再重复第二 H1）。</li>
+<li><strong>BLUF</strong>：每个 H2 下第一段 40–60 词直接给结论/定义。</li>
+<li><strong>疑问句式 H2</strong> 至少 2 个（匹配 AI Prompt）。</li>
+<li><strong>原生列表或表格</strong>至少 1 组；<strong>权威外链引用</strong>至少 2 条（IES / CIE / ENERGY STAR / DLC / UL 等）。</li>
+<li>篇幅建议 <strong>800–1800 英文词</strong>（可抽取区间）。</li>
+<li>文末含 Related Products / CTA 指向 <code>businessReturnUrl</code>。</li>
+</ol>
+<h3>2.2 生产格式：<code>src/data/articles.tsx</code>（BlogPost）</h3>
+<div class="code-wrap"><button class="copy" onclick="navigator.clipboard.writeText(this.nextElementSibling.innerText)">复制</button><pre><code>export interface BlogPost {
+  id: string;                 // = slug，如 &#x27;what-is-cri-in-lighting&#x27;
+  title: string;
+  excerpt: string;
+  content: React.ReactNode;   // JSX：h2/p/ul/ol/table
+  author: string;
+  date: string;               // 展示用，如 &quot;Apr 13, 2026&quot;
+  category: string;           // Technical | Design | Trends | ...
+  readTime: string;           // &quot;7 min&quot;
+  image: string;              // 资产路径或 R2 URL
+  tags: string[];
+  featured: boolean;
+}</code></pre></div>
+<p><code>getLocalArticles()</code> 会把 <code>id</code> 映射为 <code>slug</code>。路由：<code>/insights/:slug</code>（见 <code>App.tsx</code>）。</p>
+<h3>2.3 CMS 映射（若启用远程 CMS）</h3>
+<p><code>CmsArticle</code> 字段：<code>id, slug, title, excerpt, content, author, date, category, readTime, image, tags, featured</code>。  </p>
+<p>远程条目需 <code>status === 1</code> 才会展示。</p>
+<h3>2.4 交给墨墨的「文章简报」最小模板</h3>
+<p>每天例程为当日关键词生成一份简报（可放 <code>content/insights/briefs/</code>）：</p>
+<div class="code-wrap"><button class="copy" onclick="navigator.clipboard.writeText(this.nextElementSibling.innerText)">复制</button><pre><code># Brief: &lt;primaryKeyword&gt;
+- 日期：YYYY-MM-DD
+- 目标 URL：/insights/&lt;slug&gt;
+- 主关键词 / 次关键词 / 意图
+- 建议 Title（≤60）与 Meta Description（120–160）
+- H2 大纲（4–7 个，含疑问句）
+- 必须内链（锚文本 → URL，2–3 条）
+- 商业回流页
+- FAQ（≥3）
+- Schema 要求（Article + FAQPage）
+- 需引用的权威来源
+- 禁忌：禁止合并 main / 禁止自行部署</code></pre></div>
+<hr/>
+<h2>3. 每日 SEO 检查如何跑</h2>
+<h3>3.1 仓库脚本</h3>
+<div class="code-wrap"><button class="copy" onclick="navigator.clipboard.writeText(this.nextElementSibling.innerText)">复制</button><pre><code>cd /workspace/formorelighting2.0   # 或本机仓库路径
+# 可选：导出 PSI_API_KEY 后才有真实 Lighthouse 分数；无 Key 会 skipped
+export SITE_URL=https://www.formorelightings.com
+export SEO_TASK_DATE=$(date +%F)          # Asia/Shanghai 日历日
+# export PSI_API_KEY=...                  # 有则填；无则报告标注 skipped
+npm run seo:daily
+# 等价：node scripts/daily-seo-check.mjs</code></pre></div>
+<p>输出：<code>reports/seo/&lt;SEO_TASK_DATE&gt;.md</code>  </p>
+<p>检查 URL：<code>/</code>、<code>/products</code>、<code>/sourcing</code>、<code>/insights</code>。  </p>
+<p>阈值 95 分以下时进程 <code>exitCode=1</code>（用于例程告警，不代表自动修复）。</p>
+<p>将 Markdown 转 HTML 报告（可选）：</p>
+<div class="code-wrap"><button class="copy" onclick="navigator.clipboard.writeText(this.nextElementSibling.innerText)">复制</button><pre><code>npm run seo:report-html -- reports/seo/&lt;date&gt;.md</code></pre></div>
+<h3>3.2 双轨深度体检（SeoHub，按需/周更）</h3>
+<div class="code-wrap"><button class="copy" onclick="navigator.clipboard.writeText(this.nextElementSibling.innerText)">复制</button><pre><code>python3 /home/box/agent-data/workflows/seohub/scripts/audit.py \
+  https://www.formorelightings.com \
+  --output-dir /workspace/超级工作台/bots/网站项目/Super-SEO-Hub/deliverables/formorelightings</code></pre></div>
+<h3>3.3 例程每日标准动作清单</h3>
+<ol>
+<li><code>git fetch</code> + 在 <code>seo-drafts</code> 上工作（或从 main 开当日短分支再并回 <code>seo-drafts</code>）。</li>
+<li>跑 <code>npm run seo:daily</code>，把报告复制/摘要到工作台 deliverables（可选）。</li>
+<li>按《SEO+GEO 优化计划》当日排期：选关键词 → 写 Brief → 发给墨墨。</li>
+<li>收到英文稿后审稿（关键词、内链、FAQ、schema、BLUF、外链引用）。</li>
+<li>定稿写入 <code>content/insights/drafts/</code>；批准上线时再写入 <code>src/data/articles.tsx</code> 并开 PR。</li>
+<li><strong>停止点</strong>：开 PR 后等待用户批准；不合并、不部署。</li>
+</ol>
+<hr/>
+<h2>4. 与优化计划的衔接</h2>
+<ul>
+<li>30 日关键词与每日任务见同目录：<code>formorelightings-seo-geo-optimization-plan.md</code> §5。</li>
+<li>体检基线见：<code>formorelightings-seo-geo-audit-report.md</code>（SEO 91.5 / GEO 71.5）。</li>
+<li>P0 技术项（llms.txt、sameAs、Privacy/Terms、Title 缩短）优先于纯内容日，可占用 Day1–2 / Day13 / Day28。</li>
+</ul>
+<hr/>
+<h2>5. 变更记录</h2>
+<div class="table-wrap"><table><thead><tr><th>日期</th><th>说明</th></tr></thead><tbody>
+<tr><td>2026-10-30</td><td>初版：确定 <code>seo-drafts</code> + <code>content/insights/drafts/</code>、articles.tsx 生产格式、daily-seo-check 用法</td></tr>
+</tbody></table></div></div></main>
+<footer class="footer">生成时间 2026-10-30 02:25（Asia/Shanghai）· 仅归档于超级工作台，未推送站点 main</footer>
+</body></html>
