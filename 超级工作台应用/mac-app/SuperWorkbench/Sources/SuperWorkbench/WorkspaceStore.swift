@@ -36,6 +36,8 @@ final class WorkspaceStore: ObservableObject {
     /// Multi-workbench
     @Published var workbenches: [WorkbenchConfig] = []
     @Published var activeWorkbenchId: String = "general"
+    /// Active MagicHub tab id when 外贸工作台 is selected (synced with WKWebView).
+    @Published var magicHubTab: String = UserDefaults.standard.string(forKey: "sw.mhTab") ?? "dashboard"
     @Published var tradeLeadsIndex: TradeLeadsIndex? = nil
     @Published var crmLeadsTotal: Int? = nil
     // MARK: Feeds (data/feeds)
@@ -948,6 +950,18 @@ final class WorkspaceStore: ObservableObject {
                 self.feedLoading = false
             }
         }
+    }
+
+    
+    func setMagicHubTab(_ id: String) {
+        let tab = id.isEmpty ? "dashboard" : id
+        guard magicHubTab != tab else {
+            NotificationCenter.default.post(name: .swMagicHubPushTab, object: nil, userInfo: ["tab": tab])
+            return
+        }
+        magicHubTab = tab
+        UserDefaults.standard.set(tab, forKey: "sw.mhTab")
+        NotificationCenter.default.post(name: .swMagicHubPushTab, object: nil, userInfo: ["tab": tab])
     }
 
     func switchWorkbench(_ id: String) {

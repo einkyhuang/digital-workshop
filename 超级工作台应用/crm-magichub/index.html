@@ -1,6 +1,46 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
+    <head>
+<script>
+(function () {
+  try {
+    var q = new URLSearchParams(location.search || '');
+    var embed = q.get('embed') === '1' || q.get('embed') === 'true' || window.__SW_EMBED__ === true;
+    if (embed) {
+      document.documentElement.setAttribute('data-sw-embed', '1');
+      document.documentElement.classList.add('sw-mh-embed');
+      window.__SW_EMBED__ = true;
+    }
+  } catch (_) {}
+  try {
+    var st = document.createElement('style');
+    st.id = 'sw-mh-embed-css';
+    st.textContent = 'html.sw-mh-embed aside.apple-sidebar-glass,html[data-sw-embed="1"] aside.apple-sidebar-glass{display:none!important;width:0!important;min-width:0!important;padding:0!important;overflow:hidden!important}';
+    document.documentElement.appendChild(st);
+  } catch (_) {}
+  if (window.electronAPI && window.electronAPI.__swBridge) return;
+  if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.swMagicHub) return;
+  var storeKey = function (k) { return 'magichub_settings:' + k; };
+  window.electronAPI = {
+    __swBridge: true, platform: 'web',
+    isSecureMode: async function () { return { secure: false }; },
+    openPath: async function () { return { success: false, error: 'web' }; },
+    scanDirectory: async function () { return { success: true, files: [] }; },
+    saveSettings: async function (key, data) {
+      try { localStorage.setItem(storeKey(key), JSON.stringify(data)); return { success: true }; }
+      catch (e) { return { success: false, error: String(e) }; }
+    },
+    loadSettings: async function (key) {
+      try { var raw = localStorage.getItem(storeKey(key)); return { success: true, data: raw ? JSON.parse(raw) : null }; }
+      catch (e) { return { success: false, error: String(e) }; }
+    },
+    readFile: async function () { return { success: false, error: 'web' }; },
+    writeFile: async function () { return { success: false, error: 'web' }; },
+    selectLocalZipAndUpdate: async function () { return { success: false, error: 'web' }; }
+  };
+})();
+</script>
+
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

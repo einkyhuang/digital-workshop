@@ -26,9 +26,16 @@ for x in /tmp/mh-public-bak/*; do
 done
 rm -rf "$OUT"
 mkdir -p "$OUT"
-rsync -a --exclude '*.pdf' --exclude 'product-images' --exclude 'seeds' \
-  --exclude 'products_imported.json' --exclude 'thumbs' --exclude 'external_reports' \
-  dist/ "$OUT/"
+if command -v rsync >/dev/null 2>&1; then
+  rsync -a --exclude '*.pdf' --exclude 'product-images' --exclude 'seeds' \
+    --exclude 'products_imported.json' --exclude 'thumbs' --exclude 'external_reports' \
+    dist/ "$OUT/"
+else
+  cp -a dist/. "$OUT/"
+  rm -rf "$OUT/product-images" "$OUT/seeds" "$OUT/thumbs" "$OUT/external_reports" 2>/dev/null || true
+  rm -f "$OUT/products_imported.json" 2>/dev/null || true
+  find "$OUT" -maxdepth 1 -name '*.pdf' -delete 2>/dev/null || true
+fi
 if [ -d "$PRIV" ]; then
   ln -sfn "$PRIV/thumbs/products" "$OUT/product-images"
   ln -sfn "$PRIV/products/products_imported.json" "$OUT/products_imported.json"

@@ -127,6 +127,42 @@
     rooms: "群聊协作", routines: "定时巡检", hiring: "招聘规划",
     rules: "规则与文档", projects: "网站项目"
   };
+
+  /** MagicHub menus (外贸工作台 outer sidebar). Order matches crm-magichub App.vue. */
+  const MAGICHUB_NAV = [
+    { id: "dashboard", name: "驾驶舱" },
+    { id: "schedule", name: "日程管理" },
+    { id: "customers", name: "客户管理" },
+    { id: "marketing", name: "智能营销" },
+    { id: "opportunities", name: "商机管理" },
+    { id: "followup", name: "跟进记录" },
+    { id: "samples", name: "寄样跟进" },
+    { id: "quotes", name: "报价记录" },
+    { id: "contracts", name: "订单合同" },
+    { id: "products", name: "产品管理" },
+    { id: "knowledge", name: "知识仓库" },
+    { id: "company", name: "公司信息" },
+    { id: "team", name: "团队管理" },
+    { id: "agentRoom", name: "Agent 协同" },
+    { id: "forwelike", name: "Forwelike 专区" },
+    { id: "settings", name: "系统设置" }
+  ];
+  function magicHubTabId() {
+    return state.magicHubTab || localStorage.getItem("sw.mhTab") || "dashboard";
+  }
+  function setMagicHubTab(id) {
+    const tab = id || "dashboard";
+    state.magicHubTab = tab;
+    try { localStorage.setItem("sw.mhTab", tab); } catch (_) {}
+    const frame = document.getElementById("magichubFrame");
+    if (frame && frame.contentWindow) {
+      try { frame.contentWindow.postMessage({ type: "sw-set-tab", tab }, "*"); } catch (_) {}
+      try {
+        if (typeof frame.contentWindow.__swSetTab === "function") frame.contentWindow.__swSetTab(tab);
+      } catch (_) {}
+    }
+  }
+
   function workbenchTabs() {
     const wb = (state.workbenches || []).find(w => w.id === state.activeWorkbenchId) || (state.workbenches || [])[0];
     if (!wb || !wb.modules) return TABS.filter(x => !["客户与线索","客户管理","开发进度","询盘与报价"].includes(x));
@@ -178,8 +214,12 @@
   function switchWorkbench(id) {
     state.activeWorkbenchId = id;
     try { localStorage.setItem("sw.activeWorkbenchId", id); } catch (_) {}
-    const tabs = workbenchTabs();
-    if (!tabs.includes(state.tab)) state.tab = tabs[0] || "总览";
+    if (id === "trade") {
+      state.magicHubTab = magicHubTabId();
+    } else {
+      const tabs = workbenchTabs();
+      if (!tabs.includes(state.tab)) state.tab = tabs[0] || "总览";
+    }
     render();
   }
   function scopedBots() {
@@ -464,9 +504,9 @@
           <div class="daily-card"><div class="muted">CRM 客户（本地）</div><div style="font-size:28px;font-weight:700">${(state.crmLeadsIndex&&state.crmLeadsIndex.total)||"—"}</div></div>
         </div>`;
     }
-    // Local web: full-page iframe; bridge via sibling magichub-bridge-web.js
-    return `<div class="section-title-row" style="padding:8px 12px"><h2 class="section-title" style="margin:0">外贸工作台</h2></div>
-      <iframe id="magichubFrame" title="MagicHub" src="./magichub/index.html" style="border:0;width:100%;height:calc(100vh - 120px);background:#f3f4f6"></iframe>`;
+    // Local web: full-page iframe (embed=1 hides MagicHub aside; outer sidebar drives tabs)
+    const tab = encodeURIComponent(magicHubTabId());
+    return `<iframe id="magichubFrame" title="MagicHub" src="./magichub/index.html?embed=1&tab=${tab}" style="border:0;width:100%;height:calc(100vh - 56px);background:#f3f4f6"></iframe>`;
   }
 
   function renderTradeModule(kind) {
@@ -1540,17 +1580,48 @@ function renderKanban() {
       bindWorkbenchSegment();
     }
     const tabs = document.getElementById("tabs");
-    tabs.innerHTML = workbenchTabs().map((t) =>
-      `<button type="button" class="${state.tab === t ? "active" : ""}" data-tab="${t}"><span class="nav-label">${TAB_NAV_LABEL[t] || t}</span></button>`
-    ).join("");
-    tabs.querySelectorAll("[data-tab]").forEach((el) => {
-      el.onclick = () => setTab(el.getAttribute("data-tab"));
-    });
+    if (isTradeWorkbench()) {
+      const cur = magicHubTabId();
+      tabs.innerHTML = MAGICHUB_NAV.map((t) =>
+        `<button type="button" class="${cur === t.id ? "active" : ""}" data-mh-tab="${t.id}"><span class="nav-label">${esc(t.name)}</span></button>`
+      ).join("");
+      tabs.querySelectorAll("[data-mh-tab]").forEach((el) => {
+        el.onclick = () => {
+          setMagicHubTab(el.getAttribute("data-mh-tab"));
+          // Re-render sidebar active only (avoid remounting iframe)
+          tabs.querySelectorAll("[data-mh-tab]").forEach((b) => {
+            b.classList.toggle("active", b.getAttribute("data-mh-tab") === state.magicHubTab);
+          });
+        };
+      });
+    } else {
+      tabs.innerHTML = workbenchTabs().map((t) =>
+        `<button type="button" class="${state.tab === t ? "active" : ""}" data-tab="${t}"><span class="nav-label">${TAB_NAV_LABEL[t] || t}</span></button>`
+      ).join("");
+      tabs.querySelectorAll("[data-tab]").forEach((el) => {
+        el.onclick = () => setTab(el.getAttribute("data-tab"));
+      });
+    }
     renderMain();
     const more = document.getElementById("webLoadMore");
     if (more) more.onclick = () => { state.webShown = (state.webShown || state.webPageSize) + state.webPageSize; render(); };
     // Reset paging when switching category/view via chips (handled below)
   }
+
+  window.addEventListener("message", (ev) => {
+    try {
+      const d = ev && ev.data;
+      if (!d || d.type !== "sw-tab-changed" || !d.tab) return;
+      if (state.magicHubTab === d.tab) return;
+      state.magicHubTab = String(d.tab);
+      try { localStorage.setItem("sw.mhTab", state.magicHubTab); } catch (_) {}
+      if (isTradeWorkbench()) {
+        document.querySelectorAll("#tabs [data-mh-tab]").forEach((b) => {
+          b.classList.toggle("active", b.getAttribute("data-mh-tab") === state.magicHubTab);
+        });
+      }
+    } catch (_) {}
+  });
 
   async function boot() {
     state.calMonth = state.calMonth || new Date().toISOString().slice(0, 7);
@@ -1558,6 +1629,7 @@ function renderKanban() {
     state.dailyReportDates = state.dailyReportDates || [];
     state.workbenches = state.workbenches || [];
     state.tradeIndex = state.tradeIndex || null;
+    state.magicHubTab = state.magicHubTab || localStorage.getItem("sw.mhTab") || "dashboard";
     await loadWorkbenches();
     bindWorkbenchSegment();
     document.getElementById("btnExport").onclick = doExport;

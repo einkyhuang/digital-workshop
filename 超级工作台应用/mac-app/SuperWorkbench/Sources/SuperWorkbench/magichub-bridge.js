@@ -35,4 +35,20 @@
     selectLocalZipAndUpdate: () => invoke('select-local-zip-and-update', [])
   };
   document.documentElement.setAttribute('data-sw-host', 'mac');
+  // Always embed when hosted by SuperWorkbench Mac WKWebView
+  try {
+    const q = new URLSearchParams(location.search || '');
+    if (q.get('embed') !== '0') {
+      document.documentElement.setAttribute('data-sw-embed', '1');
+      document.documentElement.classList.add('sw-mh-embed');
+      window.__SW_EMBED__ = true;
+    }
+  } catch (_) {}
+  // CSS hide MagicHub aside (belt-and-suspenders before Vue mounts)
+  try {
+    const st = document.createElement('style');
+    st.id = 'sw-mh-embed-css';
+    st.textContent = 'html.sw-mh-embed aside.apple-sidebar-glass,html[data-sw-embed="1"] aside.apple-sidebar-glass{display:none!important;width:0!important;min-width:0!important;padding:0!important;overflow:hidden!important}';
+    (document.head || document.documentElement).appendChild(st);
+  } catch (_) {}
 })();

@@ -799,6 +799,59 @@ const swApplyTabFromQuery = () => {
 }
 swApplyTabFromQuery()
 window.addEventListener('hashchange', swApplyTabFromQuery)
+
+/** Embedded in 超级工作台: hide MagicHub's own aside; outer sidebar drives tabs via bridge. */
+const swDetectEmbed = () => {
+  try {
+    const q = new URLSearchParams(location.search || '')
+    if (q.get('embed') === '1' || q.get('embed') === 'true') return true
+    if (window.__SW_EMBED__ === true) return true
+    if (document.documentElement.getAttribute('data-sw-embed') === '1') return true
+    if (document.documentElement.getAttribute('data-sw-host') === 'mac') return true
+  } catch (_) {}
+  return false
+}
+const isEmbedded = ref(swDetectEmbed())
+if (isEmbedded.value) {
+  try {
+    document.documentElement.setAttribute('data-sw-embed', '1')
+    document.documentElement.classList.add('sw-mh-embed')
+  } catch (_) {}
+}
+
+const swNotifyHostTab = (tabId) => {
+  try {
+    if (window.webkit?.messageHandlers?.swMagicHub) {
+      window.webkit.messageHandlers.swMagicHub.postMessage({
+        id: 'tab-' + Date.now(),
+        method: 'tab-changed',
+        args: [String(tabId || '')]
+      })
+    }
+  } catch (_) {}
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'sw-tab-changed', tab: String(tabId || '') }, '*')
+    }
+  } catch (_) {}
+}
+
+window.__swSetTab = (tabId) => {
+  if (!tabId) return
+  activeTab.value = String(tabId)
+  swNotifyHostTab(activeTab.value)
+}
+window.addEventListener('message', (ev) => {
+  try {
+    const d = ev && ev.data
+    if (d && d.type === 'sw-set-tab' && d.tab) {
+      activeTab.value = String(d.tab)
+    }
+  } catch (_) {}
+})
+watch(activeTab, (v) => {
+  if (isEmbedded.value) swNotifyHostTab(v)
+})
 ;
 const settingsInitialTab = ref('api');
 const jumpToScheduleDate = ref(null);
@@ -1290,8 +1343,8 @@ const syncToTimeline = () => {
     <!-- Background bamboo shadow layout -->
     <div class="absolute inset-0 bamboo-bg-decor z-0 opacity-15"></div>
 
-    <!-- 1. Left Sidebar (苹果毛玻璃侧导航) -->
-    <aside class="w-60 apple-sidebar-glass flex flex-col justify-between p-6 relative z-10 select-none shrink-0 h-screen sticky top-0 overflow-y-auto">
+    <!-- 1. Left Sidebar (苹果毛玻璃侧导航) — hidden when embedded in 超级工作台 -->
+    <aside v-if="!isEmbedded" class="w-60 apple-sidebar-glass flex flex-col justify-between p-6 relative z-10 select-none shrink-0 h-screen sticky top-0 overflow-y-auto">
       <div class="space-y-6">
         <!-- Logo MagicHub style -->
         <div class="flex flex-col gap-2">

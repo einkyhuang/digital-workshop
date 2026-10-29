@@ -105,6 +105,16 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
                 "success": false,
                 "error": "工作台内嵌模式下请用 git pull + 重建 Mac 应用更新；不支持 ZIP 热更新。"
             ], nil)
+        case "tab-changed":
+            let tab = (args.first as? String) ?? ""
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(
+                    name: .swMagicHubTabChanged,
+                    object: nil,
+                    userInfo: ["tab": tab]
+                )
+            }
+            return (true, ["ok": true], nil)
         default:
             return (false, nil, "unknown method \(method)")
         }

@@ -37,15 +37,28 @@ struct SidebarView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    ForEach(groups, id: \.0) { group, items in
+                    if store.activeWorkbenchId == "trade" {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(group)
+                            Text("MagicHub")
                                 .font(.system(size: SWTheme.Typography.groupTitle, weight: .medium))
                                 .foregroundStyle(SWTheme.textMuted)
                                 .padding(.horizontal, 14)
                                 .padding(.bottom, 4)
-                            ForEach(items) { section in
-                                navRow(section)
+                            ForEach(MagicHubNavItem.all) { item in
+                                mhNavRow(item)
+                            }
+                        }
+                    } else {
+                        ForEach(groups, id: \.0) { group, items in
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(group)
+                                    .font(.system(size: SWTheme.Typography.groupTitle, weight: .medium))
+                                    .foregroundStyle(SWTheme.textMuted)
+                                    .padding(.horizontal, 14)
+                                    .padding(.bottom, 4)
+                                ForEach(items) { section in
+                                    navRow(section)
+                                }
                             }
                         }
                     }
@@ -177,6 +190,35 @@ struct SidebarView: View {
                         .background(selected ? Color.black.opacity(0.10) : Color.black.opacity(0.05))
                         .clipShape(Capsule())
                 }
+            }
+            .foregroundStyle(SWTheme.text)
+            .padding(.horizontal, 12)
+            .frame(maxWidth: .infinity, minHeight: SWTheme.Typography.navRowMin, alignment: .leading)
+            .contentShape(Rectangle())
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(selected ? Color.white.opacity(0.92) : Color.clear)
+            )
+            .padding(.horizontal, 8)
+        }
+        .buttonStyle(.plain)
+    }
+
+
+    private func mhNavRow(_ item: MagicHubNavItem) -> some View {
+        let selected = store.magicHubTab == item.id
+        return Button {
+            store.setMagicHubTab(item.id)
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: item.icon)
+                    .font(.system(size: SWTheme.Typography.navIcon, weight: .regular))
+                    .frame(width: 20, alignment: .center)
+                    .foregroundStyle(selected ? SWTheme.text : SWTheme.textSecondary)
+                Text(item.title)
+                    .font(.system(size: SWTheme.Typography.nav, weight: selected ? .semibold : .regular))
+                    .lineLimit(1)
+                Spacer(minLength: 0)
             }
             .foregroundStyle(SWTheme.text)
             .padding(.horizontal, 12)
