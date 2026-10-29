@@ -27,7 +27,7 @@ struct OverviewView: View {
             if let err = store.loadError {
                 Text(err).foregroundStyle(.red).padding().swCard()
             }
-            workbenchBoard
+            tradeKeyBoard
             if store.activeWorkbench?.summaryHints?.showWebsiteProjects != false {
                 websiteBoard(kpiCols: kpiCols, goalCols: goalCols)
             }
@@ -67,75 +67,45 @@ struct OverviewView: View {
         return 1
     }
 
-    // MARK: - Workbenches switcher cards
+    // MARK: - Trade key metrics (scoped overview; no switcher cards)
 
-    private var workbenchBoard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            sectionHead("工作台", badge: "\(store.workbenches.count)")
-            Text("点击卡片切换 · 配置见 data/workbenches.json")
-                .font(.system(size: 12)).foregroundStyle(SWTheme.textMuted)
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 14)], spacing: 14) {
-                ForEach(store.workbenches) { wb in
-                    let sum = store.workbenchSummary(for: wb)
-                    let active = store.activeWorkbenchId == wb.id
-                    Button {
-                        store.switchWorkbench(wb.id)
-                    } label: {
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack {
-                                Image(systemName: wb.icon ?? "square.grid.2x2")
-                                    .font(.title3)
-                                Text(wb.name)
-                                    .font(.subheadline.weight(.bold))
-                                    .lineLimit(1)
-                                Spacer()
-                                if active {
-                                    Text("当前")
-                                        .font(.caption2.weight(.bold))
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 3)
-                                        .background(Color.black)
-                                        .foregroundStyle(.white)
-                                        .clipShape(Capsule())
-                                }
-                            }
-                            if let d = wb.description {
-                                Text(d).font(.caption).foregroundStyle(.secondary).lineLimit(2)
-                            }
-                            HStack(spacing: 16) {
-                                labelStat("员工", "\(sum.bots)")
-                                labelStat("进行中任务", "\(sum.tasksOpen)")
-                            }
-                            Text(sum.activity)
-                                .font(.caption2)
-                                .foregroundStyle(SWTheme.textMuted)
-                                .lineLimit(2)
-                        }
-                        .padding(16)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(SWTheme.card)
-                        .clipShape(RoundedRectangle(cornerRadius: SWTheme.Radius.panel, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: SWTheme.Radius.panel)
-                                .stroke(active ? Color.black : SWTheme.borderSoft, lineWidth: active ? 1.5 : 1)
-                        )
-                        .shadow(color: SWTheme.shadowElevated, radius: 6, y: 2)
-                    }
-                    .buttonStyle(.plain)
+    @ViewBuilder
+    private var tradeKeyBoard: some View {
+        if store.activeWorkbench?.summaryHints?.showTradeCounts == true {
+            let c = store.tradeLeadsIndex?.counts
+            VStack(alignment: .leading, spacing: 14) {
+                sectionHead("外贸关键指标", badge: "聚合")
+                Text("仅计数 · 客户名/金额见 private")
+                    .font(.system(size: 12)).foregroundStyle(SWTheme.textMuted)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 12)], spacing: 12) {
+                    tradeStat("线索", c?.leadsTotal)
+                    tradeStat("优质", c?.leadsQualified)
+                    tradeStat("档案", c?.profiles)
+                    tradeStat("开发中", c?.inProgressDev)
+                    tradeStat("询盘", c?.inquiriesOpen)
+                    tradeStat("报价草稿", c?.quotesDraft)
+                }
+                if let a = store.tradeLeadsIndex?.latestActivity, !a.isEmpty {
+                    Text(a).font(.caption).foregroundStyle(SWTheme.textMuted)
                 }
             }
+            .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(SWTheme.card)
+            .clipShape(RoundedRectangle(cornerRadius: SWTheme.radiusSection, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: SWTheme.radiusSection).stroke(SWTheme.borderSoft))
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(SWTheme.card.opacity(0.5))
-        .clipShape(RoundedRectangle(cornerRadius: SWTheme.radiusSection, style: .continuous))
     }
 
-    private func labelStat(_ k: String, _ v: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(v).font(.title3.weight(.bold))
-            Text(k).font(.caption2).foregroundStyle(.secondary)
+    private func tradeStat(_ k: String, _ v: Int?) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(k).font(.caption).foregroundStyle(.secondary)
+            Text(v.map(String.init) ?? "—").font(.title3.weight(.bold))
         }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(SWTheme.pageBg)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
     // MARK: - Website
@@ -569,9 +539,9 @@ struct OverviewView: View {
 
     private func rosterBoard(minWidth: CGFloat) -> some View {
         // Indexed grouping — same flow-wrap RosterGroupBoard visuals.
-        let groups = store.groupedBots(order: groupOrder)
+        let groups = store.groupedBots(order: groupOrder, from: store.scopedBots)
         return VStack(alignment: .leading, spacing: 12) {
-            sectionHead("员工看板", badge: "\(store.data.bots.count)")
+            sectionHead("员工看板", badge: "\(store.scopedBots.count)")
             RosterGroupBoard(groups: groups, cardWidth: SWTheme.Roster.cardMinWidth) { bot in
                 store.selectedBotId = bot.id
                 store.selectedSection = .roster

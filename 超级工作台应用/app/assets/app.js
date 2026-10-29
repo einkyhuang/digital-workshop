@@ -129,15 +129,31 @@
       if (res.ok) state.tradeIndex = await res.json();
     } catch (_) {}
   }
-  function fillWorkbenchSelect() {
+  function renderWorkbenchSegment() {
     const list = state.workbenches || [];
-    const html = list.map(w => `<option value="${esc(w.id)}" ${w.id===state.activeWorkbenchId?"selected":""}>${esc(w.name)}</option>`).join("");
-    for (const id of ["workbenchSelect", "workbenchSelectMain"]) {
-      const sel = document.getElementById(id);
-      if (!sel) continue;
-      sel.innerHTML = html;
-      sel.onchange = () => switchWorkbench(sel.value);
-    }
+    if (!list.length) return "";
+    return `<div class="wb-segment" role="tablist" aria-label="切换工作台">${list.map(w => {
+      const active = w.id === state.activeWorkbenchId;
+      return `<button type="button" class="wb-seg ${active ? "wb-seg--active" : ""}" data-wb="${esc(w.id)}" role="tab" aria-selected="${active ? "true" : "false"}">${esc(w.name)}</button>`;
+    }).join("")}</div>`;
+  }
+  function renderTradeKeyStrip() {
+    const hints = ((state.workbenches || []).find(w => w.id === state.activeWorkbenchId) || {}).summaryHints || {};
+    if (!hints.showTradeCounts) return "";
+    const c = (state.tradeIndex && state.tradeIndex.counts) || {};
+    const cells = [["线索", c.leadsTotal], ["优质", c.leadsQualified], ["档案", c.profiles], ["开发中", c.inProgressDev], ["询盘", c.inquiriesOpen], ["报价草稿", c.quotesDraft]]
+      .map(([k, v]) => `<div class="daily-card"><div class="muted" style="font-size:12px">${esc(k)}</div><div style="font-size:22px;font-weight:700">${v == null ? "—" : v}</div></div>`)
+      .join("");
+    const act = (state.tradeIndex && state.tradeIndex.latestActivity)
+      ? `<p class="muted" style="margin-top:8px">${esc(state.tradeIndex.latestActivity)}</p>` : "";
+    return `<section class="section-shell"><div class="section-shell__head"><h3 class="section-shell__title">外贸关键指标</h3><span class="section-shell__badge">聚合</span></div>
+      <p class="muted" style="font-size:12px">仅计数 · 客户名/金额见 private</p>
+      <div class="kpi-grid" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr))">${cells}</div>${act}</section>`;
+  }
+  function bindWorkbenchSegment() {
+    document.querySelectorAll(".wb-seg[data-wb]").forEach((el) => {
+      el.onclick = () => switchWorkbench(el.getAttribute("data-wb"));
+    });
   }
   function switchWorkbench(id) {
     state.activeWorkbenchId = id;
@@ -159,30 +175,6 @@
     if (!wb || !wb.botGroupIds || !wb.botGroupIds.length) return tasks;
     const names = new Set(scopedBots().map(b => b.name));
     return tasks.filter(t => names.has(t.executor) || names.has(t.reviewer) || [...names].some(n => (t.executor || "").includes(n)));
-  }
-  function renderWorkbenchCards() {
-    const list = state.workbenches || [];
-    if (!list.length) return "";
-    const cards = list.map(wb => {
-      const active = wb.id === state.activeWorkbenchId;
-      const bots = (!wb.botGroupIds || !wb.botGroupIds.length) ? (state.data.bots || []) :
-        (state.data.bots || []).filter(b => wb.botGroupIds.includes(b.group) || (b.groups || []).some(g => wb.botGroupIds.includes(g)));
-      const names = new Set(bots.map(b => b.name));
-      const tasks = (!wb.botGroupIds || !wb.botGroupIds.length) ? (state.data.tasks || []) :
-        (state.data.tasks || []).filter(t => names.has(t.executor) || names.has(t.reviewer));
-      const open = tasks.filter(t => t.status === "待办" || t.status === "进行中" || t.status === "验收").length;
-      let activity = "—";
-      if (wb.id === "trade" && state.tradeIndex && state.tradeIndex.latestActivity) activity = state.tradeIndex.latestActivity;
-      else if (tasks[0]) activity = tasks[0].title;
-      return `<button type="button" class="wb-card ${active ? "wb-card--active" : ""}" data-wb="${esc(wb.id)}">
-        <div class="wb-card__top"><strong>${esc(wb.name)}</strong>${active ? '<span class="pill">当前</span>' : ""}</div>
-        <div class="muted" style="font-size:12px;margin:6px 0">${esc(wb.description || "")}</div>
-        <div class="wb-card__stats"><span><b>${bots.length}</b> 员工</span><span><b>${open}</b> 进行中任务</span></div>
-        <div class="muted" style="font-size:11px;margin-top:8px">${esc(activity)}</div>
-      </button>`;
-    }).join("");
-    return `<div class="section-shell" style="margin-bottom:16px"><div class="section-shell__head"><h3 class="section-shell__title">工作台</h3><span class="section-shell__badge">${list.length}</span></div>
-      <p class="muted" style="font-size:12px">点击切换 · data/workbenches.json</p><div class="wb-grid">${cards}</div></div>`;
   }
   async function loadScheduleMonth(ym) {
     if (state.scheduleLoadedMonth === ym) return;
@@ -683,9 +675,10 @@
   }
 
   function renderOverview() {
-    const bots = state.data.bots || [];
+    const bots = scopedBots();
     const webs = state.data.websiteProjects || [];
-    const tasks = state.data.tasks || [];
+    const tasks = scopedTasks();
+    const wbHints = ((state.workbenches || []).find(w => w.id === state.activeWorkbenchId) || {}).summaryHints || {};
     const kpi = computeWebsiteKPI(webs, state.targetsFile);
     const privacy = !kpi.amountsAvailable;
     const priv = (v) => privacy ? PRIVACY_LABEL : v;
@@ -694,7 +687,7 @@
       return Math.min(100, (Number(n) / Number(d)) * 100);
     };
     const ringStyle = (pct, color) => {
-      if (pct == null) return `${renderWorkbenchCards()}background:conic-gradient(${color} 0%, var(--sw-ring-track) 0)`;
+      if (pct == null) return `background:conic-gradient(${color} 0%, var(--sw-ring-track) 0)`;
       return `background:conic-gradient(${color} ${pct.toFixed(1)}%, var(--sw-ring-track) 0)`;
     };
     const urgencyClass = (u) => {
@@ -869,11 +862,11 @@
 
     return `
       <div class="overview-main">
-      <div class="section-title-row"><h2 class="section-title">工作台总览</h2>
-      <label class="wb-switcher-label"><select id="workbenchSelectMain" class="wb-switcher" aria-label="切换工作台"></select></label></div>
+      <div class="section-title-row"><h2 class="section-title">工作台总览</h2>${renderWorkbenchSegment()}</div>
       <p class="muted"><b>网站业绩</b> · 日程 · 邮件 · 员工 · 基准 ${esc(kpi.asOf)} · ${privacy ? "金额" + PRIVACY_LABEL : "本地完整金额"} · v2</p>
       <div class="overview-stack">
-      <section class="section-shell">
+      ${renderTradeKeyStrip()}
+      ${wbHints.showWebsiteProjects === false ? "" : `<section class="section-shell">
         <div class="section-shell__head"><h3 class="section-shell__title">网站项目看板</h3><span class="section-shell__badge">${webs.length}</span></div>
         <div class="section-shell__meta">口径：金算盘 · CNY</div>
         <div class="section-subhead" style="margin-top:0">存量健康</div>
@@ -887,7 +880,7 @@
         </div>
         <div class="section-subhead">进行中优先</div>
         <div class="prio-list">${topHtml}</div>
-      </section>
+      </section>`}
       <section class="section-shell">
         <div class="section-shell__head"><h3 class="section-shell__title">日程管理 · 任务看板</h3><span class="section-shell__badge">${tasks.length}</span></div>
         <div class="section-shell__meta">只读 · 工作台任务</div>
@@ -1317,7 +1310,7 @@ function renderKanban() {
     tabs.querySelectorAll("[data-tab]").forEach((el) => {
       el.onclick = () => setTab(el.getAttribute("data-tab"));
     });
-    fillWorkbenchSelect();
+    bindWorkbenchSegment();
     renderMain();
     const more = document.getElementById("webLoadMore");
     if (more) more.onclick = () => { state.webShown = (state.webShown || state.webPageSize) + state.webPageSize; render(); };
@@ -1331,7 +1324,7 @@ function renderKanban() {
     state.workbenches = state.workbenches || [];
     state.tradeIndex = state.tradeIndex || null;
     await loadWorkbenches();
-    fillWorkbenchSelect();
+    bindWorkbenchSegment();
     document.getElementById("btnExport").onclick = doExport;
     document.getElementById("btnReset").onclick = resetDefault;
     document.getElementById("fileImport").onchange = (e) => {

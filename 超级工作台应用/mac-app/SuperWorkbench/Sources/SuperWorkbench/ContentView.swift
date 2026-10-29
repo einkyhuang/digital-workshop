@@ -140,37 +140,8 @@ struct TopBar: View {
                 }
                 HStack(alignment: .center, spacing: 12) {
                     Text(pageTitle).font(.system(size: 28, weight: .bold))
-                    if !store.workbenches.isEmpty {
-                        Menu {
-                            ForEach(store.workbenches) { wb in
-                                Button {
-                                    store.switchWorkbench(wb.id)
-                                } label: {
-                                    HStack {
-                                        Text(wb.name)
-                                        if store.activeWorkbenchId == wb.id {
-                                            Image(systemName: "checkmark")
-                                        }
-                                    }
-                                }
-                            }
-                        } label: {
-                            HStack(spacing: 6) {
-                                Image(systemName: store.activeWorkbench?.icon ?? "square.grid.2x2")
-                                Text(store.activeWorkbench?.name ?? "选择工作台")
-                                    .lineLimit(1)
-                                Image(systemName: "chevron.up.chevron.down")
-                                    .font(.caption2)
-                            }
-                            .font(.subheadline.weight(.semibold))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(Color.black.opacity(0.05))
-                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(SWTheme.borderSoft))
-                        }
-                        .menuStyle(.borderlessButton)
-                        .help("切换工作台（data/workbenches.json）")
+                    if store.selectedSection == .overview, !store.workbenches.isEmpty {
+                        workbenchSegment
                     }
                 }
                 Text(subtitle).font(.subheadline).foregroundStyle(.secondary)
