@@ -800,6 +800,9 @@ final class WorkspaceStore: ObservableObject {
                 self.workbenches = list
                 self.activeWorkbenchId = active
                 self.loadCrmPublicIndex()
+                if UserDefaults.standard.string(forKey: "sw.forceSection") == "crmCustomers" {
+                    self.selectedSection = .crmCustomers
+                }
                 self.tradeLeadsIndex = idx
                 // keep selection valid for modules
                 if !self.activeModules.contains(self.selectedSection) {

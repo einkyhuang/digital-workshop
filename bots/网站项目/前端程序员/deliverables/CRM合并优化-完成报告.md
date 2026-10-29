@@ -56,3 +56,7 @@
 ## 6. 分段切换（前置任务）截图
 
 同目录：`mac-overview-*-segment.png`、`web-overview-*-segment.png`、`分段工作台切换-完成报告.md`
+
+## 7. 客户管理页截图
+
+- `mac-crm-客户管理.png` — 19055 客户 / 949 缩略图 / 4 PDF / 本页 2ms / 191 页分页
