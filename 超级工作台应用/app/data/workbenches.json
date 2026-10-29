@@ -32,12 +32,17 @@
       "shortName": "外贸",
       "icon": "globe",
       "description": "服装外贸 · 外贸营销 · 照明外贸：线索、背调、开发进度、询盘报价",
-      "botGroupIds": ["服装外贸", "外贸营销", "照明外贸"],
+      "botGroupIds": [
+        "服装外贸",
+        "外贸营销",
+        "照明外贸"
+      ],
       "modules": [
         "overview",
         "roster",
         "tasks",
         "tradeLeads",
+        "crmCustomers",
         "tradePipeline",
         "tradeQuotes",
         "scheduleCenter",
@@ -46,7 +51,9 @@
       ],
       "data": {
         "leadsPrivate": "超级工作台应用/data/private/trade-leads.local.json",
-        "leadsIndex": "超级工作台应用/data/trade-leads-index.json"
+        "leadsIndex": "超级工作台应用/data/trade-leads-index.json",
+        "crmPrivate": "超级工作台应用/data/private/crm",
+        "crmIndex": "超级工作台应用/data/crm"
       },
       "summaryHints": {
         "showWebsiteProjects": false,

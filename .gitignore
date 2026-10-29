@@ -50,3 +50,9 @@ projects/印花产品图库/images/
 # private email summaries
 bots/*/*/deliverables/email-daily/
 bots/*/*/deliverables/email-daily-private/
+
+# CRM reference tree (never commit install/build artifacts)
+超级工作台应用/crm-magichub/node_modules/
+超级工作台应用/crm-magichub/dist/
+超级工作台应用/crm-magichub/dist_electron/
+超级工作台应用/crm-magichub/scratch/

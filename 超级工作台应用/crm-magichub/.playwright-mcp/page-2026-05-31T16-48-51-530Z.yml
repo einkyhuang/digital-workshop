@@ -1,0 +1,265 @@
+- generic [ref=e3]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - img "MagicHub Logo" [ref=e9]
+          - generic [ref=e10]:
+            - generic [ref=e11]:
+              - heading "MagicHub" [level=1] [ref=e12]
+              - generic [ref=e13]: v1.3.0
+            - paragraph [ref=e14]: Smart Trade CRM
+        - generic [ref=e15]: "System Release: v1.3.0"
+      - navigation [ref=e17]:
+        - button "驾驶舱" [ref=e18] [cursor=pointer]:
+          - img [ref=e19]
+          - text: 驾驶舱
+        - button "日程管理" [active] [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+          - text: 日程管理
+        - button "客户管理" [ref=e24] [cursor=pointer]:
+          - img [ref=e25]
+          - text: 客户管理
+        - button "智能营销" [ref=e27] [cursor=pointer]:
+          - img [ref=e28]
+          - text: 智能营销
+        - button "商机管理" [ref=e30] [cursor=pointer]:
+          - img [ref=e31]
+          - text: 商机管理
+        - button "跟进记录" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+          - text: 跟进记录
+        - button "寄样跟进" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+          - text: 寄样跟进
+        - button "报价记录" [ref=e39] [cursor=pointer]:
+          - img [ref=e40]
+          - text: 报价记录
+        - button "订单合同" [ref=e42] [cursor=pointer]:
+          - img [ref=e43]
+          - text: 订单合同
+        - button "产品管理" [ref=e45] [cursor=pointer]:
+          - img [ref=e46]
+          - text: 产品管理
+        - button "智能工具" [ref=e48] [cursor=pointer]:
+          - img [ref=e49]
+          - text: 智能工具
+        - button "📚 智能知识库" [ref=e51] [cursor=pointer]:
+          - img [ref=e52]
+          - text: 📚 智能知识库
+        - button "公司信息" [ref=e54] [cursor=pointer]:
+          - img [ref=e55]
+          - text: 公司信息
+        - button "团队管理" [ref=e57] [cursor=pointer]:
+          - img [ref=e58]
+          - text: 团队管理
+      - button "⚙️ 系统设置" [ref=e61] [cursor=pointer]:
+        - generic [ref=e62]: ⚙️
+        - text: 系统设置
+      - generic [ref=e63]:
+        - generic [ref=e64]:
+          - generic [ref=e65]: 💬 智能对话存档
+          - button "＋" [ref=e66] [cursor=pointer]
+        - generic [ref=e67]:
+          - button "📝 关于丰田越野车涉水器的开发信起草 ✕" [ref=e68] [cursor=pointer]:
+            - generic [ref=e69]:
+              - generic [ref=e70]: 📝
+              - generic [ref=e71]: 关于丰田越野车涉水器的开发信起草
+            - button "✕" [ref=e72]
+          - button "📝 进出口海运信用证法务合规审计 ✕" [ref=e73] [cursor=pointer]:
+            - generic [ref=e74]:
+              - generic [ref=e75]: 📝
+              - generic [ref=e76]: 进出口海运信用证法务合规审计
+            - button "✕" [ref=e77]
+    - generic [ref=e78]:
+      - generic [ref=e79]:
+        - generic [ref=e80]:
+          - generic [ref=e81]: 底库核心：
+          - generic [ref=e82]: SQLite (Encrypted)
+        - generic [ref=e83]:
+          - generic [ref=e84]: 向量仓：
+          - generic [ref=e85]: ChromaDB Local
+      - paragraph [ref=e86]: 雅致极简 🌿 绝对隐私保护
+  - generic [ref=e87]:
+    - banner [ref=e88]:
+      - generic [ref=e89]:
+        - heading "日程管理" [level=2] [ref=e369]
+        - generic [ref=e91]: "|"
+        - generic [ref=e92]: 高保真智能连接本地化 CRM
+      - generic [ref=e93]:
+        - generic "点击管理 AI 路由配置" [ref=e94] [cursor=pointer]:
+          - generic [ref=e96]: AI 网关：国内外多模型智能路由中 ⚙️
+        - button "极密模式 (关)" [ref=e97] [cursor=pointer]:
+          - img [ref=e98]
+          - text: 极密模式 (关)
+    - main [ref=e100]:
+      - generic [ref=e371]:
+        - generic [ref=e372]:
+          - generic [ref=e373]:
+            - generic [ref=e374]:
+              - heading "📅 2026年度日程与业务总结中心" [level=2] [ref=e375]
+              - paragraph [ref=e376]: 统一梳理全年 12 个月所有客商跟进、合同履行、AI 离线清洗日志及 ChromaDB 向量知识库的热同步印记。
+            - button "🤖 AI 一键生成年度总结报告" [ref=e378] [cursor=pointer]:
+              - generic [ref=e379]: 🤖 AI 一键生成年度总结报告
+          - generic [ref=e380]:
+            - generic [ref=e381]:
+              - generic [ref=e382]: 2026年度跟进总数
+              - generic [ref=e383]: 142 次
+            - generic [ref=e384]:
+              - generic [ref=e385]: 合同订单生效数
+              - generic [ref=e386]: 24 单
+            - generic [ref=e387]:
+              - generic [ref=e388]: AI 自动清洗日志
+              - generic [ref=e389]: 189 条
+            - generic [ref=e390]:
+              - generic [ref=e391]: 待办警告异常
+              - generic [ref=e392]: 2 项
+        - generic [ref=e393]:
+          - generic [ref=e394]:
+            - generic [ref=e395]:
+              - heading "待办事项工作台" [level=3] [ref=e396]
+              - paragraph [ref=e397]: 用于集中处理需要营销、报价、回访、合同确认的客户任务。
+            - button "AI 生成待办" [ref=e399] [cursor=pointer]
+          - generic [ref=e400]:
+            - generic [ref=e401]:
+              - generic [ref=e402]:
+                - checkbox [ref=e403]
+                - generic [ref=e404]:
+                  - generic [ref=e405]:
+                    - generic [ref=e406]: 高优先级
+                    - generic [ref=e407]: 今天
+                  - heading "给德国 Müller 发送 TUV 参数营销邮件" [level=4] [ref=e408]
+                  - paragraph [ref=e409]: 重点附上防撞杠材料、包装和交期说明。
+                - button "删除" [ref=e410] [cursor=pointer]
+              - generic [ref=e411]:
+                - checkbox [ref=e412]
+                - generic [ref=e413]:
+                  - generic [ref=e414]:
+                    - generic [ref=e415]: 高优先级
+                    - generic [ref=e416]: 本周三
+                  - heading "整理 Somchai 二期报价" [level=4] [ref=e417]
+                  - paragraph [ref=e418]: 按照首款到账后的阶梯价格准备 CIF 报价。
+                - button "删除" [ref=e419] [cursor=pointer]
+              - generic [ref=e420]:
+                - checkbox [ref=e421]
+                - generic [ref=e422]:
+                  - generic [ref=e423]:
+                    - generic [ref=e424]: 中优先级
+                    - generic [ref=e425]: 本周
+                  - heading "复核 14 家欧洲汽配客户报告" [level=4] [ref=e426]
+                  - paragraph [ref=e427]: 把高分客户标记为下一轮开发对象。
+                - button "删除" [ref=e428] [cursor=pointer]
+            - generic [ref=e429]:
+              - heading "手动建立待办" [level=4] [ref=e430]
+              - textbox "例如：给 Horntools 发报价" [ref=e431]
+              - generic [ref=e432]:
+                - combobox [ref=e433]:
+                  - option "高优先级"
+                  - option "中优先级" [selected]
+                  - option "低优先级"
+                - textbox "今天 / 本周五" [ref=e434]: 今天
+              - textbox "补充客户、产品、报价或营销动作..." [ref=e435]
+              - button "保存待办" [ref=e436] [cursor=pointer]
+        - generic [ref=e437]:
+          - generic [ref=e438]:
+            - button "全部日程" [ref=e439] [cursor=pointer]
+            - button "客户跟进" [ref=e440] [cursor=pointer]
+            - button "合同订单" [ref=e441] [cursor=pointer]
+            - button "系统与 AI" [ref=e442] [cursor=pointer]
+          - generic [ref=e443]: 当前看板：2026年 6月 (June)
+        - generic [ref=e446]:
+          - generic [ref=e447]:
+            - heading "📅 2026年 6月 (June) · 当月全宽月历" [level=3] [ref=e448]
+            - generic [ref=e449]: 2 记录
+          - generic [ref=e450]:
+            - generic [ref=e451]: 日
+            - generic [ref=e452]: 一
+            - generic [ref=e453]: 二
+            - generic [ref=e454]: 三
+            - generic [ref=e455]: 四
+            - generic [ref=e456]: 五
+            - generic [ref=e457]: 六
+          - generic [ref=e458]:
+            - generic [ref=e459]: "0"
+            - generic [ref=e461] [cursor=pointer]: "1"
+            - generic [ref=e463] [cursor=pointer]: "2"
+            - generic [ref=e465] [cursor=pointer]: "3"
+            - generic [ref=e467] [cursor=pointer]: "4"
+            - generic [ref=e469] [cursor=pointer]: "5"
+            - generic [ref=e471] [cursor=pointer]: "6"
+            - generic [ref=e473] [cursor=pointer]: "7"
+            - generic [ref=e475] [cursor=pointer]: "8"
+            - generic [ref=e477] [cursor=pointer]: "9"
+            - generic [ref=e479] [cursor=pointer]: "10"
+            - generic [ref=e481] [cursor=pointer]: "11"
+            - generic [ref=e483] [cursor=pointer]: "12"
+            - generic [ref=e485] [cursor=pointer]: "13"
+            - generic [ref=e487] [cursor=pointer]: "14"
+            - generic [ref=e489] [cursor=pointer]: "15"
+            - generic [ref=e491] [cursor=pointer]: "16"
+            - generic [ref=e493] [cursor=pointer]: "17"
+            - generic [ref=e495] [cursor=pointer]: "18"
+            - generic [ref=e497] [cursor=pointer]: "19"
+            - generic [ref=e499] [cursor=pointer]: "20"
+            - generic [ref=e501] [cursor=pointer]: "21"
+            - generic [ref=e503] [cursor=pointer]: "22"
+            - generic [ref=e505] [cursor=pointer]: "23"
+            - generic [ref=e507] [cursor=pointer]: "24"
+            - generic [ref=e509] [cursor=pointer]: "25"
+            - generic [ref=e511] [cursor=pointer]: "26"
+            - generic [ref=e513] [cursor=pointer]: "27"
+            - generic [ref=e515] [cursor=pointer]: "28"
+            - generic [ref=e517] [cursor=pointer]: "29"
+            - generic [ref=e519] [cursor=pointer]: "30"
+        - generic [ref=e520]:
+          - group [ref=e521]:
+            - generic "2026年 1月 (January) · 0 项记录 点击展开" [ref=e522] [cursor=pointer]:
+              - generic [ref=e523]: 2026年 1月 (January) · 0 项记录
+              - generic [ref=e524]: 点击展开
+          - group [ref=e525]:
+            - generic "2026年 2月 (February) · 0 项记录 点击展开" [ref=e526] [cursor=pointer]:
+              - generic [ref=e527]: 2026年 2月 (February) · 0 项记录
+              - generic [ref=e528]: 点击展开
+          - group [ref=e529]:
+            - generic "2026年 3月 (March) · 2 项记录 点击展开" [ref=e530] [cursor=pointer]:
+              - generic [ref=e531]: 2026年 3月 (March) · 2 项记录
+              - generic [ref=e532]: 点击展开
+          - group [ref=e533]:
+            - generic "2026年 4月 (April) · 3 项记录 点击展开" [ref=e534] [cursor=pointer]:
+              - generic [ref=e535]: 2026年 4月 (April) · 3 项记录
+              - generic [ref=e536]: 点击展开
+          - group [ref=e537]:
+            - generic "2026年 5月 (May) · 8 项记录 点击展开" [ref=e538] [cursor=pointer]:
+              - generic [ref=e539]: 2026年 5月 (May) · 8 项记录
+              - generic [ref=e540]: 点击展开
+          - group [ref=e541]:
+            - generic "2026年 7月 (July) · 0 项记录 点击展开" [ref=e542] [cursor=pointer]:
+              - generic [ref=e543]: 2026年 7月 (July) · 0 项记录
+              - generic [ref=e544]: 点击展开
+          - group [ref=e545]:
+            - generic "2026年 8月 (August) · 0 项记录 点击展开" [ref=e546] [cursor=pointer]:
+              - generic [ref=e547]: 2026年 8月 (August) · 0 项记录
+              - generic [ref=e548]: 点击展开
+          - group [ref=e549]:
+            - generic "2026年 9月 (September) · 0 项记录 点击展开" [ref=e550] [cursor=pointer]:
+              - generic [ref=e551]: 2026年 9月 (September) · 0 项记录
+              - generic [ref=e552]: 点击展开
+          - group [ref=e553]:
+            - generic "2026年 10月 (October) · 0 项记录 点击展开" [ref=e554] [cursor=pointer]:
+              - generic [ref=e555]: 2026年 10月 (October) · 0 项记录
+              - generic [ref=e556]: 点击展开
+          - group [ref=e557]:
+            - generic "2026年 11月 (November) · 0 项记录 点击展开" [ref=e558] [cursor=pointer]:
+              - generic [ref=e559]: 2026年 11月 (November) · 0 项记录
+              - generic [ref=e560]: 点击展开
+          - group [ref=e561]:
+            - generic "2026年 12月 (December) · 0 项记录 点击展开" [ref=e562] [cursor=pointer]:
+              - generic [ref=e563]: 2026年 12月 (December) · 0 项记录
+              - generic [ref=e564]: 点击展开
+  - generic [ref=e361] [cursor=pointer]:
+    - generic [ref=e362]: 随时输入指令、背调分析客商或整理沟通纪要...
+    - generic [ref=e363]:
+      - generic [ref=e364]: 深度求索
+      - button "🖥️" [ref=e365]
+      - button [ref=e366]:
+        - img [ref=e367]

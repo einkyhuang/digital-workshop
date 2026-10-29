@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "total": 952,
+  "pageSize": 50,
+  "sqlite": "private/crm/products/products.sqlite",
+  "sample": [
+    {
+      "id": 16718,
+      "sku": "",
+      "name": "17971A Snorkel with \"LAND CRUISER\" for Toyota Land Cruiser 70, 76, 79 2024 Onwards",
+      "category": "",
+      "image": "/product-images/16718.jpg"
+    },
+    {
+      "id": 16714,
+      "sku": "",
+      "name": "SDGGY Snorkel for DODGE RAM PICKUP",
+      "category": "",
+      "image": "/product-images/16714.jpg"
+    },
+    {
+      "id": 16711,
+      "sku": "",
+      "name": "GS134G-2 Snorkel for Isuzu D-MAX 2021 Onwards, Diesel",
+      "category": "",
+      "image": "/product-images/16711.jpg"
+    },
+    {
+      "id": 16707,
+      "sku": "",
+      "name": "S664A Snorkel for Mitsubishi MV Triton MY24 / L200 2024-Onwards",
+      "category": "",
+      "image": "/product-images/16707.jpg"
+    },
+    {
+      "id": 16704,
+      "sku": "",
+      "name": "011SAT0183X Snorkel for Volkswagen Amarok 2022+",
+      "category": "",
+      "image": "/product-images/16704.jpg"
+    }
+  ],
+  "note": "明细仅 private"
+}

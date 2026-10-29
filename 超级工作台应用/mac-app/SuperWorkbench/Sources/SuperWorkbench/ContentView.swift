@@ -84,6 +84,7 @@ struct ContentView: View {
         case .tradeLeads: TradeLeadsView()
         case .tradePipeline: TradePipelineView()
         case .tradeQuotes: TradeQuotesView()
+        case .crmCustomers: CrmCustomersView()
         case .rooms: RoomsView()
         case .routines: RoutinesView()
         case .hiring: HiringView()
@@ -117,6 +118,7 @@ struct TopBar: View {
         case .tradeLeads: return "线索/档案聚合计数 · 明细仅本地 private"
         case .tradePipeline: return "开发进度聚合 · 无客户名"
         case .tradeQuotes: return "询盘与报价计数 · 金额不上 Pages"
+        case .crmCustomers: return "MagicHub CRM · 分页/缩略图/PDF 索引 · 明细仅 private"
         case .rooms: return "群聊协作时间线"
         case .routines: return "规划中的定时巡检（尚未启用）"
         case .hiring: return "待招岗位 · 本地标记不会真正创建 Bot"
@@ -237,6 +239,7 @@ struct TopBar: View {
         case .tradeLeads: return "客户与线索"
         case .tradePipeline: return "开发进度"
         case .tradeQuotes: return "询盘与报价"
+        case .crmCustomers: return "客户管理"
         case .projects: return selectedProjectTitle
         default: return title
         }

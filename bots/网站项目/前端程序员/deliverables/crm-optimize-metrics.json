@@ -1,0 +1,40 @@
+{
+  "steps": [
+    {
+      "name": "leads_to_sqlite",
+      "seconds": 0.381,
+      "total": 19055,
+      "sqlite_bytes": 19103744,
+      "pages": 191
+    },
+    {
+      "name": "pdf_index",
+      "seconds": 0.001,
+      "count": 4
+    },
+    {
+      "name": "products_to_sqlite",
+      "seconds": 0.011,
+      "total": 952,
+      "sqlite_bytes": 1241088
+    },
+    {
+      "name": "webp_thumbnails",
+      "seconds": 3.591,
+      "ok": 949,
+      "fail": 0,
+      "thumb_bytes": 8913768,
+      "source_count": 949
+    }
+  ],
+  "sizes": {
+    "private_total": "269M",
+    "leads_sqlite": "18M",
+    "leads_json_seed": "13M",
+    "thumbs": "10M",
+    "products_originals": "34M",
+    "pdfs_originals": "189M",
+    "source_tree": "3.8M",
+    "public_indexes": "20K"
+  }
+}

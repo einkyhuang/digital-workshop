@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "total": 19055,
+  "pageSize": 100,
+  "pageCount": 191,
+  "note": "明细与 SQLite 仅本地 private/crm/leads/",
+  "sample": [
+    {
+      "id": 200,
+      "company": "LIONG MEI GENERATION CORPORATION",
+      "country": "菲律宾",
+      "contact": "ROBIN AVIS CHUA",
+      "status": "potential",
+      "email": "rob***"
+    },
+    {
+      "id": 201,
+      "company": "D\"s car boutique ltd",
+      "country": "特立尼达和多巴哥",
+      "contact": "haseeb deen",
+      "status": "potential",
+      "email": "dca***"
+    },
+    {
+      "id": 202,
+      "company": "CONACORP SA DE CV",
+      "country": "墨西哥",
+      "contact": "JUAN REYES",
+      "status": "potential",
+      "email": "jua***"
+    },
+    {
+      "id": 203,
+      "company": "SINO GOLD MINE I/E CO.,LTD",
+      "country": "中国香港",
+      "contact": "Amy HuangZhiMin",
+      "status": "potential",
+      "email": "hkg***"
+    },
+    {
+      "id": 204,
+      "company": "combine group of co. ltd.",
+      "country": "科威特",
+      "contact": "ahmad",
+      "status": "potential",
+      "email": "s.a***"
+    }
+  ]
+}

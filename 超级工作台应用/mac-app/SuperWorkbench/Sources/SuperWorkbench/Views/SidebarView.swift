@@ -91,6 +91,7 @@ struct SidebarView: View {
         case .tradeLeads: return store.tradeLeadsIndex?.counts?.leadsTotal
         case .tradePipeline: return store.tradeLeadsIndex?.counts?.inProgressDev
         case .tradeQuotes: return store.tradeLeadsIndex?.counts?.quotesDraft
+        case .crmCustomers: return store.crmLeadsTotal
         default: return nil
         }
     }

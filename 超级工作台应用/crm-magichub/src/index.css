@@ -1,0 +1,270 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ----------------------------------------------------
+   1. 东方禅意基础版式 (Oriental Zen Base Typo)
+   ---------------------------------------------------- */
+@layer base {
+  html {
+    font-size: 16px;
+  }
+  body {
+    background-color: #F9FBFA;
+    color: #1A2220;
+    font-family: 'HarmonyOS Sans SC', 'HarmonyOS Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 500; /* Robust weight to make text less thin */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, .font-serif-sc {
+    font-family: 'HarmonyOS Sans SC', 'HarmonyOS Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 600; /* Enhanced heading visibility */
+  }
+}
+
+/* ----------------------------------------------------
+   2. 极简轻盈定制滚动条 (Elegant Minimalist Scrollbars)
+   ---------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E5E8E7; /* zen-light */
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8E9E88; /* zen-tea */
+}
+
+/* ----------------------------------------------------
+   3. 顶级图层原生过渡动画 (@starting-style Transitions)
+   ---------------------------------------------------- */
+/* 3.1 弹窗与抽屉 */
+dialog,
+[popover] {
+  opacity: 0;
+  transform: scale(0.97) translateY(10px);
+  transition-property: opacity, transform, display, overlay;
+  transition-duration: 0.4s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transition-behavior: allow-discrete;
+}
+
+dialog[open],
+[popover]:popover-open {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.97) translateY(10px);
+  }
+}
+
+/* 3.2 弹窗遮罩层 */
+dialog::backdrop,
+[popover]::backdrop {
+  background-color: rgba(26, 34, 32, 0); /* zen-ink color with 0 opacity */
+  transition:
+    display 0.4s allow-discrete,
+    overlay 0.4s allow-discrete,
+    background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+dialog[open]::backdrop,
+[popover]:popover-open::backdrop {
+  background-color: rgba(26, 34, 32, 0.25); /* 柔和的水墨黑遮罩 */
+
+  @starting-style {
+    background-color: rgba(26, 34, 32, 0);
+  }
+}
+
+/* 3.3 减速动画适应 */
+@media (prefers-reduced-motion: reduce) {
+  dialog, [popover] {
+    transform: none !important;
+    transition-duration: 0.15s;
+  }
+  @starting-style {
+    dialog[open], [popover]:popover-open {
+      transform: none !important;
+    }
+  }
+}
+
+/* ----------------------------------------------------
+   4. 微光/水墨微动效果 (Micro-interactions & Effects)
+   ---------------------------------------------------- */
+/* 宁静水墨呼吸灯 */
+@keyframes ink-breath {
+  0%, 100% {
+    opacity: 0.85;
+    box-shadow: 0 0 10px 1px rgba(98, 114, 84, 0.15);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 18px 4px rgba(98, 114, 84, 0.3);
+  }
+}
+
+.zen-active-indicator {
+  animation: ink-breath 3s infinite ease-in-out;
+}
+
+/* 极密绿光呼吸灯 */
+@keyframes secure-breath {
+  0%, 100% {
+    box-shadow: 0 0 8px 1px rgba(142, 158, 136, 0.2);
+    border-color: rgba(142, 158, 136, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 16px 5px rgba(142, 158, 136, 0.4);
+    border-color: rgba(142, 158, 136, 0.8);
+  }
+}
+
+.zen-secure-active {
+  animation: secure-breath 2.5s infinite ease-in-out;
+}
+
+/* 清洗任务流水动画 */
+@keyframes cleaning-flow {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.cleaning-progress-flow {
+  background: linear-gradient(
+    90deg,
+    #8E9E88 0%,
+    #BCC5B9 25%,
+    #8E9E88 50%,
+    #BCC5B9 75%,
+    #8E9E88 100%
+  );
+  background-size: 200% 100%;
+  animation: cleaning-flow 8s infinite linear;
+}
+
+/* ----------------------------------------------------
+   5. 苹果设计风格磨砂玻璃效果 (Apple Glassmorphic Style)
+   ---------------------------------------------------- */
+.apple-glass {
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(20px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 
+    0 8px 32px 0 rgba(98, 114, 84, 0.03), 
+    0 1px 2px 0 rgba(0, 0, 0, 0.01),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.apple-glass-dark {
+  background: rgba(26, 34, 32, 0.85) !important;
+  backdrop-filter: blur(20px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+/* 磨砂玻璃悬浮增强 */
+.apple-glass-hover {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.apple-glass-hover:hover {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.65) !important;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 16px 40px 0 rgba(98, 114, 84, 0.06), 
+    0 2px 6px 0 rgba(0, 0, 0, 0.02) !important;
+}
+
+/* 苹果系统毛玻璃侧栏 */
+.apple-sidebar-glass {
+  background: rgba(244, 246, 245, 0.75) !important;
+  backdrop-filter: blur(25px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(190%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+/* 苹果系统毛玻璃导航 */
+.apple-header-glass {
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(20px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+/* 背景呼吸发光球 (Background Glowing Spheres) */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(30px, -40px) scale(1.15);
+  }
+}
+
+@keyframes float-reverse {
+  0%, 100% {
+    transform: translate(0, 0) scale(1.1);
+  }
+  50% {
+    transform: translate(-40px, 30px) scale(0.9);
+  }
+}
+
+.glass-sphere-1 {
+  background: radial-gradient(circle, rgba(142, 158, 136, 0.15) 0%, rgba(142, 158, 136, 0) 70%);
+  animation: float-slow 15s infinite ease-in-out;
+}
+
+.glass-sphere-2 {
+  background: radial-gradient(circle, rgba(194, 164, 120, 0.12) 0%, rgba(194, 164, 120, 0) 70%);
+  animation: float-reverse 18s infinite ease-in-out;
+}
+
+.glass-sphere-3 {
+  background: radial-gradient(circle, rgba(98, 114, 84, 0.1) 0%, rgba(98, 114, 84, 0) 70%);
+  animation: float-slow 22s infinite ease-in-out;
+}
+
+/* ----------------------------------------------------
+   6. 磨砂玻璃详情抽屉过渡 (Glassmorphic Drawer Transitions)
+   ---------------------------------------------------- */
+.drawer-fade-enter-active,
+.drawer-fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+.drawer-fade-enter-from,
+.drawer-fade-leave-to {
+  opacity: 0;
+}
+
+.drawer-slide-enter-active,
+.drawer-slide-leave-active {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.drawer-slide-enter-from,
+.drawer-slide-leave-to {
+  transform: translateX(100%);
+}
+

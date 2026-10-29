@@ -1,0 +1,21 @@
+{
+  "before_load_leads_json_ms": 104.6,
+  "before_leads_count": 19055,
+  "before_leads_json_bytes": 13372945,
+  "after_load_leads_index_ms": 1.1,
+  "after_load_page0_ms": 2.0,
+  "after_page0_count": 100,
+  "after_sqlite_count_ms": 18.7,
+  "after_sqlite_count": 19055,
+  "after_pdf_index_ms": 0.2,
+  "after_thumb_index_ms": 0.2,
+  "after_workbench_crm_indexes_ms": 0.1,
+  "size_before_full_tree_GB": "2.2G",
+  "size_after_private_crm": "269M",
+  "size_after_source_tree": "3.8M",
+  "size_public_indexes": "20K",
+  "size_thumbs": "10M",
+  "size_originals_images": "34M",
+  "size_pdfs": "189M",
+  "size_leads_sqlite": "18M"
+}

@@ -1,6 +1,6 @@
 (function () {
   const LS_KEY = "digital-workshop-v2";
-  const TABS = ["总览", "员工档案", "网站项目", "任务看板", "任务与日程中心", "每日总结", "客户与线索", "开发进度", "询盘与报价", "群聊协作", "定时巡检", "招聘规划", "规则与文档"];
+  const TABS = ["总览", "员工档案", "网站项目", "任务看板", "任务与日程中心", "每日总结", "客户与线索", "客户管理", "开发进度", "询盘与报价", "群聊协作", "定时巡检", "招聘规划", "规则与文档"];
   /** Plug 搜搜 field spec / 画眉 visual tokens via ../data/ui-config.json (mirrored here for static Pages). */
   const WEBSITE_UI = {
     defaultView: "list",
@@ -104,13 +104,13 @@
   const MODULE_TAB = {
     overview: "总览", roster: "员工档案", tasks: "任务看板",
     scheduleCenter: "任务与日程中心", dailySummary: "每日总结",
-    tradeLeads: "客户与线索", tradePipeline: "开发进度", tradeQuotes: "询盘与报价",
+    tradeLeads: "客户与线索", crmCustomers: "客户管理", tradePipeline: "开发进度", tradeQuotes: "询盘与报价",
     rooms: "群聊协作", routines: "定时巡检", hiring: "招聘规划",
     rules: "规则与文档", projects: "网站项目"
   };
   function workbenchTabs() {
     const wb = (state.workbenches || []).find(w => w.id === state.activeWorkbenchId) || (state.workbenches || [])[0];
-    if (!wb || !wb.modules) return TABS.filter(x => !["客户与线索","开发进度","询盘与报价"].includes(x));
+    if (!wb || !wb.modules) return TABS.filter(x => !["客户与线索","客户管理","开发进度","询盘与报价"].includes(x));
     return wb.modules.map(m => MODULE_TAB[m]).filter(Boolean);
   }
   async function loadWorkbenches() {
@@ -269,6 +269,104 @@
       <div class="daily-cards"><div class="daily-card"><h4>完成事项</h4><p class="muted">仅本地可见</p></div><div class="daily-card"><h4>交付物</h4><p class="muted">仅本地可见</p></div><div class="daily-card"><h4>卡住的事</h4><p class="muted">仅本地可见</p></div><div class="daily-card"><h4>待用户决定的事</h4><p class="muted">仅本地可见</p></div></div>`;
     return `<h2 class="section-title">每日总结</h2><div class="daily-layout"><aside class="daily-aside">${list}</aside><section class="daily-main">${pane}</section></div>`;
   }
+
+  async function loadCrmIndexes() {
+    if (state.crmIndexLoaded) return;
+    state.crmIndexLoaded = true;
+    state.crmLeadsIndex = null;
+    state.crmPdfIndex = null;
+    state.crmThumbIndex = null;
+    state.crmPage = 0;
+    state.crmPageRows = [];
+    if (isHostedPages()) return; // private CRM never on Pages
+    const tryFetch = async (paths) => {
+      for (const p of paths) {
+        try {
+          const res = await fetch(p, { cache: "no-store" });
+          if (res.ok) return await res.json();
+        } catch (_) {}
+      }
+      return null;
+    };
+    state.crmLeadsIndex = await tryFetch([
+      "./data/private/crm/leads/leads-index.json",
+      "../data/private/crm/leads/leads-index.json",
+      "./data/crm/leads-index.json",
+      "../data/crm/leads-index.json",
+    ]);
+    state.crmPdfIndex = await tryFetch([
+      "./data/private/crm/pdfs/pdf-index.json",
+      "../data/private/crm/pdfs/pdf-index.json",
+      "./data/crm/pdf-index.json",
+    ]);
+    state.crmThumbIndex = await tryFetch([
+      "./data/private/crm/thumbs/thumb-index.json",
+      "../data/private/crm/thumbs/thumb-index.json",
+      "./data/crm/thumb-index.json",
+    ]);
+    await loadCrmPage(0);
+  }
+
+  async function loadCrmPage(page) {
+    state.crmPage = page;
+    const t0 = performance.now();
+    if (isHostedPages()) {
+      state.crmPageRows = (state.crmLeadsIndex && state.crmLeadsIndex.sample) || [];
+      state.crmPageMs = Math.round(performance.now() - t0);
+      return;
+    }
+    const name = `page-${String(page).padStart(4, "0")}.json`;
+    const paths = [
+      `./data/private/crm/leads/${name}`,
+      `../data/private/crm/leads/${name}`,
+    ];
+    let rows = null;
+    for (const p of paths) {
+      try {
+        const res = await fetch(p, { cache: "no-store" });
+        if (res.ok) { rows = await res.json(); break; }
+      } catch (_) {}
+    }
+    state.crmPageRows = Array.isArray(rows) ? rows : ((state.crmLeadsIndex && state.crmLeadsIndex.sample) || []);
+    state.crmPageMs = Math.round(performance.now() - t0);
+  }
+
+  function renderCrmCustomers() {
+    const idx = state.crmLeadsIndex || {};
+    const pdfs = (state.crmPdfIndex && state.crmPdfIndex.items) || [];
+    const thumbs = state.crmThumbIndex || {};
+    const rows = state.crmPageRows || [];
+    const page = state.crmPage || 0;
+    const pageCount = idx.pageCount || 1;
+    const cards = [
+      ["客户总数", idx.total],
+      ["本页条数", rows.length],
+      ["产品缩略图", thumbs.total],
+      ["PDF 目录", (state.crmPdfIndex && state.crmPdfIndex.total) || pdfs.length],
+      ["本页加载", state.crmPageMs != null ? state.crmPageMs + "ms" : "—"],
+    ].map(([k,v]) => `<div class="daily-card"><div class="muted" style="font-size:12px">${esc(k)}</div><div style="font-size:22px;font-weight:700">${v == null ? "—" : esc(String(v))}</div></div>`).join("");
+    const list = rows.map(r => `<div class="crm-row" style="padding:10px 12px;border-bottom:1px solid rgba(0,0,0,.06)">
+      <div style="font-weight:600">${esc(r.company || "未命名客户")}</div>
+      <div class="muted" style="font-size:12px">${esc([r.country,r.status,r.email].filter(Boolean).join(" · "))}</div>
+    </div>`).join("") || `<p class="muted">无本页数据（Pages 托管仅显示公开样例；本地请打开 private/crm）</p>`;
+    const pdfList = pdfs.map(p => `<div class="daily-card"><div style="font-weight:600">${esc(p.name)}</div><div class="muted" style="font-size:12px">${p.bytes ? Math.round(p.bytes/1048576)+" MB" : ""} · 按需打开原文</div></div>`).join("") || `<p class="muted">无 PDF 索引</p>`;
+    return `<h2 class="section-title">客户管理</h2>
+      <p class="muted">MagicHub 优化合并 · 分页客户 / WebP 缩略图 / PDF 仅索引 · 不阻塞工作台启动</p>
+      <div class="daily-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin:12px 0">${cards}</div>
+      <div style="display:flex;gap:16px;align-items:flex-start">
+        <div style="flex:1;min-width:0;background:#fff;border-radius:12px;border:1px solid rgba(0,0,0,.06)">
+          <div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.06)">
+            <strong>客户列表（分页）</strong>
+            <span class="muted" style="margin-left:auto">第 ${page+1} / ${pageCount} 页</span>
+            <button type="button" class="btn" data-crm-page="${Math.max(0,page-1)}" ${page<=0?"disabled":""}>上一页</button>
+            <button type="button" class="btn" data-crm-page="${Math.min(pageCount-1,page+1)}" ${page>=pageCount-1?"disabled":""}>下一页</button>
+          </div>
+          <div style="max-height:520px;overflow:auto">${list}</div>
+        </div>
+        <div style="width:280px">${pdfList}<p class="muted" style="margin-top:10px;font-size:12px">缩略图与原图在 private/crm/（gitignore）</p></div>
+      </div>`;
+  }
+
   function renderTradeModule(kind) {
     const c = (state.tradeIndex && state.tradeIndex.counts) || {};
     const act = (state.tradeIndex && state.tradeIndex.latestActivity) || "—";
@@ -428,8 +526,11 @@
     return `<span class="badge ${cls}">${esc(s)}</span>`;
   }
 
-  function setTab(tab) {
+  async function setTab(tab) {
     state.tab = tab;
+    if (tab === "客户管理") {
+      await loadCrmIndexes();
+    }
     render();
   }
 
@@ -1186,6 +1287,7 @@ function renderKanban() {
       "任务与日程中心": renderScheduleCenter,
       "每日总结": renderDailySummary,
       "客户与线索": () => renderTradeModule("leads"),
+      "客户管理": () => renderCrmCustomers(),
       "开发进度": () => renderTradeModule("pipeline"),
       "询盘与报价": () => renderTradeModule("quotes"),
       "群聊协作": renderGroups,
@@ -1286,6 +1388,13 @@ function renderKanban() {
     });
     document.querySelectorAll("[data-wb]").forEach((el) => {
       el.onclick = () => switchWorkbench(el.getAttribute("data-wb"));
+    });
+    document.querySelectorAll("[data-crm-page]").forEach((el) => {
+      el.onclick = async () => {
+        const p = Number(el.getAttribute("data-crm-page") || "0");
+        await loadCrmPage(p);
+        render();
+      };
     });
     if (state.tab === "任务与日程中心" && state.scheduleLoadedMonth !== state.calMonth) {
       loadScheduleMonth(state.calMonth).then(() => render());

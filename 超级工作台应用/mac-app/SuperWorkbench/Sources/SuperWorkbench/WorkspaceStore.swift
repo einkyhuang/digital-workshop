@@ -36,6 +36,7 @@ final class WorkspaceStore: ObservableObject {
     @Published var workbenches: [WorkbenchConfig] = []
     @Published var activeWorkbenchId: String = "general"
     @Published var tradeLeadsIndex: TradeLeadsIndex? = nil
+    @Published var crmLeadsTotal: Int? = nil
 
 
     @Published private(set) var botById: [String: Bot] = [:]
@@ -798,6 +799,7 @@ final class WorkspaceStore: ObservableObject {
             DispatchQueue.main.async {
                 self.workbenches = list
                 self.activeWorkbenchId = active
+                self.loadCrmPublicIndex()
                 self.tradeLeadsIndex = idx
                 // keep selection valid for modules
                 if !self.activeModules.contains(self.selectedSection) {
@@ -805,6 +807,17 @@ final class WorkspaceStore: ObservableObject {
                 }
             }
         }
+    }
+
+
+    func loadCrmPublicIndex() {
+        let priv = repoRoot.appendingPathComponent("超级工作台应用/data/private/crm/leads/leads-index.json")
+        let pub = repoRoot.appendingPathComponent("超级工作台应用/data/crm/leads-index.json")
+        let url = FileManager.default.fileExists(atPath: priv.path) ? priv : pub
+        guard let data = try? Data(contentsOf: url),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let total = obj["total"] as? Int else { return }
+        DispatchQueue.main.async { self.crmLeadsTotal = total }
     }
 
     func switchWorkbench(_ id: String) {
