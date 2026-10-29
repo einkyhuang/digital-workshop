@@ -34,3 +34,6 @@ node_modules/
 # Finance dashboard local calc (amounts) — never commit
 **/网站业绩看板实算.local.md
 **/targets.local.json
+
+# WeDrive 印花产品图库 images (synced locally; do not commit binaries)
+projects/印花产品图库/images/

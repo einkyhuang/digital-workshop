@@ -1,0 +1,25 @@
+{
+  "share_url": "https://drive.weixin.qq.com/s?k=AMgAqAdCAAoxkvZIpz",
+  "title": "印花产品图库",
+  "corp_name": "广州展发纺织",
+  "invitor_name": "庄耀骏",
+  "space_id": "s.1970325009115336.773587278Qwd",
+  "file_id": "s.1970325009115336.773587278Qwd_d.773639842WLTZ",
+  "auth_type": 2,
+  "has_login": false,
+  "is_valid": false,
+  "download_url": null,
+  "status": "login_required",
+  "reason": "Share owner set folder permission that requires WeCom/WeDrive login (auth_type=2). Page shows \"Permission set for the folder. Log in to view.\" No file-list API is called and download_url is empty. Cannot list or download without login.",
+  "how_to_unblock": [
+    "Ask 庄耀骏 @广州展发纺织 to change share permission to「任何人可查看/下载」(anyone with the link), then re-run this script.",
+    "Or open a browser session, sign in to enterprise WeChat / WeDrive once (interactive), then extend this script to reuse that session — not suitable for unattended cron without stored login.",
+    "Or manually export/zip the folder from WeDrive and drop files into projects/印花产品图库/images/."
+  ],
+  "synced_at": "2026-10-30 00:01:08 Asia/Shanghai",
+  "file_count": 0,
+  "total_bytes": 0,
+  "downloaded": 0,
+  "skipped": 0,
+  "files": []
+}
