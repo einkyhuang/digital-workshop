@@ -114,22 +114,62 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
         try FileManager.default.createDirectory(at: settingsDir, withIntermediateDirectories: true)
     }
 
+    /// NSJSONSerialization throws ObjC exceptions (not Swift Error) on invalid graphs —
+    /// that SIGABRTs the whole app (prod crash 2026-10-30 02:26). Always validate/sanitize first.
     private func saveSettings(key: String, data: Any) -> (Bool, Any?, String?) {
+        let safe = Self.jsonSafe(data)
+        guard JSONSerialization.isValidJSONObject(safe) else {
+            return (false, ["success": false, "error": "settings payload is not JSON-serializable"], "invalid JSON object for key \(key)")
+        }
         do {
             try ensureSettingsDir()
             let file = settingsDir.appendingPathComponent("\(key).json")
             let tmp = settingsDir.appendingPathComponent("\(key).json.tmp")
-            let json = try JSONSerialization.data(withJSONObject: data, options: [.prettyPrinted, .sortedKeys])
+            let json = try JSONSerialization.data(withJSONObject: safe, options: [.prettyPrinted, .sortedKeys])
             try json.write(to: tmp, options: .atomic)
             if FileManager.default.fileExists(atPath: file.path) {
                 _ = try? FileManager.default.removeItem(at: file)
             }
             try FileManager.default.moveItem(at: tmp, to: file)
             let bak = settingsDir.appendingPathComponent("\(key).json.bak")
+            try? FileManager.default.removeItem(at: bak)
             try? FileManager.default.copyItem(at: file, to: bak)
             return (true, ["success": true], nil)
         } catch {
             return (false, ["success": false, "error": error.localizedDescription], error.localizedDescription)
+        }
+    }
+
+    /// Convert WKScriptMessage / JS values into JSONSerialization-safe trees.
+    private static func jsonSafe(_ value: Any) -> Any {
+        switch value {
+        case is NSNull:
+            return NSNull()
+        case let n as NSNumber:
+            return n
+        case let s as String:
+            return s
+        case let d as [String: Any]:
+            return d.mapValues { jsonSafe($0) }
+        case let d as NSDictionary:
+            var out: [String: Any] = [:]
+            for (k, v) in d {
+                guard let ks = k as? String else { continue }
+                out[ks] = jsonSafe(v)
+            }
+            return out
+        case let a as [Any]:
+            return a.map { jsonSafe($0) }
+        case let a as NSArray:
+            return a.map { jsonSafe($0) }
+        case let b as Bool:
+            return b
+        case let i as Int:
+            return i
+        case let d as Double:
+            return d
+        default:
+            return String(describing: value)
         }
     }
 

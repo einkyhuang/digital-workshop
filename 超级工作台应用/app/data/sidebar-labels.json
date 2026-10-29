@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "navTitles": {
+    "overview": "总览",
+    "roster": "员工",
+    "tasks": "看板",
+    "scheduleCenter": "任务日程",
+    "dailySummary": "日报",
+    "dailySeo": "日SEO",
+    "tradeLeads": "线索",
+    "crmCustomers": "客户",
+    "tradePipeline": "开发",
+    "tradeQuotes": "询价",
+    "rooms": "群聊",
+    "routines": "巡检",
+    "hiring": "招聘",
+    "rules": "规则",
+    "projects": "网站"
+  },
+  "legacyTitles": {
+    "overview": "总览",
+    "roster": "员工档案",
+    "tasks": "任务看板",
+    "scheduleCenter": "任务与日程中心",
+    "dailySummary": "每日总结",
+    "dailySeo": "每日 SEO",
+    "tradeLeads": "客户与线索",
+    "crmCustomers": "客户管理",
+    "tradePipeline": "开发进度",
+    "tradeQuotes": "询盘与报价",
+    "rooms": "群聊协作",
+    "routines": "定时巡检",
+    "hiring": "招聘规划",
+    "rules": "规则与文档",
+    "projects": "网站项目"
+  }
+}

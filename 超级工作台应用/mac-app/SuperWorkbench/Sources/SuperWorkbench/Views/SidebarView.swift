@@ -166,7 +166,7 @@ struct SidebarView: View {
                     .font(.system(size: SWTheme.Typography.navIcon, weight: .regular))
                     .frame(width: 20, alignment: .center)
                     .foregroundStyle(selected ? SWTheme.text : SWTheme.textSecondary)
-                Text(section.rawValue)
+                Text(section.navTitle)
                     .font(.system(size: SWTheme.Typography.nav, weight: selected ? .semibold : .regular))
                 Spacer(minLength: 0)
                 if let n = badge(for: section) {

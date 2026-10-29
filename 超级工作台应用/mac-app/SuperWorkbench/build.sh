@@ -1,5 +1,10 @@
 #!/bin/bash
+# Builds into mac-app/超级工作台.app only. Does NOT open, ditto, or replace ~/Desktop/超级工作台.app.
+# NEVER auto-copy to Desktop — one-shot Desktop replace is a manual user-approved step only.
 set -euo pipefail
+if [[ "${1:-}" == "--desktop" ]]; then
+  echo "REFUSE: --desktop disabled. Copy manually only after explicit user approval."; exit 2
+fi
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 MAC_APP_DIR="$(cd "$ROOT/.." && pwd)"
 cd "$ROOT"

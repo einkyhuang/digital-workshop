@@ -304,6 +304,27 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
 
     var id: String { rawValue }
 
+    /// Left-sidebar label (≤4 Chinese chars). Page chrome may still use rawValue / pageTitle.
+    var navTitle: String {
+        switch self {
+        case .overview: return "总览"
+        case .roster: return "员工"
+        case .tasks: return "看板"
+        case .scheduleCenter: return "任务日程"
+        case .dailySummary: return "日报"
+        case .dailySeo: return "日SEO"
+        case .tradeLeads: return "线索"
+        case .tradePipeline: return "开发"
+        case .tradeQuotes: return "询价"
+        case .crmCustomers: return "客户"
+        case .rooms: return "群聊"
+        case .routines: return "巡检"
+        case .hiring: return "招聘"
+        case .rules: return "规则"
+        case .projects: return "网站"
+        }
+    }
+
     /// Stable module id used in workbenches.json
     var moduleId: String {
         switch self {
@@ -453,6 +474,7 @@ enum TaskColumn: String, CaseIterable, Identifiable {
     case review = "验收"
     case done = "完成"
     var id: String { rawValue }
+
     var colorName: String {
         switch self {
         case .todo: return "blue"

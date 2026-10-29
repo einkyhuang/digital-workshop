@@ -103,6 +103,23 @@
   }
 
 
+  const TAB_NAV_LABEL = {
+    "总览": "总览",
+    "员工档案": "员工",
+    "任务看板": "看板",
+    "任务与日程中心": "任务日程",
+    "每日总结": "日报",
+    "每日 SEO": "日SEO",
+    "客户与线索": "线索",
+    "客户管理": "客户",
+    "开发进度": "开发",
+    "询盘与报价": "询价",
+    "群聊协作": "群聊",
+    "定时巡检": "巡检",
+    "招聘规划": "招聘",
+    "规则与文档": "规则",
+    "网站项目": "网站"
+  };
   const MODULE_TAB = {
     overview: "总览", roster: "员工档案", tasks: "任务看板",
     scheduleCenter: "任务与日程中心", dailySummary: "每日总结", dailySeo: "每日 SEO",
@@ -1524,7 +1541,7 @@ function renderKanban() {
     }
     const tabs = document.getElementById("tabs");
     tabs.innerHTML = workbenchTabs().map((t) =>
-      `<button type="button" class="${state.tab === t ? "active" : ""}" data-tab="${t}"><span class="nav-label">${t}</span></button>`
+      `<button type="button" class="${state.tab === t ? "active" : ""}" data-tab="${t}"><span class="nav-label">${TAB_NAV_LABEL[t] || t}</span></button>`
     ).join("");
     tabs.querySelectorAll("[data-tab]").forEach((el) => {
       el.onclick = () => setTab(el.getAttribute("data-tab"));
