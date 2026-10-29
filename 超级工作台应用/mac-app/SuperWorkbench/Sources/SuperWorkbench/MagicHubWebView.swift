@@ -76,9 +76,11 @@ struct MagicHubWebView: NSViewRepresentable {
                 queue: .main
             ) { [weak self] note in
                 guard let tab = note.userInfo?["tab"] as? String, !tab.isEmpty else { return }
-                self?.store?.magicHubTab = tab
                 UserDefaults.standard.set(tab, forKey: "sw.mhTab")
                 self?.lastPushedTab = tab
+                Task { @MainActor in
+                    self?.store?.magicHubTab = tab
+                }
             }
             observers = [push, changed]
         }
@@ -105,7 +107,11 @@ struct MagicHubWebView: NSViewRepresentable {
             }
             let access = repoRoot.appendingPathComponent("超级工作台应用")
             var url = index
-            let tabId = tab ?? store?.magicHubTab ?? UserDefaults.standard.string(forKey: "sw.mhTab") ?? "dashboard"
+            let tabId: String = {
+                if let tab, !tab.isEmpty { return tab }
+                if let s = UserDefaults.standard.string(forKey: "sw.mhTab"), !s.isEmpty { return s }
+                return "dashboard"
+            }()
             if var comps = URLComponents(url: index, resolvingAgainstBaseURL: false) {
                 comps.queryItems = [
                     URLQueryItem(name: "embed", value: "1"),
