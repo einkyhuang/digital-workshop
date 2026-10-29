@@ -11,39 +11,40 @@ struct ContentView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            if isTradeWorkbench {
-                // Full MagicHub UI fills the content area; keep segmented switcher in host chrome.
-                TradeMagicHubHost()
-            } else {
             HStack(spacing: 0) {
                 SidebarView()
                     .frame(width: SWTheme.sidebarWidth)
                 Divider()
-                VStack(spacing: 0) {
-                    TopBar(
-                        searchFocused: $searchFocused,
-                        onNew: { handleNew() },
-                        onSync: { store.syncGit() }
-                    )
-                    // Projects (and similar) own a Lazy ScrollView — nesting breaks laziness at scale.
-                    if store.selectedSection == .projects {
-                        sectionBody
-                            .padding(24)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                            .background(SWTheme.pageBg)
-                    } else {
-                        ScrollView {
+                if isTradeWorkbench {
+                    // Sidebar keeps Qianwen-style workbench segment; MagicHub fills main pane.
+                    TradeMagicHubHost()
+                } else {
+                    VStack(spacing: 0) {
+                        TopBar(
+                            searchFocused: $searchFocused,
+                            onNew: { handleNew() },
+                            onSync: { store.syncGit() }
+                        )
+                        if store.selectedSection == .projects {
                             sectionBody
                                 .padding(24)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                                .background(SWTheme.pageBg)
+                        } else {
+                            ScrollView {
+                                sectionBody
+                                    .padding(24)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .background(SWTheme.pageBg)
                         }
-                        .background(SWTheme.pageBg)
                     }
                 }
             }
 
-            FloatingCommandBar()
-                .padding(.bottom, 18)
+            if !isTradeWorkbench {
+                FloatingCommandBar()
+                    .padding(.bottom, 18)
             }
         }
         .background(SWTheme.pageBg)
@@ -151,12 +152,7 @@ struct TopBar: View {
                     .buttonStyle(.plain)
                     .foregroundStyle(.secondary)
                 }
-                HStack(alignment: .center, spacing: 12) {
-                    Text(pageTitle).font(.system(size: 28, weight: .bold))
-                    if store.selectedSection == .overview, !store.workbenches.isEmpty {
-                        workbenchSegment
-                    }
-                }
+                Text(pageTitle).font(.system(size: 28, weight: .bold))
                 Text(subtitle).font(.subheadline).foregroundStyle(.secondary)
             }
             Spacer()
@@ -201,40 +197,6 @@ struct TopBar: View {
         .padding(.vertical, 16)
         .background(Color.white.opacity(0.9))
         .overlay(alignment: .bottom) { Divider() }
-    }
-
-    @ViewBuilder
-    private var workbenchSegment: some View {
-        let items = store.workbenches
-        if items.count > 1 {
-            HStack(spacing: 0) {
-                ForEach(items) { wb in
-                    Button {
-                        store.switchWorkbench(wb.id)
-                    } label: {
-                        Text(wb.name)
-                            .font(.system(size: 13, weight: store.activeWorkbenchId == wb.id ? .semibold : .regular))
-                            .foregroundStyle(store.activeWorkbenchId == wb.id ? Color.white : Color.secondary)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 7)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .fill(store.activeWorkbenchId == wb.id ? Color.accentColor : Color.clear)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(3)
-            .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color(nsColor: .controlBackgroundColor).opacity(0.9))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
-            )
-        }
     }
 
     private var pageTitle: String {

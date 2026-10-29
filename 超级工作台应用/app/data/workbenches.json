@@ -4,8 +4,8 @@
   "workbenches": [
     {
       "id": "general",
-      "name": "超级工作台（综合）",
-      "shortName": "综合",
+      "name": "超级工作台",
+      "shortName": "超级工作台",
       "icon": "square.grid.2x2",
       "description": "全员数字员工、网站项目与日程总控",
       "botGroupIds": null,
@@ -30,7 +30,7 @@
     {
       "id": "trade",
       "name": "外贸工作台",
-      "shortName": "外贸",
+      "shortName": "外贸工作台",
       "icon": "globe",
       "description": "服装外贸 · 外贸营销 · 照明外贸：线索、背调、开发进度、询盘报价",
       "botGroupIds": [

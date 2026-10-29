@@ -47,11 +47,14 @@ enum SWTheme {
 
 
     enum Type {
-        /// Sidebar / secondary nav label
-        static let nav: CGFloat = 15
-        static let navIcon: CGFloat = 17
-        static let navLine: CGFloat = 1.45
-        /// Body copy (团队日报等)
+        /// Sidebar nav (千问参考 ~14–15pt)
+        static let nav: CGFloat = 14.5
+        static let navIcon: CGFloat = 16
+        static let navLine: CGFloat = 1.4
+        static let navRowMin: CGFloat = 40
+        /// Group subheadings ~12pt
+        static let groupTitle: CGFloat = 12
+        /// Body copy (团队日报等) 15–16pt
         static let body: CGFloat = 15.5
         static let bodyLine: CGFloat = 1.62
         static let h1: CGFloat = 26
@@ -59,6 +62,8 @@ enum SWTheme {
         static let h3: CGFloat = 17
         static let caption: CGFloat = 13
         static let captionLine: CGFloat = 1.45
+        /// Segment control
+        static let segment: CGFloat = 13
     }
 
     enum Space {

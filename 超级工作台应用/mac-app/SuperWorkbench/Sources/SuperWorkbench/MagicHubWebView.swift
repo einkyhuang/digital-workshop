@@ -85,7 +85,7 @@ struct MagicHubWebView: NSViewRepresentable {
     }
 }
 
-/// Chrome for 外贸工作台: keep segmented switcher, embed full MagicHub below.
+/// Chrome for 外贸工作台: MagicHub fills main pane; workbench switch lives in SidebarView.
 struct TradeMagicHubHost: View {
     @EnvironmentObject var store: WorkspaceStore
 
@@ -94,10 +94,9 @@ struct TradeMagicHubHost: View {
             HStack(alignment: .center, spacing: 12) {
                 Text("外贸工作台")
                     .font(.system(size: 22, weight: .bold))
-                workbenchSegment
                 Spacer()
                 Text("MagicHub 完整内嵌 · 数据仅本地 private/crm")
-                    .font(.caption)
+                    .font(.system(size: SWTheme.Type.caption))
                     .foregroundStyle(.secondary)
             }
             .padding(.horizontal, 20)
@@ -109,39 +108,5 @@ struct TradeMagicHubHost: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .background(SWTheme.pageBg)
-    }
-
-    @ViewBuilder
-    private var workbenchSegment: some View {
-        let items = store.workbenches
-        if items.count > 1 {
-            HStack(spacing: 0) {
-                ForEach(items) { wb in
-                    Button {
-                        store.switchWorkbench(wb.id)
-                    } label: {
-                        Text(wb.name)
-                            .font(.system(size: 13, weight: store.activeWorkbenchId == wb.id ? .semibold : .regular))
-                            .foregroundStyle(store.activeWorkbenchId == wb.id ? Color.white : Color.secondary)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 7)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .fill(store.activeWorkbenchId == wb.id ? Color.accentColor : Color.clear)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(3)
-            .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color(nsColor: .controlBackgroundColor).opacity(0.9))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
-            )
-        }
     }
 }

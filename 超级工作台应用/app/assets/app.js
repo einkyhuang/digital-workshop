@@ -75,7 +75,9 @@
   function clone(x) { return JSON.parse(JSON.stringify(x)); }
 
   function defaultData() {
-    return clone(window.__EMBEDDED_WORKSPACE__);
+    const emb = window.__EMBEDDED_WORKSPACE__;
+    if (emb && emb.bots) return clone(emb);
+    return { version: 5, bots: [], tasks: [], vacancies: [], groups: [], routines: [], rules: [], groupsOrder: [] };
   }
 
   function loadLocal() {
@@ -132,10 +134,11 @@
   function renderWorkbenchSegment() {
     const list = state.workbenches || [];
     if (!list.length) return "";
-    return `<div class="wb-segment" role="tablist" aria-label="切换工作台">${list.map(w => {
+    return list.map(w => {
       const active = w.id === state.activeWorkbenchId;
-      return `<button type="button" class="wb-seg ${active ? "wb-seg--active" : ""}" data-wb="${esc(w.id)}" role="tab" aria-selected="${active ? "true" : "false"}">${esc(w.name)}</button>`;
-    }).join("")}</div>`;
+      const label = w.shortName || w.name;
+      return `<button type="button" class="wb-seg ${active ? "wb-seg--active" : ""}" data-wb="${esc(w.id)}" role="tab" aria-selected="${active ? "true" : "false"}">${esc(label)}</button>`;
+    }).join("");
   }
   function renderTradeKeyStrip() {
     const hints = ((state.workbenches || []).find(w => w.id === state.activeWorkbenchId) || {}).summaryHints || {};
@@ -433,7 +436,7 @@
   function renderTradeMagicHub() {
     const hosted = isHostedPages();
     if (hosted) {
-      return `<div class="section-title-row"><h2 class="section-title">外贸工作台</h2>${renderWorkbenchSegment()}</div>
+      return `<div class="section-title-row"><h2 class="section-title">外贸工作台</h2></div>
         <div class="callout warn" style="margin:16px">
           <strong>隐私降级（Pages）</strong>
           MagicHub 客户/订单/产品等明细仅存本机 <code>data/private/crm</code>，不会发布到 Pages。
@@ -445,7 +448,7 @@
         </div>`;
     }
     // Local web: full-page iframe; bridge via sibling magichub-bridge-web.js
-    return `<div class="section-title-row" style="padding:8px 12px"><h2 class="section-title" style="margin:0">外贸工作台</h2>${renderWorkbenchSegment()}</div>
+    return `<div class="section-title-row" style="padding:8px 12px"><h2 class="section-title" style="margin:0">外贸工作台</h2></div>
       <iframe id="magichubFrame" title="MagicHub" src="./magichub/index.html" style="border:0;width:100%;height:calc(100vh - 120px);background:#f3f4f6"></iframe>`;
   }
 
@@ -1050,7 +1053,7 @@
 
     return `
       <div class="overview-main">
-      <div class="section-title-row"><h2 class="section-title">工作台总览</h2>${renderWorkbenchSegment()}</div>
+      <div class="section-title-row"><h2 class="section-title">工作台总览</h2></div>
       <p class="muted"><b>网站业绩</b> · 日程 · 邮件 · 员工 · 基准 ${esc(kpi.asOf)} · ${privacy ? "金额" + PRIVACY_LABEL : "本地完整金额"} · v2</p>
       <div class="overview-stack">
       ${renderTradeKeyStrip()}
@@ -1509,15 +1512,23 @@ function renderKanban() {
 
 
   function render() {
-    document.getElementById("dataSource").textContent = "数据源：" + state.source;
+    const wb = (state.workbenches || []).find(w => w.id === state.activeWorkbenchId) || (state.workbenches || [])[0];
+    const titleEl = document.getElementById("wbTitle");
+    if (titleEl) titleEl.textContent = (wb && (wb.shortName || wb.name)) || "超级工作台";
+    const ds = document.getElementById("dataSource");
+    if (ds) ds.textContent = "数据源：" + state.source;
+    const seg = document.getElementById("wbSegment");
+    if (seg) {
+      seg.innerHTML = renderWorkbenchSegment();
+      bindWorkbenchSegment();
+    }
     const tabs = document.getElementById("tabs");
     tabs.innerHTML = workbenchTabs().map((t) =>
-      `<button type="button" class="${state.tab === t ? "active" : ""}" data-tab="${t}">${t}</button>`
+      `<button type="button" class="${state.tab === t ? "active" : ""}" data-tab="${t}"><span class="nav-label">${t}</span></button>`
     ).join("");
     tabs.querySelectorAll("[data-tab]").forEach((el) => {
       el.onclick = () => setTab(el.getAttribute("data-tab"));
     });
-    bindWorkbenchSegment();
     renderMain();
     const more = document.getElementById("webLoadMore");
     if (more) more.onclick = () => { state.webShown = (state.webShown || state.webPageSize) + state.webPageSize; render(); };

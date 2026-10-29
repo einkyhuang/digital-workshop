@@ -8,32 +8,42 @@ struct SidebarView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            workbenchSegment
+                .padding(.horizontal, 12)
+                .padding(.top, 14)
+                .padding(.bottom, 10)
+
             HStack(spacing: 10) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .fill(Color.black)
-                        .frame(width: 36, height: 36)
-                    Image(systemName: "square.grid.2x2.fill")
+                        .frame(width: 32, height: 32)
+                    Image(systemName: store.activeWorkbench?.icon ?? "square.grid.2x2.fill")
                         .foregroundStyle(.white)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold))
                 }
                 VStack(alignment: .leading, spacing: 1) {
-                    Text("超级工作台").font(.headline)
+                    Text(store.activeWorkbench?.name ?? "超级工作台")
+                        .font(.system(size: SWTheme.Type.nav, weight: .semibold))
+                        .lineLimit(1)
                     Text("\(store.scopedBots.count) 员工 · \(store.scopedTasks.count) 任务")
-                        .font(.caption2).foregroundStyle(.secondary)
+                        .font(.system(size: SWTheme.Type.groupTitle))
+                        .foregroundStyle(.secondary)
                 }
-                Spacer()
+                Spacer(minLength: 0)
             }
-            .padding(16)
+            .padding(.horizontal, 14)
+            .padding(.bottom, 12)
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 14) {
                     ForEach(groups, id: \.0) { group, items in
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(group.uppercased())
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 12)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(group)
+                                .font(.system(size: SWTheme.Type.groupTitle, weight: .medium))
+                                .foregroundStyle(SWTheme.textMuted)
+                                .padding(.horizontal, 14)
+                                .padding(.bottom, 4)
                             ForEach(items) { section in
                                 navRow(section)
                             }
@@ -49,9 +59,9 @@ struct SidebarView: View {
                 HStack(spacing: 8) {
                     Circle().fill(Color.green).frame(width: 8, height: 8)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("数据文件").font(.caption.weight(.semibold))
+                        Text("数据文件").font(.system(size: SWTheme.Type.groupTitle, weight: .semibold))
                         Text(store.loadError == nil ? "已连接 workspace.json" : "读取异常")
-                            .font(.caption2).foregroundStyle(.secondary)
+                            .font(.system(size: 11)).foregroundStyle(.secondary)
                             .lineLimit(1)
                     }
                 }
@@ -67,8 +77,8 @@ struct SidebarView: View {
                     }
                     .frame(width: 28, height: 28)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("KY Workspace").font(.caption.weight(.semibold))
-                        Text("ARM64 · 离线本地").font(.caption2).foregroundStyle(.secondary)
+                        Text("KY Workspace").font(.system(size: SWTheme.Type.groupTitle, weight: .semibold))
+                        Text("ARM64 · 离线本地").font(.system(size: 11)).foregroundStyle(.secondary)
                     }
                     Spacer()
                 }
@@ -78,7 +88,49 @@ struct SidebarView: View {
             }
             .padding(12)
         }
-        .background(Color.white)
+        .background(SWTheme.sidebarBg)
+    }
+
+    /// 千问风格：灰底胶囊，选中项白底微阴影
+    private var workbenchSegment: some View {
+        let items = store.workbenches
+        return Group {
+            if items.count > 1 {
+                HStack(spacing: 0) {
+                    ForEach(items) { wb in
+                        let selected = store.activeWorkbenchId == wb.id
+                        Button {
+                            store.switchWorkbench(wb.id)
+                        } label: {
+                            Text(wb.shortName ?? wb.name)
+                                .font(.system(size: SWTheme.Type.segment, weight: selected ? .semibold : .regular))
+                                .foregroundStyle(SWTheme.text)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.85)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .background(
+                                    Group {
+                                        if selected {
+                                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                                .fill(Color.white)
+                                                .shadow(color: Color.black.opacity(0.08), radius: 3, y: 1)
+                                        } else {
+                                            Color.clear
+                                        }
+                                    }
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(3)
+                .background(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(Color.black.opacity(0.06))
+                )
+            }
+        }
     }
 
     private func badge(for section: SidebarSection) -> Int? {
@@ -100,7 +152,6 @@ struct SidebarView: View {
     private func navRow(_ section: SidebarSection) -> some View {
         let selected = store.selectedSection == section
         return Button {
-            // Immediate selection — no withAnimation
             store.selectedSection = section
             if section != .roster { store.showingBotDetail = false }
             if section == .scheduleCenter { store.loadScheduleMonth(around: store.calendarMonth) }
@@ -114,32 +165,37 @@ struct SidebarView: View {
                 store.watchFeed(feedId: "seo")
             }
         } label: {
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
                 Image(systemName: section.icon)
-                    .font(.system(size: SWTheme.Type.navIcon, weight: .semibold))
-                    .frame(width: 22, alignment: .center)
+                    .font(.system(size: SWTheme.Type.navIcon, weight: .regular))
+                    .frame(width: 20, alignment: .center)
+                    .foregroundStyle(selected ? SWTheme.text : SWTheme.textSecondary)
                 Text(section.rawValue)
                     .font(.system(size: SWTheme.Type.nav, weight: selected ? .semibold : .regular))
-                    .lineSpacing(4)
                 Spacer(minLength: 0)
                 if let n = badge(for: section) {
                     Text("\(n)")
-                        .font(.system(size: 12, weight: .bold))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(selected ? Color.black.opacity(0.12) : Color.black.opacity(0.06))
+                        .font(.system(size: 11, weight: .bold))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 2)
+                        .background(selected ? Color.black.opacity(0.10) : Color.black.opacity(0.05))
                         .clipShape(Capsule())
                 }
             }
-            .foregroundStyle(.primary)
+            .foregroundStyle(SWTheme.text)
             .padding(.horizontal, 12)
-            .padding(.vertical, 11)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: SWTheme.Type.navRowMin, alignment: .leading)
             .contentShape(Rectangle())
-            .background(selected ? Color.black.opacity(0.06) : Color.clear)
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(selected ? Color.white.opacity(0.92) : Color.clear)
+            )
             .padding(.horizontal, 8)
         }
         .buttonStyle(.plain)
+        .onHover { hovering in
+            // hover via NSView not wired; selected/contentShape enough for click
+            _ = hovering
+        }
     }
 }
