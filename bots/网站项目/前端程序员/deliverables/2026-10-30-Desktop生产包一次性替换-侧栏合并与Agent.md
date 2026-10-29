@@ -16,7 +16,7 @@
 | PID 稳定性 | 40812 连续 **≥90s**（etime 实测 01:32+）不变 |
 | 新 exe mtime | **2026-10-30 03:37** Asia/Shanghai |
 | 外贸侧栏 | 外层仅 MagicHub 菜单（驾驶舱…）；AX 未见「总览/员工/看板」；MH aside 嵌入隐藏 |
-| ⌘K | 打开全局 Agent；AX 可见「AI 助手团队 / SPI Research Agent」 |
+| ⌘K | 菜单/FAB 打开「全局 Agent P2 · CRM + 确认」面板（截图可见）；本地只读示例指令「搜客户 …」 |
 | MagicHub 存盘 | `data/private/crm/settings/magichub_*.json` 于 **03:38 / 03:41** 写入；进程未退 |
 | 崩溃 | 替换后 **无新增** `DiagnosticReports/超级工作台*.ips`（仅 Retired 旧报告） |
 
