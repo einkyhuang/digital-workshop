@@ -141,6 +141,9 @@ final class GlobalAgentViewModel: ObservableObject {
     @Published var model: String = UserDefaults.standard.string(forKey: "sw.agent.model") ?? "deepseek-chat"
     @Published var keyDraft: String = ""
     @Published var status: String = ""
+    struct ProviderItem: Identifiable, Equatable { var id: String; var name: String; var baseURL: String; var model: String }
+    @Published var providerList: [ProviderItem] = []
+    @Published var selectedProviderId: String = ""
 
     private var store: WorkspaceStore?
     private let executor = AgentExecutor()
@@ -183,6 +186,42 @@ final class GlobalAgentViewModel: ObservableObject {
         let k = keyDraft.trimmingCharacters(in: .whitespacesAndNewlines)
         if !k.isEmpty { AgentKeychain.saveKey(k); keyDraft = "" }
         status = "已保存（Key 在 Keychain）"
+    }
+
+    func importMagicHubProviders() {
+        guard let store else { status = "无 store"; return }
+        let url = store.repoRoot.appendingPathComponent("超级工作台应用/data/private/crm/settings/magichub_ai_providers.json")
+        guard let data = try? Data(contentsOf: url),
+              let obj = try? JSONSerialization.jsonObject(with: data) else {
+            status = "未找到 magichub_ai_providers.json"; return
+        }
+        var arr: [[String: Any]] = []
+        if let a = obj as? [[String: Any]] { arr = a }
+        else if let d = obj as? [String: Any] {
+            arr = (d["providers"] as? [[String: Any]]) ?? (d["data"] as? [[String: Any]]) ?? []
+        }
+        var items: [ProviderItem] = []
+        for (i, p) in arr.enumerated() {
+            let base = (p["baseURL"] as? String) ?? (p["baseUrl"] as? String) ?? (p["apiBase"] as? String) ?? ""
+            let model = (p["model"] as? String) ?? (p["defaultModel"] as? String) ?? ""
+            let name = (p["name"] as? String) ?? (p["label"] as? String) ?? "provider-\(i)"
+            let id = (p["id"] as? String) ?? "p\(i)"
+            if !base.isEmpty {
+                items.append(ProviderItem(id: id, name: name, baseURL: base, model: model.isEmpty ? self.model : model))
+            }
+        }
+        providerList = items
+        if let first = items.first {
+            selectedProviderId = first.id
+            applySelectedProvider()
+        }
+        status = items.isEmpty ? "列表为空" : "已导入 \(items.count) 个（未导入任何 API Key）"
+    }
+
+    func applySelectedProvider() {
+        guard let p = providerList.first(where: { $0.id == selectedProviderId }) else { return }
+        baseURL = p.baseURL
+        if !p.model.isEmpty { model = p.model }
     }
 
     func send() async {
@@ -319,6 +358,19 @@ struct AgentSettingsSheet: View {
                 Button("取消") { dismiss() }
                 Button("保存") { vm.saveSettings(); dismiss() }
                     .keyboardShortcut(.defaultAction)
+            }
+            Divider().padding(.vertical, 4)
+            Button("从 MagicHub 导入 Provider 列表") { vm.importMagicHubProviders() }
+                .buttonStyle(.bordered)
+            if !vm.providerList.isEmpty {
+                Text("已载入 \(vm.providerList.count) 个网关（Key 仍用上方 Keychain，不读 MagicHub 密钥文件进聊天）")
+                    .font(.caption).foregroundStyle(.secondary)
+                Picker("选用", selection: $vm.selectedProviderId) {
+                    ForEach(vm.providerList, id: \.id) { p in
+                        Text(p.name).tag(p.id)
+                    }
+                }
+                .onChange(of: vm.selectedProviderId) { vm.applySelectedProvider() }
             }
         }
         .padding(20)

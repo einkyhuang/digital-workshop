@@ -1597,5 +1597,15 @@ function renderKanban() {
     render();
   }
 
-  boot();
+  boot().then(() => {
+    if (window.SWGlobalAgent) {
+      window.SWGlobalAgent.mount({
+        getState: () => state,
+        setTab,
+        switchWorkbench,
+        saveLocal,
+        render
+      });
+    }
+  });
 })();
