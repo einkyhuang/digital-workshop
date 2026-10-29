@@ -1,0 +1,11 @@
+box tool check (2026-10-30 Asia/Shanghai):
+- ffmpeg: YES (/usr/bin/ffmpeg 7.1.5)
+- pdftotext: YES (poppler 25.03.0)
+- python3/pip3: YES
+- yt-dlp: YES via /workspace/.distill-venv (2026.10.26)
+- faster-whisper: YES via venv
+- ebooklib/html2text/readability: YES via venv
+- openai-whisper CLI: NO
+- pandoc: NO (apt package unavailable in this image)
+- ebook-convert (Calibre): NO
+- tesseract: NO (apt package unavailable)

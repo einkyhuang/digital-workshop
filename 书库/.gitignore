@@ -1,0 +1,32 @@
+# Never commit book/media originals (public repo)
+待蒸馏/**
+!待蒸馏/视频/
+待蒸馏/视频/**
+!待蒸馏/**/.gitkeep
+已蒸馏/**
+_work/
+*.pdf
+*.epub
+*.mobi
+*.azw3
+*.azw
+*.docx
+*.txt
+!README.md
+!链接清单.md
+!蒸馏记录.md
+!样例skill/**/*.md
+# Video / audio / transcripts
+*.mp4
+*.mkv
+*.webm
+*.mov
+*.avi
+*.m4a
+*.mp3
+*.wav
+*.flac
+*.vtt
+*.srt
+*transcript*
+*字幕*
