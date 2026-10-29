@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "issues": [],
+  "summary": [
+    "Prerendered file present (52.1 KB)",
+    "Local static page available (equivalent to HTTP 200 for preview)",
+    "Document title: What Is UGR in Office Lighting? | Formore (41 chars)",
+    "Meta description length: 168",
+    "Canonical: https://www.formorelightings.com/insights/ugr-office-lighting-explained",
+    "Single H1 present",
+    "H2 count: 9",
+    "Article JSON-LD present",
+    "BreadcrumbList JSON-LD present",
+    "FAQPage JSON-LD present (3 questions)",
+    "All 5 images have alt",
+    "Internal links OK (20 checked)",
+    "Title uniqueness check completed"
+  ],
+  "filePath": "/workspace/formorelighting2.0/dist/insights/ugr-office-lighting-explained/index.html",
+  "title": "What Is UGR in Office Lighting? | Formore",
+  "types": [
+    "BreadcrumbList",
+    "Article",
+    "FAQPage"
+  ]
+}
