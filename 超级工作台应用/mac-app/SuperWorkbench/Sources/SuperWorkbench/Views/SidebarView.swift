@@ -24,10 +24,10 @@ struct SidebarView: View {
                 }
                 VStack(alignment: .leading, spacing: 1) {
                     Text(store.activeWorkbench?.name ?? "超级工作台")
-                        .font(.system(size: SWTheme.Type.nav, weight: .semibold))
+                        .font(.system(size: SWTheme.Typography.nav, weight: .semibold))
                         .lineLimit(1)
                     Text("\(store.scopedBots.count) 员工 · \(store.scopedTasks.count) 任务")
-                        .font(.system(size: SWTheme.Type.groupTitle))
+                        .font(.system(size: SWTheme.Typography.groupTitle))
                         .foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 0)
@@ -40,7 +40,7 @@ struct SidebarView: View {
                     ForEach(groups, id: \.0) { group, items in
                         VStack(alignment: .leading, spacing: 2) {
                             Text(group)
-                                .font(.system(size: SWTheme.Type.groupTitle, weight: .medium))
+                                .font(.system(size: SWTheme.Typography.groupTitle, weight: .medium))
                                 .foregroundStyle(SWTheme.textMuted)
                                 .padding(.horizontal, 14)
                                 .padding(.bottom, 4)
@@ -59,7 +59,7 @@ struct SidebarView: View {
                 HStack(spacing: 8) {
                     Circle().fill(Color.green).frame(width: 8, height: 8)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("数据文件").font(.system(size: SWTheme.Type.groupTitle, weight: .semibold))
+                        Text("数据文件").font(.system(size: SWTheme.Typography.groupTitle, weight: .semibold))
                         Text(store.loadError == nil ? "已连接 workspace.json" : "读取异常")
                             .font(.system(size: 11)).foregroundStyle(.secondary)
                             .lineLimit(1)
@@ -77,7 +77,7 @@ struct SidebarView: View {
                     }
                     .frame(width: 28, height: 28)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("KY Workspace").font(.system(size: SWTheme.Type.groupTitle, weight: .semibold))
+                        Text("KY Workspace").font(.system(size: SWTheme.Typography.groupTitle, weight: .semibold))
                         Text("ARM64 · 离线本地").font(.system(size: 11)).foregroundStyle(.secondary)
                     }
                     Spacer()
@@ -92,45 +92,41 @@ struct SidebarView: View {
     }
 
     /// 千问风格：灰底胶囊，选中项白底微阴影
+    @ViewBuilder
     private var workbenchSegment: some View {
-        let items = store.workbenches
-        return Group {
-            if items.count > 1 {
-                HStack(spacing: 0) {
-                    ForEach(items) { wb in
-                        let selected = store.activeWorkbenchId == wb.id
-                        Button {
-                            store.switchWorkbench(wb.id)
-                        } label: {
-                            Text(wb.shortName ?? wb.name)
-                                .font(.system(size: SWTheme.Type.segment, weight: selected ? .semibold : .regular))
-                                .foregroundStyle(SWTheme.text)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.85)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 8)
-                                .background(
-                                    Group {
-                                        if selected {
-                                            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                                .fill(Color.white)
-                                                .shadow(color: Color.black.opacity(0.08), radius: 3, y: 1)
-                                        } else {
-                                            Color.clear
-                                        }
-                                    }
-                                )
-                        }
-                        .buttonStyle(.plain)
-                    }
+        if store.workbenches.count > 1 {
+            HStack(spacing: 0) {
+                ForEach(store.workbenches) { wb in
+                    segmentButton(wb)
                 }
-                .padding(3)
-                .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(Color.black.opacity(0.06))
-                )
             }
+            .padding(3)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Color.black.opacity(0.06))
+            )
         }
+    }
+
+    private func segmentButton(_ wb: WorkbenchConfig) -> some View {
+        let selected = store.activeWorkbenchId == wb.id
+        return Button {
+            store.switchWorkbench(wb.id)
+        } label: {
+            Text(wb.shortName ?? wb.name)
+                .font(.system(size: SWTheme.Typography.segment, weight: selected ? .semibold : .regular))
+                .foregroundStyle(SWTheme.text)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(selected ? Color.white : Color.clear)
+                        .shadow(color: selected ? Color.black.opacity(0.08) : .clear, radius: 3, y: 1)
+                )
+        }
+        .buttonStyle(.plain)
     }
 
     private func badge(for section: SidebarSection) -> Int? {
@@ -167,11 +163,11 @@ struct SidebarView: View {
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: section.icon)
-                    .font(.system(size: SWTheme.Type.navIcon, weight: .regular))
+                    .font(.system(size: SWTheme.Typography.navIcon, weight: .regular))
                     .frame(width: 20, alignment: .center)
                     .foregroundStyle(selected ? SWTheme.text : SWTheme.textSecondary)
                 Text(section.rawValue)
-                    .font(.system(size: SWTheme.Type.nav, weight: selected ? .semibold : .regular))
+                    .font(.system(size: SWTheme.Typography.nav, weight: selected ? .semibold : .regular))
                 Spacer(minLength: 0)
                 if let n = badge(for: section) {
                     Text("\(n)")
@@ -184,7 +180,7 @@ struct SidebarView: View {
             }
             .foregroundStyle(SWTheme.text)
             .padding(.horizontal, 12)
-            .frame(maxWidth: .infinity, minHeight: SWTheme.Type.navRowMin, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: SWTheme.Typography.navRowMin, alignment: .leading)
             .contentShape(Rectangle())
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -193,9 +189,5 @@ struct SidebarView: View {
             .padding(.horizontal, 8)
         }
         .buttonStyle(.plain)
-        .onHover { hovering in
-            // hover via NSView not wired; selected/contentShape enough for click
-            _ = hovering
-        }
     }
 }

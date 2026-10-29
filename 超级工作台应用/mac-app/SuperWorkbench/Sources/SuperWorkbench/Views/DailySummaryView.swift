@@ -29,7 +29,7 @@ struct DailySummaryView: View {
     private var dateList: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("日报日期")
-                .font(.system(size: SWTheme.Type.caption, weight: .semibold))
+                .font(.system(size: SWTheme.Typography.caption, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 14)
                 .padding(.top, 14)
@@ -49,7 +49,7 @@ struct DailySummaryView: View {
                             } label: {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text(d).font(.system(size: SWTheme.Type.nav, weight: store.selectedDailyReportDate == d ? .bold : .regular))
+                                        Text(d).font(.system(size: SWTheme.Typography.nav, weight: store.selectedDailyReportDate == d ? .bold : .regular))
                                         Text("纪纪-总结助手")
                                             .font(.caption2)
                                             .foregroundStyle(SWTheme.textMuted)
@@ -94,9 +94,9 @@ struct DailySummaryView: View {
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("团队日报 \(date)")
-                                    .font(.system(size: SWTheme.Type.h1, weight: .bold))
+                                    .font(.system(size: SWTheme.Typography.h1, weight: .bold))
                                 Text("来源：bots/管理中枢/总结助手/deliverables/日报-\(date).md")
-                                    .font(.system(size: SWTheme.Type.caption))
+                                    .font(.system(size: SWTheme.Typography.caption))
                                     .foregroundStyle(SWTheme.textMuted)
                             }
                             Spacer()
@@ -133,15 +133,15 @@ struct DailySummaryView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Label(sec.title, systemImage: sec.icon)
-                    .font(.system(size: SWTheme.Type.h3, weight: .bold))
+                    .font(.system(size: SWTheme.Typography.h3, weight: .bold))
                 Spacer()
             }
             if sec.body.isEmpty {
-                Text("—").foregroundStyle(.secondary).font(.system(size: SWTheme.Type.body))
+                Text("—").foregroundStyle(.secondary).font(.system(size: SWTheme.Typography.body))
             } else {
                 Text(sec.body)
-                    .font(.system(size: SWTheme.Type.body))
-                    .lineSpacing(SWTheme.Type.body * (SWTheme.Type.bodyLine - 1))
+                    .font(.system(size: SWTheme.Typography.body))
+                    .lineSpacing(SWTheme.Typography.body * (SWTheme.Typography.bodyLine - 1))
                     .foregroundStyle(SWTheme.text)
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)

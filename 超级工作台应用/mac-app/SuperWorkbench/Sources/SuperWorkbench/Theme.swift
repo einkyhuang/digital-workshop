@@ -46,7 +46,7 @@ enum SWTheme {
     }
 
 
-    enum Type {
+    enum Typography {
         /// Sidebar nav (千问参考 ~14–15pt)
         static let nav: CGFloat = 14.5
         static let navIcon: CGFloat = 16

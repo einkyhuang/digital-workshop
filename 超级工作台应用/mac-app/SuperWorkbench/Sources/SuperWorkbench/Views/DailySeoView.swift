@@ -46,14 +46,14 @@ struct DailySeoView: View {
     private var dateList: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("SEO 日期")
-                .font(.system(size: SWTheme.Type.caption, weight: .semibold))
+                .font(.system(size: SWTheme.Typography.caption, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 14)
                 .padding(.top, 14)
                 .padding(.bottom, 8)
             if dates.isEmpty {
                 Text("暂无 feed\n写入 data/feeds/seo/YYYY-MM-DD.json\n后跑 rebuild-feeds-index.mjs")
-                    .font(.system(size: SWTheme.Type.caption))
+                    .font(.system(size: SWTheme.Typography.caption))
                     .foregroundStyle(.secondary)
                     .padding(14)
                 Spacer()
@@ -67,9 +67,9 @@ struct DailySeoView: View {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(item.date)
-                                            .font(.system(size: SWTheme.Type.nav, weight: selected == item.date ? .semibold : .regular))
+                                            .font(.system(size: SWTheme.Typography.nav, weight: selected == item.date ? .semibold : .regular))
                                         Text(item.summary ?? "搜搜-SEO专家")
-                                            .font(.system(size: SWTheme.Type.caption))
+                                            .font(.system(size: SWTheme.Typography.caption))
                                             .foregroundStyle(SWTheme.textMuted)
                                             .lineLimit(2)
                                     }
@@ -109,7 +109,7 @@ struct DailySeoView: View {
                         Text("每日 SEO · \(date)")
                             .font(.title2.weight(.bold))
                         Text(day.botName ?? "搜搜-SEO专家")
-                            .font(.system(size: SWTheme.Type.body))
+                            .font(.system(size: SWTheme.Typography.body))
                             .foregroundStyle(.secondary)
                         if let s = day.summary, !s.isEmpty {
                             Text(s).font(.body)
@@ -155,7 +155,7 @@ struct DailySeoView: View {
                     }
 
                     Text("数据：超级工作台应用/data/feeds/seo/ · 私有补充见 private/feeds/seo/")
-                        .font(.system(size: SWTheme.Type.caption))
+                        .font(.system(size: SWTheme.Typography.caption))
                         .foregroundStyle(SWTheme.textMuted)
                 }
                 .padding(24)
@@ -169,11 +169,11 @@ struct DailySeoView: View {
     }
 
     private func sectionTitle(_ t: String) -> some View {
-        Text(t).font(.system(size: SWTheme.Type.h3, weight: .semibold))
+        Text(t).font(.system(size: SWTheme.Typography.h3, weight: .semibold))
     }
 
     private func emptyCard(_ t: String) -> some View {
-        Text(t).font(.system(size: SWTheme.Type.caption)).foregroundStyle(.secondary)
+        Text(t).font(.system(size: SWTheme.Typography.caption)).foregroundStyle(.secondary)
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(SWTheme.card)
@@ -186,19 +186,19 @@ struct DailySeoView: View {
                 Text(a.title ?? a.id).font(.subheadline.weight(.semibold))
                 Spacer()
                 Text(a.status ?? "")
-                    .font(.system(size: SWTheme.Type.caption))
+                    .font(.system(size: SWTheme.Typography.caption))
                     .padding(.horizontal, 6).padding(.vertical, 2)
                     .background(Color.black.opacity(0.06))
                     .clipShape(Capsule())
             }
             if let kw = a.primaryKeyword, !kw.isEmpty {
-                Text("主词：\(kw)").font(.system(size: SWTheme.Type.caption)).foregroundStyle(.secondary)
+                Text("主词：\(kw)").font(.system(size: SWTheme.Typography.caption)).foregroundStyle(.secondary)
             }
             if let url = a.url, let u = URL(string: url) {
-                Link(url, destination: u).font(.system(size: SWTheme.Type.caption))
+                Link(url, destination: u).font(.system(size: SWTheme.Typography.caption))
             }
             if let n = a.notes, !n.isEmpty {
-                Text(n).font(.system(size: SWTheme.Type.caption)).foregroundStyle(SWTheme.textMuted)
+                Text(n).font(.system(size: SWTheme.Typography.caption)).foregroundStyle(SWTheme.textMuted)
             }
         }
         .padding(14)
@@ -216,10 +216,10 @@ struct DailySeoView: View {
                 .padding(.top, 5)
             VStack(alignment: .leading, spacing: 4) {
                 Text(c.name ?? c.id).font(.subheadline.weight(.semibold))
-                if let d = c.detail { Text(d).font(.system(size: SWTheme.Type.caption)).foregroundStyle(.secondary) }
+                if let d = c.detail { Text(d).font(.system(size: SWTheme.Typography.caption)).foregroundStyle(.secondary) }
             }
             Spacer()
-            Text(c.status ?? "").font(.system(size: SWTheme.Type.caption)).foregroundStyle(.secondary)
+            Text(c.status ?? "").font(.system(size: SWTheme.Typography.caption)).foregroundStyle(.secondary)
         }
         .padding(12)
         .background(SWTheme.card)
@@ -235,7 +235,7 @@ struct DailySeoView: View {
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(.orange)
             }
-            if let d = iss.detail { Text(d).font(.system(size: SWTheme.Type.caption)).foregroundStyle(.secondary) }
+            if let d = iss.detail { Text(d).font(.system(size: SWTheme.Typography.caption)).foregroundStyle(.secondary) }
         }
         .padding(12)
         .background(SWTheme.card)
@@ -259,7 +259,7 @@ private struct FlowKW: View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 8)], alignment: .leading, spacing: 8) {
             ForEach(Array(items.enumerated()), id: \.offset) { _, kw in
                 Text("\(kw.term ?? "") · \(kw.intent ?? "")")
-                    .font(.system(size: SWTheme.Type.caption))
+                    .font(.system(size: SWTheme.Typography.caption))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                     .frame(maxWidth: .infinity, alignment: .leading)

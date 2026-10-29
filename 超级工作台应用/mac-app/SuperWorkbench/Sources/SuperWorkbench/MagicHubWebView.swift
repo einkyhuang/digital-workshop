@@ -96,7 +96,7 @@ struct TradeMagicHubHost: View {
                     .font(.system(size: 22, weight: .bold))
                 Spacer()
                 Text("MagicHub 完整内嵌 · 数据仅本地 private/crm")
-                    .font(.system(size: SWTheme.Type.caption))
+                    .font(.system(size: SWTheme.Typography.caption))
                     .foregroundStyle(.secondary)
             }
             .padding(.horizontal, 20)
