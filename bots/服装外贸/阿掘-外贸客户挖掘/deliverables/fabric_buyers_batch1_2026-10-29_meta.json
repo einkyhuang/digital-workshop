@@ -1,0 +1,20 @@
+{
+  "batch": "fabric_buyers_batch1_2026-10-29",
+  "count": 20,
+  "named_key_person": 15,
+  "verified_email_companies": [
+    "World Class Textiles",
+    "Liba Fabrics",
+    "Go Textile/Euphoric Colors",
+    "Verhees Textiles",
+    "Télio",
+    "Nooteboom Textiles",
+    "Worldtex",
+    "Fernando Maluhy CIA Ltda"
+  ],
+  "files": [
+    "/workspace/超级工作台/bots/服装外贸/阿掘-外贸客户挖掘/deliverables/fabric_buyers_batch1_2026-10-29.csv",
+    "/workspace/超级工作台/bots/服装外贸/阿掘-外贸客户挖掘/deliverables/fabric_buyers_batch1_2026-10-29.xlsx",
+    "/workspace/fabric_buyers_batch1.xlsx"
+  ]
+}
