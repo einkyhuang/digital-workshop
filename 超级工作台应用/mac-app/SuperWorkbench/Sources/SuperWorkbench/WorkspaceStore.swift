@@ -37,6 +37,13 @@ final class WorkspaceStore: ObservableObject {
     @Published var activeWorkbenchId: String = "general"
     @Published var tradeLeadsIndex: TradeLeadsIndex? = nil
     @Published var crmLeadsTotal: Int? = nil
+    // MARK: Feeds (data/feeds)
+    @Published var feedsRegistry: FeedsRegistryFile? = nil
+    @Published var feedIndexes: [String: FeedIndexFile] = [:]
+    @Published var feedDays: [String: [String: FeedDayDoc]] = [:]
+    @Published var selectedFeedDates: [String: String] = [:]
+    @Published var feedLoading: Bool = false
+    private let feedWatcher = FeedWatcher()
 
 
     @Published private(set) var botById: [String: Bot] = [:]
@@ -821,6 +828,125 @@ final class WorkspaceStore: ObservableObject {
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let total = obj["total"] as? Int else { return }
         DispatchQueue.main.async { self.crmLeadsTotal = total }
+    }
+
+
+    // MARK: - Feeds
+    func ensureFeedsLoaded() {
+        if feedsRegistry != nil { return }
+        let url = repoRoot.appendingPathComponent("超级工作台应用/data/feeds-registry.json")
+        guard let data = try? Data(contentsOf: url),
+              let reg = try? JSONDecoder().decode(FeedsRegistryFile.self, from: data) else { return }
+        feedsRegistry = reg
+        feedWatcher.onChange = { [weak self] feedId in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                // Only refresh visible feed
+                if self.selectedSection == .dailySeo && feedId == "seo" {
+                    self.refreshFeedIndex(feedId: feedId)
+                    if let d = self.selectedFeedDates[feedId] {
+                        self.loadFeedDay(feedId: feedId, date: d, force: true)
+                    }
+                }
+            }
+        }
+    }
+
+    func feedEntry(_ id: String) -> FeedRegistryEntry? {
+        feedsRegistry?.feeds.first { $0.id == id }
+    }
+
+    func watchFeed(feedId: String) {
+        ensureFeedsLoaded()
+        guard let entry = feedEntry(feedId), let rel = entry.publicDir else { return }
+        let dir = repoRoot.appendingPathComponent(rel)
+        feedWatcher.watch(feedId: feedId, directory: dir)
+        if let priv = entry.privateDir {
+            feedWatcher.watch(feedId: feedId + ":private", directory: repoRoot.appendingPathComponent(priv))
+        }
+    }
+
+    func unwatchFeed(feedId: String) {
+        feedWatcher.stop(feedId: feedId)
+        feedWatcher.stop(feedId: feedId + ":private")
+    }
+
+    func refreshFeedIndex(feedId: String) {
+        ensureFeedsLoaded()
+        guard let entry = feedEntry(feedId) else { return }
+        DispatchQueue.global(qos: .userInitiated).async {
+            var index: FeedIndexFile? = nil
+            if let idxRel = entry.indexFile {
+                let idxURL = self.repoRoot.appendingPathComponent(idxRel)
+                if let data = try? Data(contentsOf: idxURL),
+                   let doc = try? JSONDecoder().decode(FeedIndexFile.self, from: data) {
+                    index = doc
+                }
+            }
+            if index == nil, let rel = entry.publicDir {
+                let dir = self.repoRoot.appendingPathComponent(rel)
+                var dates: [FeedIndexDate] = []
+                if let files = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) {
+                    for u in files {
+                        let name = u.lastPathComponent
+                        guard name.hasSuffix(".json") || name.hasSuffix(".md") else { continue }
+                        let date = u.deletingPathExtension().lastPathComponent
+                        guard date.count == 10, date.contains("-") else { continue }
+                        var summary: String? = nil
+                        var ac = 0
+                        var ic = 0
+                        if u.pathExtension == "json",
+                           let data = try? Data(contentsOf: u),
+                           let day = try? JSONDecoder().decode(FeedDayDoc.self, from: data) {
+                            summary = day.summary
+                            ac = day.articles?.count ?? 0
+                            ic = day.issues?.count ?? 0
+                        }
+                        dates.append(FeedIndexDate(date: date, file: name, summary: summary, articleCount: ac, issueCount: ic))
+                    }
+                }
+                dates.sort { $0.date > $1.date }
+                index = FeedIndexFile(version: 1, feedId: feedId, timezone: "Asia/Shanghai", updatedAt: nil, dates: dates)
+            }
+            DispatchQueue.main.async {
+                if let index { self.feedIndexes[feedId] = index }
+            }
+        }
+    }
+
+    func selectFeedDate(feedId: String, date: String) {
+        selectedFeedDates[feedId] = date
+        loadFeedDay(feedId: feedId, date: date, force: false)
+    }
+
+    func loadFeedDay(feedId: String, date: String, force: Bool) {
+        if !force, feedDays[feedId]?[date] != nil { return }
+        ensureFeedsLoaded()
+        guard let entry = feedEntry(feedId), let rel = entry.publicDir else { return }
+        feedLoading = true
+        DispatchQueue.global(qos: .userInitiated).async {
+            let dir = self.repoRoot.appendingPathComponent(rel)
+            let json = dir.appendingPathComponent("\(date).json")
+            var doc: FeedDayDoc? = nil
+            if let data = try? Data(contentsOf: json) {
+                doc = try? JSONDecoder().decode(FeedDayDoc.self, from: data)
+            }
+            // Optional private merge: if private day exists, prefer its issues/checks overlay later — for now load private if public missing
+            if doc == nil, let priv = entry.privateDir {
+                let p = self.repoRoot.appendingPathComponent(priv).appendingPathComponent("\(date).json")
+                if let data = try? Data(contentsOf: p) {
+                    doc = try? JSONDecoder().decode(FeedDayDoc.self, from: data)
+                }
+            }
+            DispatchQueue.main.async {
+                if let doc {
+                    var map = self.feedDays[feedId] ?? [:]
+                    map[date] = doc
+                    self.feedDays[feedId] = map
+                }
+                self.feedLoading = false
+            }
+        }
     }
 
     func switchWorkbench(_ id: String) {

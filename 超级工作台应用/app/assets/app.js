@@ -1,6 +1,6 @@
 (function () {
   const LS_KEY = "digital-workshop-v2";
-  const TABS = ["总览", "员工档案", "网站项目", "任务看板", "任务与日程中心", "每日总结", "客户与线索", "客户管理", "开发进度", "询盘与报价", "群聊协作", "定时巡检", "招聘规划", "规则与文档"];
+  const TABS = ["总览", "员工档案", "网站项目", "任务看板", "任务与日程中心", "每日总结", "每日 SEO", "客户与线索", "客户管理", "开发进度", "询盘与报价", "群聊协作", "定时巡检", "招聘规划", "规则与文档"];
   /** Plug 搜搜 field spec / 画眉 visual tokens via ../data/ui-config.json (mirrored here for static Pages). */
   const WEBSITE_UI = {
     defaultView: "list",
@@ -103,7 +103,7 @@
 
   const MODULE_TAB = {
     overview: "总览", roster: "员工档案", tasks: "任务看板",
-    scheduleCenter: "任务与日程中心", dailySummary: "每日总结",
+    scheduleCenter: "任务与日程中心", dailySummary: "每日总结", dailySeo: "每日 SEO",
     tradeLeads: "客户与线索", crmCustomers: "客户管理", tradePipeline: "开发进度", tradeQuotes: "询盘与报价",
     rooms: "群聊协作", routines: "定时巡检", hiring: "招聘规划",
     rules: "规则与文档", projects: "网站项目"
@@ -258,6 +258,64 @@
     const reportBlock = hasReport ? `<button type="button" class="btn primary" data-open-daily="${date}">打开「每日总结」</button>` : `<p class="muted">无纪纪日报</p>`;
     return `<div class="cal-detail-card"><h3>${esc(date)}</h3><h4>任务</h4>${tasks}<h4>日程</h4>${sched}<h4>邮件</h4>${emailBlock}<h4>日报</h4>${reportBlock}</div>`;
   }
+
+  async function loadSeoFeedIndex() {
+    if (state.seoFeedIndex) return;
+    const paths = ["./data/feeds/seo/index.json", "../data/feeds/seo/index.json", "data/feeds/seo/index.json"];
+    for (const p of paths) {
+      try {
+        const res = await fetch(p, { cache: "no-store" });
+        if (res.ok) { state.seoFeedIndex = await res.json(); return; }
+      } catch (_) {}
+    }
+    state.seoFeedIndex = { dates: [] };
+  }
+  async function loadSeoFeedDay(date) {
+    state.seoFeedDate = date;
+    state.seoFeedDay = null;
+    const files = [`${date}.json`, `${date}.md`];
+    for (const f of files) {
+      for (const base of ["./data/feeds/seo/", "../data/feeds/seo/", "data/feeds/seo/"]) {
+        try {
+          const res = await fetch(base + f, { cache: "no-store" });
+          if (!res.ok) continue;
+          if (f.endsWith(".json")) state.seoFeedDay = await res.json();
+          else state.seoFeedDay = { date, summary: await res.text(), articles: [], keywords: [], checks: [], issues: [] };
+          return;
+        } catch (_) {}
+      }
+    }
+  }
+  function renderDailySeo() {
+    const idx = state.seoFeedIndex || { dates: [] };
+    const dates = idx.dates || [];
+    const sel = state.seoFeedDate || (dates[0] && dates[0].date) || null;
+    if (sel && sel !== state.seoFeedDate) { /* will load below */ }
+    const list = dates.length
+      ? dates.map(d => `<button type="button" class="daily-date ${d.date === sel ? "active" : ""}" data-seo-date="${esc(d.date)}"><strong>${esc(d.date)}</strong><div class="muted">${esc(d.summary || "")}</div></button>`).join("")
+      : `<p class="muted">暂无 SEO feed。Bot 写入 data/feeds/seo/YYYY-MM-DD.json 后运行 rebuild-feeds-index.mjs</p>`;
+    const day = state.seoFeedDay;
+    let pane = `<p class="muted">选择日期</p>`;
+    if (sel && day) {
+      const arts = (day.articles || []).map(a => `<div class="daily-card feed-article"><h4>${esc(a.title || a.id || "")}</h4>
+        <p>${esc(a.primaryKeyword || "")} · ${esc(a.status || "")}</p>
+        ${a.url ? `<p><a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.url)}</a></p>` : ""}
+        ${a.notes ? `<p class="muted">${esc(a.notes)}</p>` : ""}</div>`).join("") || `<div class="daily-card"><p class="muted">无文章</p></div>`;
+      const kws = (day.keywords || []).map(k => `<span class="feed-chip">${esc(k.term || "")}</span>`).join("") || `<span class="muted">无</span>`;
+      const checks = (day.checks || []).map(c => `<div class="daily-card"><h4>${esc(c.name || c.id)}</h4><p>${esc(c.status || "")} — ${esc(c.detail || "")}</p></div>`).join("") || "";
+      const issues = (day.issues || []).map(i => `<div class="daily-card"><h4>${esc(i.title || "问题")}</h4><p class="muted">${esc(i.severity || "")}</p><p>${esc(i.detail || "")}</p></div>`).join("") || `<div class="daily-card"><p class="muted">无问题</p></div>`;
+      pane = `<h3 class="feed-day-title">每日 SEO · ${esc(sel)}</h3>
+        <p class="feed-day-body">${esc(day.summary || "")}</p>
+        <h4>文章</h4>${arts}
+        <h4>关键词</h4><div>${kws}</div>
+        <h4>日检</h4>${checks}
+        <h4>问题</h4>${issues}`;
+    } else if (sel) {
+      pane = `<p class="muted">加载 ${esc(sel)}…</p>`;
+    }
+    return `<h2 class="section-title">每日 SEO</h2><p class="muted">搜搜-SEO专家 · data/feeds/seo/</p><div class="daily-layout"><aside class="daily-aside">${list}</aside><section class="daily-main">${pane}</section></div>`;
+  }
+
   function renderDailySummary() {
     const dates = state.dailyReportDates || [];
     const sel = state.dailyReportDate || dates[0] || null;
@@ -554,6 +612,11 @@
     state.tab = tab;
     if (tab === "客户管理") {
       await loadCrmIndexes();
+    }
+    if (tab === "每日 SEO") {
+      await loadSeoFeedIndex();
+      const d = state.seoFeedDate || (state.seoFeedIndex && state.seoFeedIndex.dates && state.seoFeedIndex.dates[0] && state.seoFeedIndex.dates[0].date);
+      if (d) await loadSeoFeedDay(d);
     }
     render();
   }
@@ -1310,6 +1373,7 @@ function renderKanban() {
       "任务看板": renderKanban,
       "任务与日程中心": renderScheduleCenter,
       "每日总结": renderDailySummary,
+      "每日 SEO": () => renderDailySeo(),
       "客户与线索": () => renderTradeModule("leads"),
       "客户管理": () => renderCrmCustomers(),
       "开发进度": () => renderTradeModule("pipeline"),
@@ -1413,6 +1477,12 @@ function renderKanban() {
     });
     document.querySelectorAll("[data-daily-date]").forEach((el) => {
       el.onclick = () => { state.dailyReportDate = el.getAttribute("data-daily-date"); render(); };
+    });
+    document.querySelectorAll("[data-seo-date]").forEach((el) => {
+      el.onclick = async () => {
+        await loadSeoFeedDay(el.getAttribute("data-seo-date"));
+        render();
+      };
     });
     document.querySelectorAll("[data-wb]").forEach((el) => {
       el.onclick = () => switchWorkbench(el.getAttribute("data-wb"));

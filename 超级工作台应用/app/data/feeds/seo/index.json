@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-10-29T18:32:08+00:00",
+  "dates": [
+    {
+      "date": "2026-10-30",
+      "file": "2026-10-30.json",
+      "summary": "Formore Lighting：完成 1 篇 Insights 定稿链路说明与日检；未批准不合并 main。",
+      "articleCount": 1,
+      "issueCount": 1
+    },
+    {
+      "date": "2026-10-29",
+      "file": "2026-10-29.json",
+      "summary": "完成 Formore SEO+GEO 审计报告与 30 日计划归档。",
+      "articleCount": 0,
+      "issueCount": 0
+    }
+  ]
+}

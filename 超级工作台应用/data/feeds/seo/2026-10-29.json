@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-10-29",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-10-29T20:00:00+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "完成 Formore SEO+GEO 审计报告与 30 日计划归档。",
+  "articles": [],
+  "keywords": [
+    { "term": "China lighting manufacturer", "intent": "commercial", "priority": "high" }
+  ],
+  "images": [],
+  "checks": [
+    { "id": "audit", "name": "全站审计归档", "status": "pass", "detail": "deliverables/formorelightings/*-audit-report.md" }
+  ],
+  "issues": []
+}

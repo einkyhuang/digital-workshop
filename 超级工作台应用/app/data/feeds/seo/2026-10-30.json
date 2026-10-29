@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-10-30",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-10-30T18:00:00+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "Formore Lighting：完成 1 篇 Insights 定稿链路说明与日检；未批准不合并 main。",
+  "articles": [
+    {
+      "id": "what-is-cri-in-lighting",
+      "title": "What Is CRI in Lighting? A Buyer’s Guide",
+      "url": "https://www.formorelightings.com/insights/what-is-cri-in-lighting",
+      "status": "draft",
+      "primaryKeyword": "what is cri in lighting",
+      "secondaryKeywords": ["cri 90 led", "color rendering index"],
+      "image": null,
+      "publishedAt": null,
+      "notes": "草稿在 seo-drafts；待用户批准后上线"
+    }
+  ],
+  "keywords": [
+    { "term": "what is cri in lighting", "intent": "informational", "priority": "high" },
+    { "term": "LED linear lights OEM", "intent": "commercial", "priority": "medium" }
+  ],
+  "images": [],
+  "checks": [
+    {
+      "id": "sitemap",
+      "name": "Sitemap 覆盖",
+      "status": "pass",
+      "detail": "现网 sitemap 可访问；新稿未上线故未纳入"
+    },
+    {
+      "id": "title-length",
+      "name": "标题长度",
+      "status": "warn",
+      "detail": "草稿标题接近 60 字符，上线前再压主词前置"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "medium",
+      "title": "生产发布闸门",
+      "detail": "禁止自动合并 main / 自动部署；须用户明确批准"
+    }
+  ]
+}

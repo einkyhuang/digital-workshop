@@ -90,6 +90,7 @@ struct ContentView: View {
         case .tasks: KanbanView()
         case .scheduleCenter: ScheduleCenterView()
         case .dailySummary: DailySummaryView()
+        case .dailySeo: DailySeoView()
         case .tradeLeads: TradeLeadsView()
         case .tradePipeline: TradePipelineView()
         case .tradeQuotes: TradeQuotesView()
@@ -124,6 +125,7 @@ struct TopBar: View {
         case .tasks: return "共 \(store.data.tasks.count) 项任务 · 拖拽卡片改状态 · 待办/进行中/验收/完成"
         case .scheduleCenter: return "月历 · 当日任务/日程/邮件标记/纪纪日报 · 仅加载当月"
         case .dailySummary: return "纪纪日报 · 按需加载 · 左选日期右看卡片"
+        case .dailySeo: return "搜搜 SEO 日更 · feeds/seo · FSEvents 刷新"
         case .tradeLeads: return "线索/档案聚合计数 · 明细仅本地 private"
         case .tradePipeline: return "开发进度聚合 · 无客户名"
         case .tradeQuotes: return "询盘与报价计数 · 金额不上 Pages"
@@ -245,6 +247,7 @@ struct TopBar: View {
         case .overview: return "工作台总览"
         case .scheduleCenter: return "任务与日程中心"
         case .dailySummary: return "每日总结"
+        case .dailySeo: return "每日 SEO"
         case .tradeLeads: return "客户与线索"
         case .tradePipeline: return "开发进度"
         case .tradeQuotes: return "询盘与报价"

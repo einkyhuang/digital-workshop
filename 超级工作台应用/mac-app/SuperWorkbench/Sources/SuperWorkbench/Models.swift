@@ -291,6 +291,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
     case tasks = "任务看板"
     case scheduleCenter = "任务与日程中心"
     case dailySummary = "每日总结"
+    case dailySeo = "每日 SEO"
     case tradeLeads = "客户与线索"
     case tradePipeline = "开发进度"
     case tradeQuotes = "询盘与报价"
@@ -311,6 +312,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
         case .tasks: return "tasks"
         case .scheduleCenter: return "scheduleCenter"
         case .dailySummary: return "dailySummary"
+        case .dailySeo: return "dailySeo"
         case .tradeLeads: return "tradeLeads"
         case .tradePipeline: return "tradePipeline"
         case .tradeQuotes: return "tradeQuotes"
@@ -334,6 +336,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
         case .tasks: return "rectangle.split.3x1"
         case .scheduleCenter: return "calendar"
         case .dailySummary: return "doc.text"
+        case .dailySeo: return "chart.line.uptrend.xyaxis"
         case .tradeLeads: return "person.crop.rectangle.stack"
         case .tradePipeline: return "chart.bar.doc.horizontal"
         case .tradeQuotes: return "doc.richtext"
@@ -348,7 +351,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
 
     var group: String {
         switch self {
-        case .overview, .roster, .tasks, .scheduleCenter, .dailySummary: return "工作台"
+        case .overview, .roster, .tasks, .scheduleCenter, .dailySummary, .dailySeo: return "工作台"
         case .tradeLeads, .tradePipeline, .tradeQuotes, .crmCustomers: return "外贸业务"
         case .rooms, .routines: return "协作与运维"
         case .hiring, .rules: return "组织与规则"
