@@ -1,0 +1,45 @@
+{
+  "batch": "fabric_buyers_batch1_verified_2026-10-29",
+  "source": "bots/服装外贸/阿掘-外贸客户挖掘/deliverables/fabric_buyers_batch1_2026-10-29.xlsx",
+  "count": 20,
+  "star_distribution": {
+    "5": 3,
+    "4": 8,
+    "3": 8,
+    "2": 1,
+    "1": 0
+  },
+  "key_persons_added": [
+    "Amrik Bahia (JS Suppliers)",
+    "Susan & Phillip Donnelley (Textile & Lace)",
+    "Puru Kanodia / Suman Kanodia (Silk World)",
+    "Roger Wall / Alice Giblin (Wall Fabrics)",
+    "Arnie Kaufman (International Textiles)",
+    "Manish Manwani / Jai Manwani (Sonatex)"
+  ],
+  "key_persons_still_missing": [
+    "Ultratex Trading L.L.C"
+  ],
+  "emails_added_or_verified_this_run": [
+    "phillip@textileandlace.com.au (valid)",
+    "susan@textileandlace.com.au (found; verify unknown)",
+    "puru@silkworld.com.au (valid)",
+    "Roger@wallfabrics.com (valid)",
+    "allanmurphy@xln.com.au (valid/safe)",
+    "manish@sonatex.ae (found; catch-all不可确认)",
+    "info@xln.com.au (官网新增通用邮箱，未单独验证)"
+  ],
+  "official_sites_confirmed": [
+    "https://www.xln.com.au/",
+    "https://internationaltextiles.ca/",
+    "https://www.fernandomaluhy.com.br/"
+  ],
+  "doubtful": [
+    "JS Suppliers Limited — 新公司/刚换董事/Micro/含旧衣出口",
+    "ENY — catch-all邮箱",
+    "Sonatex manish@ — catch-all",
+    "XLN / International Textiles / Fernando Maluhy — 更偏拼布家居而非成衣时装面料"
+  ],
+  "no_outreach": true,
+  "observed_date": "2026-10-29"
+}
