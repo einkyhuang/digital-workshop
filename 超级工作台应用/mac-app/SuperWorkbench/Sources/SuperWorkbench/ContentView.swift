@@ -192,12 +192,12 @@ struct TopBar: View {
 
     @ViewBuilder
     private var workbenchSegment: some View {
-        let items = store.availableWorkbenches
+        let items = store.workbenches
         if items.count > 1 {
             HStack(spacing: 0) {
                 ForEach(items) { wb in
                     Button {
-                        store.setActiveWorkbench(wb.id)
+                        store.switchWorkbench(wb.id)
                     } label: {
                         Text(wb.name)
                             .font(.system(size: 13, weight: store.activeWorkbenchId == wb.id ? .semibold : .regular))
