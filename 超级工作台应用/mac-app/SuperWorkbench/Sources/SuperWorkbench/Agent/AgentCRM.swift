@@ -57,6 +57,7 @@ enum AgentCRM {
         return (true, jsonString(payload))
     }
 
+    @MainActor
     static func openCustomer(store: WorkspaceStore, customerId: String) -> (Bool, String) {
         store.switchWorkbench("trade")
         // Prefer CRM module in host sidebar when leaving MagicHub full-bleed —
