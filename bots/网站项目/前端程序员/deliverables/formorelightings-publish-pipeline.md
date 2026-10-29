@@ -79,3 +79,22 @@ https://www.formorelightings.com/insights/<slug>
 - `/privacy` + `/terms` (draft copy marked for legal review)
 - Shorter homepage `<title>` via `SITE_NAME_SHORT`
 - `vercel.json` cache headers for static assets / HTML SWR
+
+---
+
+## Dry-run result (2026-10-30 Asia/Shanghai)
+
+| Item | Value |
+|---|---|
+| Branch | `seo-publish-pipeline` |
+| Commit | `daf178a` |
+| Sample slug | `ugr-office-lighting-explained` |
+| Local validation | **PASSED** (`reports/publish/ugr-office-lighting-explained.json`) |
+| Local preview HTTP | article / llms.txt / privacy → 200 |
+| Document title | `What Is UGR in Office Lighting? \| Formore` (41 chars) |
+| Prerender path | `dist/insights/ugr-office-lighting-explained/index.html` |
+| Screenshot | `bots/网站项目/前端程序员/deliverables/formorelightings-ugr-article-preview.png` |
+| Branch push effect | Creates Vercel **Preview** deployment only (this one was blocked by Vercel SSO/protection). **Does not** update Production. |
+| After merge to `main` | Vercel Production deploy → live URL `https://www.formorelightings.com/insights/ugr-office-lighting-explained` |
+
+`PUBLISH_ALLOW_MAIN=1` + `--push` was **not** used. Main/live awaits user approval.
