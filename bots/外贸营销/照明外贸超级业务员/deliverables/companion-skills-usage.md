@@ -1,0 +1,3 @@
+# Companion skills usage (lighting)
+
+Use **global-trade-lead-search** to build an auditable public lead set (LED distributors, wholesalers, contractors, project buyers) by product and country—verify domains and sources, never invent contacts or send outreach. Use **deep-client-analysis** on shortlisted or inbound accounts for a modular deep report (company, key people, products, competition, SWOT, development plan) as Markdown+HTML; when the development module is on, supply the real lighting company profile first. Then apply **lighting-trade-hub** for star tiering, spec matching, quote checklists, objection scripts, and English email drafts for user approval.

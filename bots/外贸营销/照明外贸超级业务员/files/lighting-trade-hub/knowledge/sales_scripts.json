@@ -1,0 +1,77 @@
+[
+  {
+    "category": "价格高",
+    "title": "价格太高",
+    "script_en": "We understand price matters. For LED luminaires, the landed cost is driven by efficacy (lm/W), driver brand, optical design, certification, and warranty — not only the housing.\n\nWhy many buyers stay with a qualified factory:\n• Stable lumen & CCT binning → fewer site complaints\n• Driver & SPD reliability → lower maintenance\n• Complete cert package (CE/RoHS/ERP, UL/ETL/DLC as required) → smoother customs & tenders\n• Clear warranty terms → predictable after-sales\n\nIf budget is tight, we can review: lower wattage with similar lux via better optics, a value-line driver, or a higher MOQ tier. Could you share the competing offer's key specs (lm, CRI, IP, certs, warranty) so we compare apples to apples?"
+  },
+  {
+    "category": "确认需求",
+    "title": "客户发来项目图纸或型号清单",
+    "script_en": "Thanks for sharing the drawings / model list — this helps a lot.\nFrom a lighting-application view, your project looks like a good fit for our [panel/high bay/street…] line.\nTo prepare an accurate BOM and quote, please confirm:\n1) Target lux / mounting height (if known)\n2) CCT & CRI requirements\n3) Dimming / sensor / emergency versions needed?\n4) Mandatory certificates for the destination\n5) Quantity by SKU and delivery schedule\nWe can also provide IES / DIALux support after model freeze."
+  },
+  {
+    "category": "合作流程",
+    "title": "标准合作流程（询盘到出货）",
+    "script_en": "Here is our typical process:\nStep 1: Spec confirmation (product type, W/lm, CCT, IP, certs, qty, Incoterm).\nStep 2: Quotation / PI — after details are clear.\nStep 3: Sample (if needed) — [X] working days; sample fee policy [confirm].\nStep 4: Deposit → production → QC photos/videos & packing list.\nStep 5: Balance payment → shipment (FOB/CIF/DDP as agreed) with documents.\nShall we start by locking the specification checklist?"
+  },
+  {
+    "category": "合作流程",
+    "title": "客户想先看样品",
+    "script_en": "Absolutely — validating a luminaire before bulk is professional.\nWe support samples so you can check: build quality, CCT, flicker, beam, driver labeling, and packing.\nPlease confirm the exact model (or application), destination voltage, and shipping address / courier account.\nSample lead time is about [3–7] working days after confirmation. Sample fee & freight: [company policy]. Sample fee is usually deductible from the bulk order when you proceed."
+  },
+  {
+    "category": "合作流程",
+    "title": "付款犹豫-锁产能/船期",
+    "script_en": "Our planning team can reserve production capacity for your [model] for the next [24–48] hours based on the current PI.\nDrivers / housings for certified versions sometimes have longer buying cycles — confirming the deposit helps us lock materials and your ETD.\nIf you hit any bank-transfer issue, tell me and I will help. Looking forward to your payment slip so we can kick off QC scheduling."
+  },
+  {
+    "category": "合作流程",
+    "title": "发出PI后催确认",
+    "script_en": "Please find PI #[order no.] attached for your [product] order.\nKindly check: models, qty, unit price, Incoterm, payment terms, and delivery window.\nOnce the deposit is received, we will book production and share the updated schedule.\nPlease send the bank receipt after transfer so we can start without delay."
+  },
+  {
+    "category": "运费",
+    "title": "报价前确认运费与包装体积",
+    "script_en": "I am preparing your official quote. To recommend the best logistics option, please confirm:\n1) Destination city / port / zip code\n2) Preferred term: FOB / CIF / CFR / DDP?\n3) Timeline: air (faster, higher cost) vs sea (better for volume)\nFor lighting, volumetric weight and carton size matter — I will estimate CBM after SKU confirmation.\nSmall trial orders by air can look expensive per piece; consolidating to a fuller carton/pallet usually improves unit landed cost. What quantity are you targeting for the first shipment?"
+  },
+  {
+    "category": "首次回复",
+    "title": "客户只要目录/信息很少",
+    "script_en": "Hi! Nice to connect with you.\nThis is [Your Name] from [Your Lighting Company] ([website]). We manufacture / export LED luminaires including panel, downlight, high bay, street light, flood light, and strip (adjust to real catalog).\nTo send the right catalog and avoid irrelevant PDFs, could you tell me:\n1) Application: office / warehouse / roadway / facade / retail / residential?\n2) Any target certificates (CE, UL, DLC…)?\n3) Destination country?\nIf you have a website or project photo, feel free to share — I will recommend the best-fit series."
+  },
+  {
+    "category": "首次回复",
+    "title": "客户要工矿灯/high bay",
+    "script_en": "Happy to support your high bay project.\nTo size the right wattage and optics, may I know:\n1) Mounting height and target lux?\n2) Preferred power or lumen package?\n3) CCT (4000K/5000K…), sensor needed?\n4) Certifications required for your market?\n5) Quantity and timeline?\nWe can share IES files and a simple layout suggestion after these points are clear."
+  },
+  {
+    "category": "首次回复",
+    "title": "客户要路灯/street light",
+    "script_en": "Thank you for your street lighting inquiry.\nFor roadway luminaires we usually confirm: pole height & spacing, road width, optics type (I–V), CCT, smart photocell/NEMA-Zhaga need, SPD level, and required certificates.\nDo you already have a tender specification or DIALux requirement? If yes, please share the PDF and we will match models + offer IES."
+  },
+  {
+    "category": "首次回复",
+    "title": "客户要面板灯/downlight",
+    "script_en": "Glad to help with indoor LED panel / downlight.\nPlease confirm: size or cutout, wattage or lumen target, CCT, CRI (80/90), dimming type, IP if wet area, and destination certificates.\nWith quantity and Incoterm, I can prepare a clear quotation sheet."
+  },
+  {
+    "category": "确认需求",
+    "title": "发完目录跟进",
+    "script_en": "Just checking whether you had a chance to review the catalog.\nIf the list is long, I can shortlist the Top 3 models for your application (e.g. office UGR panel / UFO high bay / Type II street light) based on your voltage and certificate needs.\nWould you like me to send that shortlist with key data (W, lm, CRI, IP, certs)?"
+  },
+  {
+    "category": "认证",
+    "title": "客户只要有UL/DLC的产品",
+    "script_en": "Understood — for the North American market, UL/ETL listing and DLC (where rebate applies) are critical.\nPlease tell me the exact product family and whether you need DLC Standard or Premium. I will only recommend models we can support with real certificate files / listing links.\nIf a model is CE-only today, I will say so clearly instead of over-promising."
+  },
+  {
+    "category": "交期",
+    "title": "交期太长",
+    "script_en": "I understand timing is critical for your project handover / tender.\nCurrent estimated lead time for [model] is [X] days after deposit, based on driver and housing availability.\nOptions to accelerate: choose a faster-moving standard SKU, split shipment (partial air), or confirm earlier so we pre-book materials.\nWhat is your must-arrive date on site? I will check a realistic schedule with production."
+  },
+  {
+    "category": "售后",
+    "title": "质保与客诉安抚",
+    "script_en": "Sorry to hear there is an issue on site — thank you for flagging it quickly.\nPlease share: model/batch, photos/videos, failure rate, installation conditions (voltage, surge, water), and how long it has been running.\nWe will check retained samples and driver logs and reply with a finding + solution within [24–48] hours. If it is confirmed as our quality responsibility, we will take proper care under the warranty terms."
+  }
+]

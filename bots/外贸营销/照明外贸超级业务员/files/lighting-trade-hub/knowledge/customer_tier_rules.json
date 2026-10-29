@@ -1,0 +1,71 @@
+{
+  "industry": "lighting_led_export",
+  "tier_rules": {
+    "1星": {
+      "网站": "无或不专业",
+      "平台信誉": "无 / 新号",
+      "项目或采购信号": "仅询价、无项目、无型号",
+      "注册/经营时间": "很新或不明",
+      "技术成熟度": "只问价格",
+      "采购经验": "无进口/项目经验迹象",
+      "处理方案": "确认MOQ与最小起订金额；达不到则礼貌筛选，不强推大项目",
+      "对应的话术英文": "Thank you for your interest in our LED lighting.\n\nTo check if we can support this order efficiently, may I know:\n1) Which product (panel / downlight / high bay / street / flood / strip)?\n2) Target quantity (pcs or meters)?\n3) Destination country (for voltage & certifications)?\n\nOur standard MOQ for this model is [MOQ — confirm]. Would this quantity work for your first trial?"
+    },
+    "2星": {
+      "网站": "无或简易页",
+      "平台信誉": "有基础认证",
+      "项目或采购信号": "有型号意向或小批量试用",
+      "注册/经营时间": "少于一年",
+      "技术成熟度": "有部分规格（瓦数/尺寸）",
+      "采购经验": "有限",
+      "处理方案": "确认渠道（分销/工程/电商）、目标认证、MOQ；快速给范围价+规格确认清单",
+      "对应的话术英文": "Thanks for sharing your interest.\n1) May I visit your website or LinkedIn company page to understand your business better?\n2) Are you a distributor, contractor, or brand/retailer?\n3) Which certifications do you need for your market (CE/RoHS/ERP, UL/ETL/DLC, SAA…)?\n4) What quantity are you planning for the first order so we can offer a suitable tier price?\n5) Do you already have a target model, or shall we recommend based on application (office / warehouse / roadway / facade)?"
+    },
+    "3星": {
+      "网站": "有，内容较新",
+      "平台信誉": "中等",
+      "项目或采购信号": "有明确应用场景与大致数量",
+      "注册/经营时间": "一到二年或有项目履历",
+      "技术成熟度": "能提供部分图纸/IES需求/竞品型号",
+      "采购经验": "有",
+      "处理方案": "建立信任（工厂/认证/案例占位）、主动补齐规格、问交期与清关经验、是否自有货代",
+      "对应的话术英文": "Happy to support your [office/warehouse/road] lighting project.\n\nBased on your description, we can propose [product family] with [key certs — only if real].\nTo finalize a proper offer, please confirm:\n1) Power / lumen target & CCT\n2) Diming / sensor needs\n3) Required certificates for [country]\n4) Quantity & delivery window\n5) Have you imported lighting from China before? Do you have your own forwarder, or shall we quote FOB / CIF / DDP?\n\nWe can also share LM-79 / IES / installation drawings after model confirmation."
+    },
+    "4星": {
+      "网站": "有，产品与项目展示完整",
+      "平台信誉": "较好",
+      "项目或采购信号": "稳定补货或中大型项目",
+      "注册/经营时间": "不用苛求",
+      "技术成熟度": "有BOM/规格书/竞品对照",
+      "采购经验": "有",
+      "处理方案": "先公开背调找共同话题；优先响应；认证包与样品策略；必要时上级一起回复",
+      "对应的话术英文": "I reviewed your website/projects — your focus on [commercial/industrial/municipal] lighting is clear.\nWe supply [matching categories] with project support (specs, IES, packing, OEM labeling).\nMay I ask:\n1) Your current main suppliers' pain points (lead time / bin consistency / after-sales / DLC listing)?\n2) Upcoming tender or replenishment volume in the next 90 days?\n3) Preferred contact (email / WhatsApp / Teams) for faster technical exchange?\nHappy to prepare a comparison sheet against your current model list."
+    },
+    "5星": {
+      "网站": "专业站；可查域名年限与项目案例",
+      "平台信誉": "高 / 知名分销或工程商",
+      "项目或采购信号": "大额年采、框架协议或市政/连锁项目",
+      "注册/经营时间": "不用苛求",
+      "技术成熟度": "完善",
+      "采购经验": "有",
+      "处理方案": "深度背调+深度客户分析；专人对接；样品/认证/交期资源倾斜；持续跟进直到拿下或明确关闭",
+      "对应的话术英文": "Same approach as 4-star, with higher touch: assign senior sales + engineer, share factory audit / cert package, propose pilot SKU + volume roadmap, and schedule a technical call.\nDo not invent case names; use only verified references the user provides."
+    }
+  },
+  "core_qualification_principles": [
+    "1. 采购预算/项目资金：有可验证的项目或合理首单金额（照明常见试单到柜货量级因品类而异）",
+    "2. 销售/工程渠道：分销网络、电工承包商、项目业主、电商或品牌零售",
+    "3. 行业经验：做过灯具进口、了解电压(100–277V/220–240V)、认证与安装规范",
+    "4. 技术清晰度：能提供应用场景、目标照度、型号或竞品参数、认证清单",
+    "5. 决策与计划：有决策人、明确交期/投标节点"
+  ],
+  "cooperative_tier_by_annual_purchase_rmb_reference": {
+    "note": "Adapted from textile RMB bands in source package; lighting thresholds should be reconfirmed with the user's real CRM rules.",
+    "5星_S": "年采 >100万 RMB 或战略项目客户",
+    "4星_A": "年采 ~50万 RMB+",
+    "3星_B": "年采 ~15万 RMB+",
+    "2星_C": "年采 ~5万 RMB+",
+    "1星_D": "年采很低 / 达不到MOQ"
+  },
+  "objection_handling_deposit_sample": "We understand you want to validate quality before bulk. Our sample room is busy, and free unlimited samples are hard to process if the bulk price target is unclear. A practical way: pay a small sample fee + freight, fully deductible / refundable after bulk confirmation; or place 30% deposit on the trial bulk order and we prioritize a free sample (freight collect). Exact policy: [confirm with company]. We are confident you will be satisfied with lumen consistency, driver quality, and finish."
+}

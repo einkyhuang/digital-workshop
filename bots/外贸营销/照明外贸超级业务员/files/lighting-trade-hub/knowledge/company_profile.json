@@ -1,0 +1,56 @@
+{
+  "_status": "PLACEHOLDER — fill with the user's lighting company facts before quoting externally",
+  "_do_not_use_textile_profile": "Guangzhou Zhanfa Textile / MGOO Fashion profiles from the source package are textile brands and must NOT be used for lighting quotes.",
+  "company_name_en": "[Your Lighting Company Name]",
+  "company_name_cn": "[贵司中文名]",
+  "website": "[https://your-company.com]",
+  "location": "[City, Province, China]",
+  "business_scope": "LED lighting manufacturer / exporter specializing in [panel / downlight / high bay / street light / flood light / strip / custom OEM-ODM — fill in].",
+  "main_markets": [
+    "[North America]",
+    "[Europe]",
+    "[Middle East]",
+    "[Southeast Asia]",
+    "[Other — fill in]"
+  ],
+  "production_capacity": "[e.g. XXX,000 pcs/month — fill in; do not invent]",
+  "certifications_claimed_or_target": [
+    "CE",
+    "RoHS",
+    "ERP / Ecodesign (EU)",
+    "UL / cUL (if NA)",
+    "ETL (if NA)",
+    "DLC (if commercial NA rebate)",
+    "SAA / RCM (if AU/NZ)",
+    "CB / ENEC (if applicable)",
+    "[others — fill only if real certificates exist]"
+  ],
+  "standard_terms": {
+    "currency": "USD / EUR / RMB — [confirm]",
+    "incoterms": "FOB [port], CIF, CFR, EXW, DDP/DDU on request — [confirm]",
+    "payment_terms": "[e.g. 30% T/T deposit, 70% before shipment / against B/L copy; L/C at sight for large projects — confirm]",
+    "moq": {
+      "standard_models": "[e.g. 50–200 pcs/model — confirm]",
+      "custom_oem_odm": "[e.g. 500–1000 pcs — confirm]",
+      "sample": "[1–5 pcs sample policy — confirm]"
+    },
+    "lead_time": {
+      "sample": "[3–7 working days — confirm]",
+      "bulk_standard": "[15–25 days after deposit / sample approval — confirm]",
+      "bulk_custom": "[25–40 days — confirm]",
+      "peak_season_note": "[Chinese New Year / Q4 rush — confirm buffer]"
+    },
+    "warranty": "[e.g. 3 / 5 years — confirm; state what is covered]",
+    "packaging": "[export carton + foam / pallet — confirm]",
+    "hs_codes_examples": {
+      "led_luminaire_general": "9405.42 / 9405.11 (verify per exact product & destination)",
+      "led_modules_strips": "8539.51 / 9405.42 (verify)",
+      "note": "HS must be confirmed per SKU and destination customs practice — do not invent."
+    }
+  },
+  "key_contacts_placeholder": {
+    "sales_name": "[Your Name]",
+    "email": "[sales@your-company.com]",
+    "whatsapp_wechat": "[+86-…]"
+  }
+}

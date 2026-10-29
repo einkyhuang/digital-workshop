@@ -1,0 +1,50 @@
+[
+  {
+    "title": "第一章 开发信篇 — 照明行业适配",
+    "content": "PURPOSE: Cold outreach to lighting distributors, electrical wholesalers, contractors, project owners, and retailers.\n\nREGION TIPS (keep from source PDF, rewrite product to LED):\n• North America: quality + time + safety; prefer business email; PayPal/TT clarity; emphasize UL/ETL/DLC and after-sales.\n• Europe: quality, certificates (CE/RoHS/ERP), after-sales team, contract readiness.\n• Middle East: warmer tone, more company/product detail, insert images/specs, brand & price sensitivity.\n• South America / Australia: simpler English; small-order flexibility; reliability of supply.\n\nTEMPLATE — NA/EU distributor (placeholders only):\nHi [Name],\nGood day!\nThis is [Your Name] from [Your Lighting Company], a China LED manufacturer focused on [panel/high bay/street/flood/strip].\nOur strengths: stable lm/W, complete document package (IES, packing, certs), and reliable lead time for [your market].\nBelow / attached are best-sellers suitable for [office/warehouse/roadway] applications. Payment can be arranged by T/T [and PayPal if you support].\nMay I know which categories you currently distribute?\nBest regards,\n[Name] | [Company] | [Web] | [WhatsApp]\n\nINQUIRY-STYLE opener:\nHi [Name], do you supply LED high bays / street lights for projects in [country]? Are you a manufacturer or distributor?\n\nNEW PRODUCT share: max 3 selling points + photo/spec sheet; do not invent performance numbers.\n\nTESTIMONIAL-STYLE: only with user-approved, non-competing-market references — never fabricate."
+  },
+  {
+    "title": "第二章 回盘篇 — 照明询盘回复",
+    "content": "RULE: For one-line price asks, take back initiative — confirm specs before firm offer.\n\nSIMPLE REPLY:\nHello [Name],\nThanks for your inquiry. We are glad you are interested in our LED [product].\nWe have many variants (power, CCT, optics, driver, certificates). To recommend the right model and quote accurately, please confirm:\n1) Application / mounting height\n2) Power or lumen target, CCT, CRI\n3) IP / dimming / sensor\n4) Required certificates for [country]\n5) Quantity & destination / Incoterm\nAs soon as we have these, we will send datasheet + quotation + lead time.\nBest regards\n\nVAGUE INQUIRY — introduce categories then ask:\nMain categories: 1) Panel 2) Downlight 3) High bay 4) Street light 5) Flood 6) Strip / linear. Which matches your need? Attached company profile (when filled)."
+  },
+  {
+    "title": "第三章 报价篇 — 照明报价要素",
+    "content": "RANGE QUOTE: use when qty/specs unclear — give indicative band only if user provides real numbers; else send checklist.\n\nFIRM QUOTE CHECKLIST (must include):\n1) Incoterm + port\n2) Unit price + currency\n3) Quantity breaks\n4) Payment terms\n5) Packing / pcs per carton / CBM estimate\n6) Shipping mode suggestion\n7) Lead time\n8) Quote validity + FX note\n9) Warranty\n10) Certificates included with shipment\nOptional: HS code (verify), spare drivers ratio, IES availability.\n\nNever present textile/default_domestic prices as lighting FOB."
+  },
+  {
+    "title": "第四章 失联客户篇 — 跟进",
+    "content": "If unread: polite resend with original date + short value line (new IES / stock update / cert update).\nIf read no reply: ask frank blockers — price, cert, lead time, project postponed, already sourced — and offer solutions (MOQ trial, sample, alternative SKU).\nKeep frequency professional; combine with useful lighting market notes rather than pure chasing."
+  },
+  {
+    "title": "第五章 样品篇 — 灯具样品",
+    "content": "Before sample: confirm model, voltage, CCT, dimming, label language, ship-to, courier account.\nFee policy: [company placeholder]. Freight usually collect unless approved.\nAfter dispatch: tracking + ask confirmation on arrival + test plan (lux meter, flicker, thermal, install).\nFollow up after ~1–2 weeks for test feedback; offer technical support."
+  },
+  {
+    "title": "第六章 谈价篇 — 价值与认证",
+    "content": "Shift from price-only to value: lm/W, driver lifetime, SPD, cert listing, warranty claim process, binning consistency, project documents.\nTactics from source PDF still apply: value quantification, indirect concession (freight/payment), midpoint, either-or (volume vs alternate grade), manager-assisted close — but replace silicone/fabric examples with lighting SKUs and real numbers only."
+  },
+  {
+    "title": "第七章 收款篇",
+    "content": "After PI: repeat beneficiary bank details; warn against email fraud; ask transfer timing; call to reconfirm account for large amounts.\nSoft collection: materials ready / price validity / production slot."
+  },
+  {
+    "title": "第八章 运输篇 — 灯具出运",
+    "content": "Share closing date / ETD / ETA; send packing photos; confirm consignee & notify party early.\nDocuments: CI, PL, B/L or AWB, cert copies as agreed; watch destination customs sensitivity on sample values.\nPre-arrival reminder + local agent info when applicable.\nLighting-specific: lithium in emergency versions, battery docs if any; carton drop-test notes if relevant."
+  },
+  {
+    "title": "第九章 售后篇",
+    "content": "Ask end-user or distributor: failure rate, lumen maintenance perception, installation feedback, competitor comparison, price competitiveness.\nShare new SKUs / smart controls / higher-efficacy versions when relevant.\nReorder cadence tracking; holiday production cutoff notices."
+  },
+  {
+    "title": "第十章 客诉篇",
+    "content": "Respond fast; investigate retained samples; do not casually say 'sorry' if not at fault (per source cultural note) — clarify facts, then remedy.\nCollect: batch, photos, install conditions, surge/water evidence.\nClose loop with corrective action in packing/QC when needed."
+  },
+  {
+    "title": "第十一章 节假日祝福篇",
+    "content": "Keep weekend / Christmas / New Year / Thanksgiving / Halloween / Chinese festival templates from source structure.\nRespect markets that do not celebrate Christmas (many Middle East).\nLighting twist: optional soft product PS only when appropriate (e.g. year-end project stocking), never spam."
+  },
+  {
+    "title": "附录 — 照明询盘必问清单 (Inquiry Checklist)",
+    "content": "Product family → Model/size → Power (W) and/or lumens → Efficacy expectation → CCT → CRI → Beam/optics/UGR → IP/IK → Driver & dimming protocol → Sensor/emergency → Voltage & frequency → Housing color → Certificates (CE/RoHS/ERP/UL/ETL/DLC/SAA/…) → Warranty years → Quantity & delivery date → Destination & Incoterm → Branding/OEM label → Packing & pallet → Special tests (LM-79, salt spray, IK) → Project docs (IES, DIALux)."
+  }
+]

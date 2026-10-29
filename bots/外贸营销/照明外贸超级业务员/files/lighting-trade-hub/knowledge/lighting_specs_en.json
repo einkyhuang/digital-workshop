@@ -1,0 +1,311 @@
+{
+  "LED Panel Light": {
+    "en_name": "LED Panel Light / Flat Panel Luminaire",
+    "aliases": [
+      "panel",
+      "flat panel",
+      "troffer panel",
+      "backlit panel",
+      "edge-lit panel"
+    ],
+    "typical_sizes": [
+      "600x600 mm",
+      "300x1200 mm",
+      "600x1200 mm",
+      "2x2 ft",
+      "2x4 ft"
+    ],
+    "power_w_range": "18–72 W (typical; confirm SKU)",
+    "lumen_output": "confirm lm & lm/W per SKU; do not invent",
+    "efficacy_lm_w": "target often 100–140+ lm/W depending on grade",
+    "cri": "Ra≥80 standard; Ra≥90 for retail/medical — confirm",
+    "cct_k": "3000K / 4000K / 5000K / 5700K / tunable — confirm",
+    "beam_or_optics": "diffuser panel; UGR options for office",
+    "ip_rating": "IP20 / IP40 indoor typical; IP54+ if claimed",
+    "driver": "flicker-free constant current; 0–10V / DALI / Triac dimming options",
+    "mounting": "recessed / surface / suspended",
+    "certs_often_required": [
+      "CE",
+      "RoHS",
+      "ERP",
+      "UL/ETL",
+      "DLC (NA commercial)"
+    ],
+    "applications": "office, school, hospital, retail ceiling",
+    "inquiry_must_ask": [
+      "size",
+      "W or target lm",
+      "CCT",
+      "CRI",
+      "dimming",
+      "mounting",
+      "qty",
+      "destination + certs",
+      "warranty"
+    ],
+    "standard_moq_pcs": "待核实",
+    "default_ref_price_note": "No default FOB price in knowledge base — quote only from user/catalog facts"
+  },
+  "LED Downlight": {
+    "en_name": "LED Downlight / Recessed Spot",
+    "aliases": [
+      "downlight",
+      "COB downlight",
+      "Smd downlight",
+      "gimbal"
+    ],
+    "typical_cutout_mm": [
+      "55",
+      "75",
+      "90",
+      "105",
+      "125",
+      "150",
+      "200"
+    ],
+    "power_w_range": "5–40 W typical",
+    "lumen_output": "confirm per SKU",
+    "cri": "Ra≥80 / Ra≥90 / Ra≥95 (gallery)",
+    "cct_k": "2700–6500K / tunable white",
+    "beam_angle": "15° / 24° / 36° / 60° / adjustable",
+    "ip_rating": "IP20 / IP44 / IP54 / IP65 (bathroom/wet)",
+    "driver": "external or integrated; dimmable options",
+    "certs_often_required": [
+      "CE",
+      "RoHS",
+      "ERP",
+      "UL/ETL"
+    ],
+    "applications": "residential, hospitality, retail, bathroom",
+    "inquiry_must_ask": [
+      "cutout",
+      "W/lm",
+      "CCT",
+      "CRI",
+      "beam",
+      "IP",
+      "dimming",
+      "trim color",
+      "qty",
+      "certs"
+    ],
+    "standard_moq_pcs": "待核实",
+    "default_ref_price_note": "quote only from user/catalog facts"
+  },
+  "LED High Bay": {
+    "en_name": "LED High Bay / UFO High Bay / Linear High Bay",
+    "aliases": [
+      "high bay",
+      "UFO",
+      "industrial high bay",
+      "warehouse light"
+    ],
+    "power_w_range": "100–400 W typical",
+    "lumen_output": "confirm; often 130–180+ lm/W industrial grade",
+    "cri": "Ra≥70 / Ra≥80",
+    "cct_k": "4000K / 5000K / 5700K common",
+    "beam_angle": "60° / 90° / 120° / optics lens",
+    "ip_rating": "IP65 typical",
+    "ik_rating": "IK08 / IK10 often requested",
+    "sensor_options": "microwave / PIR / daylight harvest / 1–10V / DALI",
+    "mounting": "hook / bracket / pendant",
+    "certs_often_required": [
+      "CE",
+      "RoHS",
+      "UL/ETL",
+      "DLC",
+      "SAA"
+    ],
+    "applications": "warehouse, factory, gym, logistics center",
+    "inquiry_must_ask": [
+      "mounting height",
+      "target lux",
+      "W or lm",
+      "CCT",
+      "beam",
+      "sensor",
+      "IP/IK",
+      "qty",
+      "certs"
+    ],
+    "standard_moq_pcs": "待核实",
+    "default_ref_price_note": "quote only from user/catalog facts"
+  },
+  "LED Street Light": {
+    "en_name": "LED Street Light / Roadway Luminaire",
+    "aliases": [
+      "street light",
+      "road light",
+      "pole light",
+      "cobra head"
+    ],
+    "power_w_range": "30–300 W typical",
+    "optics": "Type I–V roadway distributions; confirm IES file need",
+    "cri": "Ra≥70 / Ra≥80",
+    "cct_k": "3000K (residential roads) / 4000–5000K",
+    "ip_rating": "IP65 / IP66",
+    "ik_rating": "IK08+",
+    "surge_protection": "10kV / 20kV SPD often required",
+    "pole_mount": "60mm / 76mm tenon — confirm",
+    "smart_options": "NEMA / Zhaga socket, photocell, smart controller",
+    "certs_often_required": [
+      "CE",
+      "RoHS",
+      "ENEC",
+      "CB",
+      "UL",
+      "LM-79/LM-80/TM-21 reports"
+    ],
+    "applications": "roads, highways, parking lots, campuses",
+    "inquiry_must_ask": [
+      "road type/class",
+      "pole height & spacing",
+      "W or target lux",
+      "optics type",
+      "CCT",
+      "smart socket",
+      "SPD",
+      "qty",
+      "project docs"
+    ],
+    "standard_moq_pcs": "待核实",
+    "default_ref_price_note": "project quote often needs DIALux / IES — ask"
+  },
+  "LED Flood Light": {
+    "en_name": "LED Flood Light / Projector",
+    "aliases": [
+      "floodlight",
+      "flood",
+      "projector light",
+      "sports flood"
+    ],
+    "power_w_range": "10–1000 W+",
+    "beam_angle": "15° / 30° / 60° / 90° / asymmetric",
+    "cri": "Ra≥70 / Ra≥80 / Ra≥90 (broadcast sports)",
+    "cct_k": "3000–6500K",
+    "ip_rating": "IP65 / IP66 / IP67",
+    "ik_rating": "IK08+",
+    "certs_often_required": [
+      "CE",
+      "RoHS",
+      "UL/ETL",
+      "DLC"
+    ],
+    "applications": "facade, billboard, sports field, yard, construction",
+    "inquiry_must_ask": [
+      "W/lm",
+      "beam",
+      "CCT",
+      "CRI",
+      "IP",
+      "mount",
+      "qty",
+      "project lux target"
+    ],
+    "standard_moq_pcs": "待核实",
+    "default_ref_price_note": "quote only from user/catalog facts"
+  },
+  "LED Strip / Tape Light": {
+    "en_name": "LED Strip Light / LED Tape / Flexible Strip",
+    "aliases": [
+      "strip",
+      "tape",
+      "COB strip",
+      "RGB strip",
+      "RGBW",
+      "CCT strip"
+    ],
+    "voltage": "DC12V / DC24V / constant current — confirm",
+    "led_density": "30–144+ LED/m or COB continuous",
+    "cri": "Ra≥80 / Ra≥90 / Ra≥95",
+    "cct_k": "2700–6500K / tunable / RGB / RGBW / RGBCCT",
+    "ip_rating": "IP20 / IP65 / IP67 / IP68",
+    "pcb_width_mm": "8 / 10 / 12 — confirm",
+    "accessories": "aluminum profile, diffuser, connectors, power supply, controller",
+    "certs_often_required": [
+      "CE",
+      "RoHS",
+      "UL (class 2 PSU)",
+      "ERP"
+    ],
+    "applications": "cove, under-cabinet, signage, decorative, architectural",
+    "inquiry_must_ask": [
+      "V",
+      "W/m or lm/m",
+      "CCT/RGB",
+      "CRI",
+      "IP",
+      "length reels",
+      "profile need",
+      "PSU",
+      "qty meters"
+    ],
+    "standard_moq_pcs": "待核实（often by meter/reel）",
+    "default_ref_price_note": "quote only from user/catalog facts"
+  },
+  "LED Tube / Linear": {
+    "en_name": "LED Tube / T8 Retrofit / Linear Batten",
+    "aliases": [
+      "tube",
+      "T8",
+      "T5",
+      "batten",
+      "linear light"
+    ],
+    "lengths": [
+      "0.6m",
+      "1.2m",
+      "1.5m",
+      "2ft",
+      "4ft",
+      "5ft"
+    ],
+    "power_w_range": "9–40 W typical for tubes",
+    "compatibility": "ballast bypass Type B / dual mode — confirm & warn safety",
+    "certs_often_required": [
+      "CE",
+      "RoHS",
+      "UL",
+      "DLC"
+    ],
+    "inquiry_must_ask": [
+      "length",
+      "W/lm",
+      "CCT",
+      "single/double ended",
+      "fixture type",
+      "qty",
+      "certs"
+    ],
+    "standard_moq_pcs": "待核实",
+    "default_ref_price_note": "quote only from user/catalog facts"
+  },
+  "LED Track Light": {
+    "en_name": "LED Track Light / Spotlight",
+    "aliases": [
+      "track light",
+      "rail spot",
+      "museum spot"
+    ],
+    "power_w_range": "10–40 W",
+    "track_system": "1-circuit / 3-circuit / magnetic track — confirm",
+    "cri": "Ra≥90 / Ra≥95 common for retail",
+    "beam_angle": "15° / 24° / 36° / zoom",
+    "certs_often_required": [
+      "CE",
+      "RoHS",
+      "UL"
+    ],
+    "inquiry_must_ask": [
+      "track type",
+      "W",
+      "CCT",
+      "CRI",
+      "beam",
+      "finish",
+      "qty"
+    ],
+    "standard_moq_pcs": "待核实",
+    "default_ref_price_note": "quote only from user/catalog facts"
+  }
+}
