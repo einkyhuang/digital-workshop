@@ -79,11 +79,18 @@
   }
 
 
+  function isHostedPages() {
+    try {
+      const h = location.hostname || "";
+      return h.endsWith("github.io") || h.endsWith("pages.dev");
+    } catch (_) { return false; }
+  }
+
   async function tryLoadPrivateWebsiteProjects() {
+    if (isHostedPages()) return null; // private/ never published — avoid 404 storm
     const paths = [
       "./data/private/websiteProjects.local.json",
       "../data/private/websiteProjects.local.json",
-      "../../data/private/websiteProjects.local.json",
       "data/private/websiteProjects.local.json",
     ];
     for (const p of paths) {
@@ -100,7 +107,9 @@
 
   async function loadData() {
     const cached = loadLocal();
-    const paths = ["./data/workspace.json", "../data/workspace.json", "../../data/workspace.json", "data/workspace.json"];
+    const paths = isHostedPages()
+      ? ["./data/workspace.json"]
+      : ["./data/workspace.json", "../data/workspace.json", "../../data/workspace.json", "data/workspace.json"];
     for (const p of paths) {
       try {
         const res = await fetch(p, { cache: "no-store" });
@@ -417,16 +426,20 @@
       return null;
     };
     // private targets — only works on file/localhost with private present
-    const targets = await tryFetch([
-      "./data/private/targets.local.json",
-      "../data/private/targets.local.json",
-      "../../data/private/targets.local.json",
-      "data/private/targets.local.json"
-    ]);
-    state.targetsFile = targets;
-    const ui = await tryFetch(["./data/ui-config.json","../data/ui-config.json","data/ui-config.json"]);
+    if (!isHostedPages()) {
+      state.targetsFile = await tryFetch([
+        "./data/private/targets.local.json",
+        "../data/private/targets.local.json",
+        "data/private/targets.local.json"
+      ]);
+    } else {
+      state.targetsFile = null;
+    }
+    const uiPaths = isHostedPages() ? ["./data/ui-config.json"] : ["./data/ui-config.json","../data/ui-config.json","data/ui-config.json"];
+    const mailPaths = isHostedPages() ? ["./data/email-daily.json"] : ["./data/email-daily.json","../data/email-daily.json","data/email-daily.json"];
+    const ui = await tryFetch(uiPaths);
     if (ui) state.uiConfig = ui;
-    const mail = await tryFetch(["./data/email-daily.json","../data/email-daily.json","data/email-daily.json"]);
+    const mail = await tryFetch(mailPaths);
     if (mail && Array.isArray(mail.items)) {
       state.emailDaily = mail.items.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
     } else state.emailDaily = [];
@@ -606,7 +619,7 @@
 
     const order = groupOrder();
     const shortCard = (b) => `<button type="button" class="emp-card dense" data-bot="${esc(b.id)}">
-        <div class="emp-avatar-wrap dense"><img class="emp-avatar-img dense" src="${avatarSrc(b)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="emp-avatar-fallback dense" style="display:none">${esc((b.name||'?')[0])}</div></div>
+        <div class="emp-avatar-wrap dense"><img class="emp-avatar-img dense" src="${avatarSrc(b)}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="emp-avatar-fallback dense" style="display:none">${esc((b.name||'?')[0])}</div></div>
         <div class="emp-meta dense"><span class="emp-pill">${esc(b.code||"—")}</span><span class="dot ok"></span></div>
         <div class="emp-name dense">${esc(displayNick(b.name))}</div>
         <div class="emp-role dense">${esc(displayTitle(b.name,b.role))}</div>
@@ -670,7 +683,7 @@ function renderRoster() {
     // Same card + group shell markup as overview 员工看板
     const rosterCard = (b) => `
       <button type="button" class="emp-card dense" data-bot="${esc(b.id)}">
-        <div class="emp-avatar-wrap dense"><img class="emp-avatar-img dense" src="${avatarSrc(b)}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="emp-avatar-fallback dense" style="display:none">${esc((b.name||'?')[0])}</div></div>
+        <div class="emp-avatar-wrap dense"><img class="emp-avatar-img dense" src="${avatarSrc(b)}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="emp-avatar-fallback dense" style="display:none">${esc((b.name||'?')[0])}</div></div>
         <div class="emp-meta dense"><span class="emp-pill">${esc(b.code||"—")}</span><span class="dot ok"></span></div>
         <div class="emp-name dense">${esc(displayNick(b.name))}</div>
         <div class="emp-role dense">${esc(displayTitle(b.name,b.role))}</div>
@@ -743,7 +756,7 @@ function renderRoster() {
   }
   function webListRow(w) {
     const owner = (state.data.bots||[]).find(b=>b.id===(w.ownerBotId||""));
-    const av = owner ? `<img class="web-owner" src="${avatarSrc(owner)}" alt=""/>` : `<span class="web-owner empty">—</span>`;
+    const av = owner ? `<img class="web-owner" src="${avatarSrc(owner)}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.style.display='none'"/>` : `<span class="web-owner empty">—</span>`;
     const pill = (WEBSITE_UI.statusMap[w.status]||{}).pill || "hold";
     const pay = w.paymentStatus==="fully_paid"?"已结清":w.paymentStatus==="deposit_paid"?"已付定金":"待付款";
     const url = (w.url||"").replace(/^https?:\/\//,"");
@@ -999,8 +1012,6 @@ function renderKanban() {
   }
 
   async function boot() {
-    await loadData();
-    await loadOverviewExtras();
     document.getElementById("btnExport").onclick = doExport;
     document.getElementById("btnReset").onclick = resetDefault;
     document.getElementById("fileImport").onchange = (e) => {
@@ -1008,6 +1019,31 @@ function renderKanban() {
       if (f) doImport(f);
       e.target.value = "";
     };
+    // Instant first paint from embedded/localStorage — then refresh from JSON.
+    try {
+      const cached = loadLocal();
+      const base = defaultData();
+      if (cached && cached.bots && cached.bots.length) {
+        state.data = Object.assign({}, base, {
+          bots: cached.bots,
+          tasks: cached.tasks || base.tasks,
+          vacancies: cached.vacancies || base.vacancies,
+          groups: cached.groups || base.groups,
+          routines: cached.routines || base.routines,
+          rules: cached.rules || base.rules,
+        });
+        state.source = "embedded + localStorage (preview)";
+        state.selectedId = cached.selectedId || base.bots[0].id;
+      } else {
+        state.data = base;
+        state.source = "embedded (preview)";
+        state.selectedId = base.bots[0].id;
+      }
+      state.editTaskId = (state.data.tasks[0] && state.data.tasks[0].id) || null;
+      render();
+    } catch (_) {}
+    await loadData();
+    await loadOverviewExtras();
     render();
   }
 

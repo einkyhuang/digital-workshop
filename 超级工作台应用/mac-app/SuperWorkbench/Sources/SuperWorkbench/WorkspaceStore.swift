@@ -43,29 +43,134 @@ final class WorkspaceStore: ObservableObject {
         repoRoot.appendingPathComponent("bots")
     }
 
+    /// Synchronous reload (menu / after sync). Prefer `loadAsync()` at launch.
     func load() {
-        do {
-            let url = dataFileURL
-            guard FileManager.default.fileExists(atPath: url.path) else {
-                loadError = "找不到数据文件：\(url.path)"
-                return
+        loadAsync(showBlockingError: true)
+    }
+
+    /// Non-blocking launch path: decode JSON + sqlite off the main thread so the window can appear immediately.
+    func loadAsync(showBlockingError: Bool = false) {
+        let url = dataFileURL
+        let privateURL = privateWebsiteProjectsURL
+        let targetsURL = repoRoot.appendingPathComponent("超级工作台应用/data/private/targets.local.json")
+        let emailDir = repoRoot.appendingPathComponent("bots/外贸营销/超级邮件助手/deliverables/email-daily")
+        let emailAgg = repoRoot.appendingPathComponent("超级工作台应用/data/email-daily.json")
+        let dbURL = repoRoot.appendingPathComponent("智能日程管理/server/smart_plan.db")
+
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self else { return }
+            let result: Result<(WorkspaceData, OverviewMetrics.TargetsFile?, [OverviewMetrics.EmailDaily], [OverviewMetrics.SmartPlanTask]), Error> = {
+                do {
+                    guard FileManager.default.fileExists(atPath: url.path) else {
+                        return .failure(NSError(domain: "SW", code: 1, userInfo: [NSLocalizedDescriptionKey: "找不到数据文件：\(url.path)"]))
+                    }
+                    let raw = try Data(contentsOf: url)
+                    var decoded = try JSONDecoder().decode(WorkspaceData.self, from: raw)
+                    if let full = Self.readPrivateWebsiteProjects(at: privateURL) {
+                        decoded.websiteProjects = full
+                    }
+                    let targets = Self.readTargets(at: targetsURL)
+                    let emails = Self.readEmailDaily(dir: emailDir, agg: emailAgg)
+                    let smart = Self.readSmartPlanTasks(db: dbURL)
+                    return .success((decoded, targets, emails, smart))
+                } catch {
+                    return .failure(error)
+                }
+            }()
+
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let (decoded, targets, emails, smart)):
+                    self.data = decoded
+                    if self.selectedBotId == nil { self.selectedBotId = decoded.bots.first?.id }
+                    if self.selectedTaskId == nil { self.selectedTaskId = decoded.tasks.first?.id }
+                    self.targetsFile = targets
+                    self.emailDaily = emails
+                    if self.expandedEmailDate == nil { self.expandedEmailDate = emails.first?.date }
+                    self.smartPlanTasks = smart
+                    self.loadError = nil
+                case .failure(let error):
+                    if showBlockingError || self.data.bots.isEmpty {
+                        self.loadError = "读取失败：\(error.localizedDescription)"
+                    }
+                }
             }
-            let raw = try Data(contentsOf: url)
-            var decoded = try JSONDecoder().decode(WorkspaceData.self, from: raw)
-            // Overlay full private websiteProjects when present
-            if let full = loadPrivateWebsiteProjects() {
-                decoded.websiteProjects = full
-            }
-            data = decoded
-            if selectedBotId == nil { selectedBotId = decoded.bots.first?.id }
-            if selectedTaskId == nil { selectedTaskId = decoded.tasks.first?.id }
-            loadError = nil
-            loadTargets()
-            loadEmailDaily()
-            loadSmartPlanTasks()
-        } catch {
-            loadError = "读取失败：\(error.localizedDescription)"
         }
+    }
+
+    private nonisolated static func readPrivateWebsiteProjects(at url: URL) -> [WebsiteProject]? {
+        guard FileManager.default.fileExists(atPath: url.path),
+              let raw = try? Data(contentsOf: url) else { return nil }
+        struct Doc: Codable {
+            var projects: [WebsiteProject]
+        }
+        if let doc = try? JSONDecoder().decode(Doc.self, from: raw) { return doc.projects }
+        return try? JSONDecoder().decode([WebsiteProject].self, from: raw)
+    }
+
+    private nonisolated static func readTargets(at url: URL) -> OverviewMetrics.TargetsFile? {
+        guard let raw = try? Data(contentsOf: url) else { return nil }
+        return try? JSONDecoder().decode(OverviewMetrics.TargetsFile.self, from: raw)
+    }
+
+    private nonisolated static func readEmailDaily(dir: URL, agg: URL) -> [OverviewMetrics.EmailDaily] {
+        let fm = FileManager.default
+        var items: [OverviewMetrics.EmailDaily] = []
+        if let files = try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) {
+            for u in files where u.pathExtension == "json" {
+                if let raw = try? Data(contentsOf: u),
+                   let doc = try? JSONDecoder().decode(OverviewMetrics.EmailDaily.self, from: raw) {
+                    items.append(doc)
+                }
+            }
+        }
+        if items.isEmpty {
+            if let raw = try? Data(contentsOf: agg),
+               let obj = try? JSONSerialization.jsonObject(with: raw) as? [String: Any],
+               let arr = obj["items"] as? [[String: Any]],
+               let data = try? JSONSerialization.data(withJSONObject: arr),
+               let decoded = try? JSONDecoder().decode([OverviewMetrics.EmailDaily].self, from: data) {
+                items = decoded
+            }
+        }
+        return items.sorted { $0.date > $1.date }
+    }
+
+    private nonisolated static func readSmartPlanTasks(db: URL) -> [OverviewMetrics.SmartPlanTask] {
+        var remote: [OverviewMetrics.SmartPlanTask] = []
+        guard FileManager.default.fileExists(atPath: db.path) else { return remote }
+        let proc = Process()
+        proc.executableURL = URL(fileURLWithPath: "/usr/bin/sqlite3")
+        proc.arguments = ["-json", db.path, "SELECT id,title,status,priority,due_date FROM tasks WHERE status != 'archived' ORDER BY updated_at DESC LIMIT 200;"]
+        let pipe = Pipe()
+        proc.standardOutput = pipe
+        proc.standardError = Pipe()
+        do {
+            try proc.run()
+            // Cap wait so a wedged iCloud/sqlite cannot hang forever
+            let deadline = Date().addingTimeInterval(4)
+            while proc.isRunning, Date() < deadline {
+                Thread.sleep(forTimeInterval: 0.05)
+            }
+            if proc.isRunning { proc.terminate() }
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            if let arr = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] {
+                for row in arr {
+                    let id = row["id"] as? String ?? UUID().uuidString
+                    let title = row["title"] as? String ?? ""
+                    let st = OverviewMetrics.mapSmartStatus(row["status"] as? String ?? "todo")
+                    remote.append(.init(
+                        id: "sp-" + id,
+                        title: title,
+                        status: st,
+                        priority: row["priority"] as? String,
+                        dueDate: row["due_date"] as? String,
+                        source: "smartplan"
+                    ))
+                }
+            }
+        } catch { /* ignore */ }
+        return remote
     }
 
     func save() {

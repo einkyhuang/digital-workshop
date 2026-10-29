@@ -94,16 +94,11 @@ struct EmployeeCard: View {
 
     @ViewBuilder
     private var avatarView: some View {
-        if let img = NSImage(contentsOf: bot.avatarURL) {
-            Image(nsImage: img).resizable().scaledToFill()
-        } else {
-            ZStack {
-                LinearGradient(colors: [.blue.opacity(0.85), .purple.opacity(0.75)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                Text(String(shortName(bot.name).prefix(1)))
-                    .font(.system(size: dense ? 22 : (compact ? 32 : 40), weight: .bold))
-                    .foregroundStyle(.white)
-            }
-        }
+        BotAvatarView(
+            url: bot.avatarURL,
+            fallbackLetter: String(shortName(bot.name).prefix(1)),
+            fontSize: dense ? 22 : (compact ? 32 : 40)
+        )
     }
 
     private func spacedCode(_ code: String) -> String {

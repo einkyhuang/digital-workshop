@@ -191,8 +191,11 @@ struct WebsiteListRow: View {
             Text(WebsiteFieldConfig.paymentLabel(project.paymentStatus)).font(.caption2).frame(width: 80, alignment: .leading)
             Text(project.displayDeadline).font(.caption.monospaced()).foregroundStyle(isOverdue ? Color.red : SWTheme.textSecondary).frame(width: 100, alignment: .leading)
             Group {
-                if let owner, let img = NSImage(contentsOf: owner.avatarURL) { Image(nsImage: img).resizable().scaledToFill() }
-                else { Image(systemName: "person.crop.circle").foregroundStyle(.secondary) }
+                if let owner {
+                    BotAvatarView(url: owner.avatarURL, fallbackLetter: String(owner.name.prefix(1)), fontSize: 14)
+                } else {
+                    Image(systemName: "person.crop.circle").foregroundStyle(.secondary)
+                }
             }.frame(width: 26, height: 26).clipShape(Circle()).frame(width: 72, alignment: .center)
             Text(relTime(project.updatedAt)).font(.caption2).foregroundStyle(SWTheme.textMuted).frame(width: 100, alignment: .leading).help(project.updatedAt ?? "")
         }

@@ -81,13 +81,7 @@ struct BotDetailView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top, spacing: 16) {
-                Group {
-                    if let img = NSImage(contentsOf: bot.avatarURL) {
-                        Image(nsImage: img).resizable().scaledToFill()
-                    } else {
-                        Text(String(bot.name.prefix(1))).font(.largeTitle)
-                    }
-                }
+                BotAvatarView(url: bot.avatarURL, fallbackLetter: String(bot.name.prefix(1)), fontSize: 28)
                 .frame(width: 72, height: 72)
                 .clipShape(Circle())
                 .overlay(Circle().stroke(Color.white, lineWidth: 3))
