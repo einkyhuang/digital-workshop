@@ -27,9 +27,14 @@ struct OverviewView: View {
             if let err = store.loadError {
                 Text(err).foregroundStyle(.red).padding().swCard()
             }
-            websiteBoard(kpiCols: kpiCols, goalCols: goalCols)
+            workbenchBoard
+            if store.activeWorkbench?.summaryHints?.showWebsiteProjects != false {
+                websiteBoard(kpiCols: kpiCols, goalCols: goalCols)
+            }
             scheduleBoard
-            emailBoard(cols: emailCols)
+            if store.activeWorkbench?.summaryHints?.showEmail != false {
+                emailBoard(cols: emailCols)
+            }
             rosterBoard(minWidth: rosterMin)
             Spacer(minLength: 80)
         }
@@ -60,6 +65,77 @@ struct OverviewView: View {
         if w >= 2560 { return 3 }
         if w >= 1920 { return 2 }
         return 1
+    }
+
+    // MARK: - Workbenches switcher cards
+
+    private var workbenchBoard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            sectionHead("工作台", badge: "\(store.workbenches.count)")
+            Text("点击卡片切换 · 配置见 data/workbenches.json")
+                .font(.system(size: 12)).foregroundStyle(SWTheme.textMuted)
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 14)], spacing: 14) {
+                ForEach(store.workbenches) { wb in
+                    let sum = store.workbenchSummary(for: wb)
+                    let active = store.activeWorkbenchId == wb.id
+                    Button {
+                        store.switchWorkbench(wb.id)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                Image(systemName: wb.icon ?? "square.grid.2x2")
+                                    .font(.title3)
+                                Text(wb.name)
+                                    .font(.subheadline.weight(.bold))
+                                    .lineLimit(1)
+                                Spacer()
+                                if active {
+                                    Text("当前")
+                                        .font(.caption2.weight(.bold))
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 3)
+                                        .background(Color.black)
+                                        .foregroundStyle(.white)
+                                        .clipShape(Capsule())
+                                }
+                            }
+                            if let d = wb.description {
+                                Text(d).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                            }
+                            HStack(spacing: 16) {
+                                labelStat("员工", "\(sum.bots)")
+                                labelStat("进行中任务", "\(sum.tasksOpen)")
+                            }
+                            Text(sum.activity)
+                                .font(.caption2)
+                                .foregroundStyle(SWTheme.textMuted)
+                                .lineLimit(2)
+                        }
+                        .padding(16)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(SWTheme.card)
+                        .clipShape(RoundedRectangle(cornerRadius: SWTheme.Radius.panel, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: SWTheme.Radius.panel)
+                                .stroke(active ? Color.black : SWTheme.borderSoft, lineWidth: active ? 1.5 : 1)
+                        )
+                        .shadow(color: SWTheme.shadowElevated, radius: 6, y: 2)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(SWTheme.card.opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: SWTheme.radiusSection, style: .continuous))
+    }
+
+    private func labelStat(_ k: String, _ v: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(v).font(.title3.weight(.bold))
+            Text(k).font(.caption2).foregroundStyle(.secondary)
+        }
     }
 
     // MARK: - Website

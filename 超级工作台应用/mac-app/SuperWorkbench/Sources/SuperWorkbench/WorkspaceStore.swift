@@ -23,6 +23,21 @@ final class WorkspaceStore: ObservableObject {
     @Published var expandedEmailDate: String? = nil
     /// First paint ready (workspace.json applied). Auxiliaries may still be loading.
     @Published var isCoreLoaded: Bool = false
+    /// Calendar / daily-summary navigation
+    @Published var calendarMonth: Date = Date()
+    @Published var selectedCalendarDate: String? = nil  // YYYY-MM-DD
+    @Published var scheduleByDate: [String: ScheduleDayDoc] = [:]
+    @Published var isScheduleLoading: Bool = false
+    @Published var dailyReportDates: [String] = []
+    @Published var selectedDailyReportDate: String? = nil
+    @Published var dailyReportMarkdown: String? = nil
+    @Published var isDailyReportLoading: Bool = false
+    /// Multi-workbench
+    @Published var workbenches: [WorkbenchConfig] = []
+    @Published var activeWorkbenchId: String = "general"
+    @Published var tradeLeadsIndex: TradeLeadsIndex? = nil
+
+
     @Published private(set) var botById: [String: Bot] = [:]
     @Published private(set) var botsByGroup: [String: [Bot]] = [:]
     private var cachedWebsiteKPI: OverviewMetrics.KPI?
@@ -146,6 +161,7 @@ final class WorkspaceStore: ObservableObject {
         if selectedTaskId == nil { selectedTaskId = decoded.tasks.first?.id }
         rebuildIndexes()
         isCoreLoaded = true
+        loadWorkbenches()
         loadError = nil
         cachedWebsiteKPI = nil
         if decoded.bots.contains(where: { $0.id.hasPrefix("stress-bot") }) {
@@ -262,24 +278,44 @@ final class WorkspaceStore: ObservableObject {
     }
 
     func save() {
-        do {
-            data.updatedAt = ISO8601DateFormatter().string(from: Date())
-            let enc = JSONEncoder()
-            enc.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
-            // 1) Write full websiteProjects to private local file
-            try savePrivateWebsiteProjects(data.websiteProjects ?? [])
-            // 2) Write redacted copy to tracked workspace.json (+ app copy)
-            var publicData = data
-            publicData.websiteProjects = redactWebsiteProjects(data.websiteProjects ?? [])
-            let raw = try enc.encode(publicData)
-            try raw.write(to: dataFileURL, options: .atomic)
-            let webCopy = repoRoot.appendingPathComponent("超级工作台应用/app/data/workspace.json")
-            try? FileManager.default.createDirectory(at: webCopy.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try? raw.write(to: webCopy, options: .atomic)
-            loadError = nil
-        } catch {
-            loadError = "保存失败：\(error.localizedDescription)"
+        data.updatedAt = ISO8601DateFormatter().string(from: Date())
+        // Snapshot on main; encode + disk write off main thread (no UI block)
+        let snapshot = data
+        let privateProjects = data.websiteProjects ?? []
+        let dataURL = dataFileURL
+        let webCopy = repoRoot.appendingPathComponent("超级工作台应用/app/data/workspace.json")
+        let privateURL = repoRoot.appendingPathComponent("超级工作台应用/data/private/websiteProjects.local.json")
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            do {
+                let enc = JSONEncoder()
+                enc.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+                // private full projects
+                if let priv = try? enc.encode(privateProjects) {
+                    try? FileManager.default.createDirectory(at: privateURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+                    try? priv.write(to: privateURL, options: .atomic)
+                }
+                var publicData = snapshot
+                publicData.websiteProjects = self?.redactWebsiteProjects(privateProjects) ?? []
+                let raw = try enc.encode(publicData)
+                try raw.write(to: dataURL, options: .atomic)
+                try? FileManager.default.createDirectory(at: webCopy.deletingLastPathComponent(), withIntermediateDirectories: true)
+                try? raw.write(to: webCopy, options: .atomic)
+                DispatchQueue.main.async { self?.loadError = nil }
+            } catch {
+                DispatchQueue.main.async {
+                    self?.loadError = "保存失败：\(error.localizedDescription)"
+                }
+            }
         }
+    }
+
+    /// Drag-and-drop: set status directly (any column ↔ any column)
+    func setTaskStatus(id: String, status: String) {
+        guard let i = data.tasks.firstIndex(where: { $0.id == id }) else { return }
+        guard TaskColumn(rawValue: status) != nil else { return }
+        if data.tasks[i].status == status { return }
+        data.tasks[i].status = status
+        save()
     }
 
 
@@ -660,10 +696,289 @@ final class WorkspaceStore: ObservableObject {
     }
 
     var filteredTasks: [WorkbenchTask] {
-        let q = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard !q.isEmpty else { return data.tasks }
-        return data.tasks.filter {
-            $0.title.lowercased().contains(q) || $0.executor.lowercased().contains(q) || $0.note.lowercased().contains(q)
+        let base = scopedTasks
+        let q = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if q.isEmpty { return base }
+        return base.filter {
+            $0.title.localizedCaseInsensitiveContains(q)
+                || $0.note.localizedCaseInsensitiveContains(q)
+                || $0.executor.localizedCaseInsensitiveContains(q)
+                || $0.reviewer.localizedCaseInsensitiveContains(q)
         }
     }
+
+
+    // MARK: - Multi-workbench
+
+    var activeWorkbench: WorkbenchConfig? {
+        workbenches.first { $0.id == activeWorkbenchId } ?? workbenches.first
+    }
+
+    var activeModules: [SidebarSection] {
+        let ids = activeWorkbench?.modules ?? SidebarSection.allCases.map(\.moduleId)
+        return ids.compactMap { SidebarSection.fromModuleId($0) }
+    }
+
+    var activeModuleGroups: [(String, [SidebarSection])] {
+        var order: [String] = []
+        var map: [String: [SidebarSection]] = [:]
+        for s in activeModules {
+            if map[s.group] == nil { order.append(s.group) }
+            map[s.group, default: []].append(s)
+        }
+        return order.map { ($0, map[$0]!) }
+    }
+
+    /// Bots visible in current workbench (by group / groups[])
+    var scopedBots: [Bot] {
+        guard let wb = activeWorkbench, let groups = wb.botGroupIds, !groups.isEmpty else {
+            return data.bots
+        }
+        let set = Set(groups)
+        return data.bots.filter { b in
+            if let g = b.group, set.contains(g) { return true }
+            if let gs = b.groups, gs.contains(where: { set.contains($0) }) { return true }
+            return false
+        }
+    }
+
+    var scopedBotsByGroup: [String: [Bot]] {
+        let bots = scopedBots
+        var map: [String: [Bot]] = [:]
+        for b in bots {
+            let g = b.group ?? "未分组"
+            map[g, default: []].append(b)
+        }
+        return map
+    }
+
+    var scopedBotNames: Set<String> {
+        Set(scopedBots.map(\.name))
+    }
+
+    /// Tasks whose executor/reviewer intersects scoped bots; general = all
+    var scopedTasks: [WorkbenchTask] {
+        guard let wb = activeWorkbench, let groups = wb.botGroupIds, !groups.isEmpty else {
+            return data.tasks
+        }
+        let names = scopedBotNames
+        let ids = Set(scopedBots.map(\.id))
+        return data.tasks.filter { t in
+            if names.contains(t.executor) || names.contains(t.reviewer) { return true }
+            // soft match folder nicknames in executor string
+            return scopedBots.contains { t.executor.contains($0.name) || t.reviewer.contains($0.name) }
+                || ids.contains(where: { t.executor.contains($0) })
+        }
+    }
+
+    func loadWorkbenches() {
+        let url = repoRoot.appendingPathComponent("超级工作台应用/data/workbenches.json")
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self else { return }
+            var list: [WorkbenchConfig] = []
+            var defaultId = "general"
+            if let raw = try? Data(contentsOf: url),
+               let doc = try? JSONDecoder().decode(WorkbenchesFile.self, from: raw) {
+                list = doc.workbenches
+                if let d = doc.defaultId { defaultId = d }
+            }
+            if list.isEmpty {
+                list = [
+                    WorkbenchConfig(id: "general", name: "超级工作台（综合）", shortName: "综合", icon: "square.grid.2x2", description: nil, botGroupIds: nil, modules: SidebarSection.allCases.map(\.moduleId), data: nil, summaryHints: nil)
+                ]
+            }
+            let saved = UserDefaults.standard.string(forKey: "sw.activeWorkbenchId")
+            let active = list.contains(where: { $0.id == saved }) ? (saved ?? defaultId) : defaultId
+            // trade index (public counts)
+            var idx: TradeLeadsIndex? = nil
+            let idxURL = self.repoRoot.appendingPathComponent("超级工作台应用/data/trade-leads-index.json")
+            if let raw = try? Data(contentsOf: idxURL) {
+                idx = try? JSONDecoder().decode(TradeLeadsIndex.self, from: raw)
+            }
+            DispatchQueue.main.async {
+                self.workbenches = list
+                self.activeWorkbenchId = active
+                self.tradeLeadsIndex = idx
+                // keep selection valid for modules
+                if !self.activeModules.contains(self.selectedSection) {
+                    self.selectedSection = self.activeModules.first ?? .overview
+                }
+            }
+        }
+    }
+
+    func switchWorkbench(_ id: String) {
+        guard workbenches.contains(where: { $0.id == id }) else { return }
+        activeWorkbenchId = id
+        UserDefaults.standard.set(id, forKey: "sw.activeWorkbenchId")
+        if !activeModules.contains(selectedSection) {
+            selectedSection = activeModules.first ?? .overview
+        }
+        showingBotDetail = false
+    }
+
+    func workbenchSummary(for wb: WorkbenchConfig) -> (bots: Int, tasksOpen: Int, activity: String) {
+        let bots: [Bot]
+        if let g = wb.botGroupIds, !g.isEmpty {
+            let set = Set(g)
+            bots = data.bots.filter { b in
+                if let gg = b.group, set.contains(gg) { return true }
+                return b.groups?.contains(where: { set.contains($0) }) ?? false
+            }
+        } else {
+            bots = data.bots
+        }
+        let names = Set(bots.map(\.name))
+        let scoped: [WorkbenchTask]
+        if wb.botGroupIds == nil || wb.botGroupIds?.isEmpty == true {
+            scoped = data.tasks
+        } else {
+            scoped = data.tasks.filter { t in
+                names.contains(t.executor) || names.contains(t.reviewer)
+                    || bots.contains { t.executor.contains($0.name) || t.reviewer.contains($0.name) }
+            }
+        }
+        let openStatuses: Set<String> = ["待办", "进行中", "验收"]
+        let open = scoped.filter { openStatuses.contains($0.status) }.count
+        var activity = "—"
+        if wb.id == "trade", let a = tradeLeadsIndex?.latestActivity, !a.isEmpty {
+            activity = a
+        } else if let t = scoped.first {
+            activity = t.title
+        }
+        return (bots.count, open, activity)
+    }
+
+    // MARK: - Schedule month + daily reports (lazy)
+
+    var scheduleDirURL: URL {
+        repoRoot.appendingPathComponent("超级工作台应用/data/schedule")
+    }
+
+    var dailyReportDirURL: URL {
+        repoRoot.appendingPathComponent("bots/管理中枢/总结助手/deliverables")
+    }
+
+    var emailDailyDirURL: URL {
+        repoRoot.appendingPathComponent("bots/外贸营销/超级邮件助手/deliverables/email-daily")
+    }
+
+    static func ymd(_ date: Date, tz: String = "Asia/Shanghai") -> String {
+        let f = DateFormatter()
+        f.calendar = Calendar(identifier: .gregorian)
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = TimeZone(identifier: tz) ?? .current
+        f.dateFormat = "yyyy-MM-dd"
+        return f.string(from: date)
+    }
+
+    static func monthPrefix(_ date: Date, tz: String = "Asia/Shanghai") -> String {
+        String(ymd(date, tz: tz).prefix(7)) // YYYY-MM
+    }
+
+    func loadScheduleMonth(around date: Date = Date()) {
+        calendarMonth = date
+        let prefix = Self.monthPrefix(date)
+        let dir = scheduleDirURL
+        isScheduleLoading = true
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self else { return }
+            var map: [String: ScheduleDayDoc] = [:]
+            if let files = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) {
+                for u in files where u.pathExtension == "json" {
+                    let name = u.deletingPathExtension().lastPathComponent
+                    guard name.hasPrefix(prefix), name.count == 10 else { continue }
+                    if let raw = try? Data(contentsOf: u),
+                       let doc = try? JSONDecoder().decode(ScheduleDayDoc.self, from: raw) {
+                        map[doc.date] = doc
+                    }
+                }
+            }
+            // Also fold workspace tasks without due into "today" markers lightly — skip
+            // Enrich meta flags from email-daily filenames + daily report filenames
+            let emailDir = self.emailDailyDirURL
+            let reportDir = self.dailyReportDirURL
+            if let emails = try? FileManager.default.contentsOfDirectory(at: emailDir, includingPropertiesForKeys: nil) {
+                for u in emails where u.pathExtension == "json" {
+                    let d = u.deletingPathExtension().lastPathComponent
+                    guard d.hasPrefix(prefix) else { continue }
+                    var doc = map[d] ?? ScheduleDayDoc(version: 1, date: d, timezone: "Asia/Shanghai", updatedAt: nil, tasks: [], schedule: [], meta: .init(hasEmailSummary: true, hasDailyReport: false, emailSource: nil, dailyReportSource: nil))
+                    var meta = doc.meta ?? ScheduleDayMeta(hasEmailSummary: true, hasDailyReport: false, emailSource: nil, dailyReportSource: nil)
+                    meta.hasEmailSummary = true
+                    doc.meta = meta
+                    map[d] = doc
+                }
+            }
+            if let reps = try? FileManager.default.contentsOfDirectory(at: reportDir, includingPropertiesForKeys: nil) {
+                for u in reps where u.lastPathComponent.hasPrefix("日报-") && u.pathExtension == "md" {
+                    let d = u.deletingPathExtension().lastPathComponent.replacingOccurrences(of: "日报-", with: "")
+                    guard d.hasPrefix(prefix) else { continue }
+                    var doc = map[d] ?? ScheduleDayDoc(version: 1, date: d, timezone: "Asia/Shanghai", updatedAt: nil, tasks: [], schedule: [], meta: .init(hasEmailSummary: false, hasDailyReport: true, emailSource: nil, dailyReportSource: nil))
+                    var meta = doc.meta ?? ScheduleDayMeta(hasEmailSummary: false, hasDailyReport: true, emailSource: nil, dailyReportSource: nil)
+                    meta.hasDailyReport = true
+                    doc.meta = meta
+                    map[d] = doc
+                }
+            }
+            DispatchQueue.main.async {
+                self.scheduleByDate = map
+                self.isScheduleLoading = false
+            }
+        }
+    }
+
+    func scheduleDay(for ymd: String) -> ScheduleDayDoc? { scheduleByDate[ymd] }
+
+    func emailSummary(for ymd: String) -> OverviewMetrics.EmailDaily? {
+        if let hit = emailDaily.first(where: { $0.date == ymd }) { return hit }
+        // On-demand read from bot deliverable (private content — local only)
+        let url = emailDailyDirURL.appendingPathComponent("\(ymd).json")
+        guard let raw = try? Data(contentsOf: url),
+              let doc = try? JSONDecoder().decode(OverviewMetrics.EmailDaily.self, from: raw) else { return nil }
+        return doc
+    }
+
+    func refreshDailyReportDates() {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self else { return }
+            var dates: [String] = []
+            if let files = try? FileManager.default.contentsOfDirectory(at: self.dailyReportDirURL, includingPropertiesForKeys: nil) {
+                for u in files where u.pathExtension == "md" && u.lastPathComponent.hasPrefix("日报-") {
+                    let d = u.deletingPathExtension().lastPathComponent.replacingOccurrences(of: "日报-", with: "")
+                    if d.count == 10 { dates.append(d) }
+                }
+            }
+            dates.sort(by: >)
+            DispatchQueue.main.async {
+                self.dailyReportDates = dates
+                if self.selectedDailyReportDate == nil { self.selectedDailyReportDate = dates.first }
+            }
+        }
+    }
+
+    func loadDailyReport(date ymd: String) {
+        selectedDailyReportDate = ymd
+        isDailyReportLoading = true
+        dailyReportMarkdown = nil
+        let url = dailyReportDirURL.appendingPathComponent("日报-\(ymd).md")
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let text = try? String(contentsOf: url, encoding: .utf8)
+            DispatchQueue.main.async {
+                self?.dailyReportMarkdown = text
+                self?.isDailyReportLoading = false
+            }
+        }
+    }
+
+    func openDailySummary(date ymd: String) {
+        selectedSection = .dailySummary
+        selectedDailyReportDate = ymd
+        loadDailyReport(date: ymd)
+    }
+
+    func openScheduleDay(_ ymd: String) {
+        selectedSection = .scheduleCenter
+        selectedCalendarDate = ymd
+    }
+
 }

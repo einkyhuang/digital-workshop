@@ -79,6 +79,11 @@ struct ContentView: View {
                 RosterGridView()
             }
         case .tasks: KanbanView()
+        case .scheduleCenter: ScheduleCenterView()
+        case .dailySummary: DailySummaryView()
+        case .tradeLeads: TradeLeadsView()
+        case .tradePipeline: TradePipelineView()
+        case .tradeQuotes: TradeQuotesView()
         case .rooms: RoomsView()
         case .routines: RoutinesView()
         case .hiring: HiringView()
@@ -106,7 +111,12 @@ struct TopBar: View {
         switch store.selectedSection {
         case .overview: return "网站业绩 → 日程 → 邮件 → 员工 · 金额仅本地"
         case .roster: return store.showingBotDetail ? "员工详情 · 可查看 bots 文件夹" : "共 \(store.data.bots.count) 位数字员工 · 点击卡片查看详情"
-        case .tasks: return "共 \(store.data.tasks.count) 项任务 · 待办/进行中/验收/完成"
+        case .tasks: return "共 \(store.data.tasks.count) 项任务 · 拖拽卡片改状态 · 待办/进行中/验收/完成"
+        case .scheduleCenter: return "月历 · 当日任务/日程/邮件标记/纪纪日报 · 仅加载当月"
+        case .dailySummary: return "纪纪日报 · 按需加载 · 左选日期右看卡片"
+        case .tradeLeads: return "线索/档案聚合计数 · 明细仅本地 private"
+        case .tradePipeline: return "开发进度聚合 · 无客户名"
+        case .tradeQuotes: return "询盘与报价计数 · 金额不上 Pages"
         case .rooms: return "群聊协作时间线"
         case .routines: return "规划中的定时巡检（尚未启用）"
         case .hiring: return "待招岗位 · 本地标记不会真正创建 Bot"
@@ -183,6 +193,11 @@ struct TopBar: View {
         case .tasks: return "任务看板与待办"
         case .roster: return "员工档案"
         case .overview: return "工作台总览"
+        case .scheduleCenter: return "任务与日程中心"
+        case .dailySummary: return "每日总结"
+        case .tradeLeads: return "客户与线索"
+        case .tradePipeline: return "开发进度"
+        case .tradeQuotes: return "询盘与报价"
         case .projects: return selectedProjectTitle
         default: return title
         }

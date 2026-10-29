@@ -1,6 +1,6 @@
 (function () {
   const LS_KEY = "digital-workshop-v2";
-  const TABS = ["总览", "员工档案", "网站项目", "任务看板", "群聊协作", "定时巡检", "招聘规划", "规则与文档"];
+  const TABS = ["总览", "员工档案", "网站项目", "任务看板", "任务与日程中心", "每日总结", "客户与线索", "开发进度", "询盘与报价", "群聊协作", "定时巡检", "招聘规划", "规则与文档"];
   /** Plug 搜搜 field spec / 画眉 visual tokens via ../data/ui-config.json (mirrored here for static Pages). */
   const WEBSITE_UI = {
     defaultView: "list",
@@ -100,6 +100,183 @@
     } catch (_) {}
   }
 
+
+  const MODULE_TAB = {
+    overview: "总览", roster: "员工档案", tasks: "任务看板",
+    scheduleCenter: "任务与日程中心", dailySummary: "每日总结",
+    tradeLeads: "客户与线索", tradePipeline: "开发进度", tradeQuotes: "询盘与报价",
+    rooms: "群聊协作", routines: "定时巡检", hiring: "招聘规划",
+    rules: "规则与文档", projects: "网站项目"
+  };
+  function workbenchTabs() {
+    const wb = (state.workbenches || []).find(w => w.id === state.activeWorkbenchId) || (state.workbenches || [])[0];
+    if (!wb || !wb.modules) return TABS.filter(x => !["客户与线索","开发进度","询盘与报价"].includes(x));
+    return wb.modules.map(m => MODULE_TAB[m]).filter(Boolean);
+  }
+  async function loadWorkbenches() {
+    try {
+      const res = await fetch("./data/workbenches.json", { cache: "no-store" });
+      if (res.ok) {
+        const doc = await res.json();
+        state.workbenches = doc.workbenches || [];
+        const saved = localStorage.getItem("sw.activeWorkbenchId");
+        const def = doc.defaultId || (state.workbenches[0] && state.workbenches[0].id);
+        state.activeWorkbenchId = state.workbenches.some(w => w.id === saved) ? saved : def;
+      }
+    } catch (_) {}
+    try {
+      const res = await fetch("./data/trade-leads-index.json", { cache: "no-store" });
+      if (res.ok) state.tradeIndex = await res.json();
+    } catch (_) {}
+  }
+  function switchWorkbench(id) {
+    state.activeWorkbenchId = id;
+    try { localStorage.setItem("sw.activeWorkbenchId", id); } catch (_) {}
+    const tabs = workbenchTabs();
+    if (!tabs.includes(state.tab)) state.tab = tabs[0] || "总览";
+    render();
+  }
+  function scopedBots() {
+    const wb = (state.workbenches || []).find(w => w.id === state.activeWorkbenchId);
+    const bots = state.data.bots || [];
+    if (!wb || !wb.botGroupIds || !wb.botGroupIds.length) return bots;
+    const set = new Set(wb.botGroupIds);
+    return bots.filter(b => set.has(b.group) || (b.groups || []).some(g => set.has(g)));
+  }
+  function scopedTasks() {
+    const wb = (state.workbenches || []).find(w => w.id === state.activeWorkbenchId);
+    const tasks = state.data.tasks || [];
+    if (!wb || !wb.botGroupIds || !wb.botGroupIds.length) return tasks;
+    const names = new Set(scopedBots().map(b => b.name));
+    return tasks.filter(t => names.has(t.executor) || names.has(t.reviewer) || [...names].some(n => (t.executor || "").includes(n)));
+  }
+  function renderWorkbenchCards() {
+    const list = state.workbenches || [];
+    if (!list.length) return "";
+    const cards = list.map(wb => {
+      const active = wb.id === state.activeWorkbenchId;
+      const bots = (!wb.botGroupIds || !wb.botGroupIds.length) ? (state.data.bots || []) :
+        (state.data.bots || []).filter(b => wb.botGroupIds.includes(b.group) || (b.groups || []).some(g => wb.botGroupIds.includes(g)));
+      const names = new Set(bots.map(b => b.name));
+      const tasks = (!wb.botGroupIds || !wb.botGroupIds.length) ? (state.data.tasks || []) :
+        (state.data.tasks || []).filter(t => names.has(t.executor) || names.has(t.reviewer));
+      const open = tasks.filter(t => t.status === "待办" || t.status === "进行中" || t.status === "验收").length;
+      let activity = "—";
+      if (wb.id === "trade" && state.tradeIndex && state.tradeIndex.latestActivity) activity = state.tradeIndex.latestActivity;
+      else if (tasks[0]) activity = tasks[0].title;
+      return `<button type="button" class="wb-card ${active ? "wb-card--active" : ""}" data-wb="${esc(wb.id)}">
+        <div class="wb-card__top"><strong>${esc(wb.name)}</strong>${active ? '<span class="pill">当前</span>' : ""}</div>
+        <div class="muted" style="font-size:12px;margin:6px 0">${esc(wb.description || "")}</div>
+        <div class="wb-card__stats"><span><b>${bots.length}</b> 员工</span><span><b>${open}</b> 进行中任务</span></div>
+        <div class="muted" style="font-size:11px;margin-top:8px">${esc(activity)}</div>
+      </button>`;
+    }).join("");
+    return `<div class="section-shell" style="margin-bottom:16px"><div class="section-shell__head"><h3 class="section-shell__title">工作台</h3><span class="section-shell__badge">${list.length}</span></div>
+      <p class="muted" style="font-size:12px">点击切换 · data/workbenches.json</p><div class="wb-grid">${cards}</div></div>`;
+  }
+  async function loadScheduleMonth(ym) {
+    if (state.scheduleLoadedMonth === ym) return;
+    const map = {};
+    let days = [];
+    try {
+      const idxRes = await fetch("./data/schedule/" + ym + ".index.json", { cache: "no-store" });
+      if (idxRes.ok) { const idx = await idxRes.json(); days = idx.dates || []; }
+    } catch (_) {}
+    await Promise.all(days.map(async (date) => {
+      try {
+        const res = await fetch("./data/schedule/" + date + ".json", { cache: "no-store" });
+        if (!res.ok) return;
+        const doc = await res.json();
+        if (doc && doc.date) map[doc.date] = doc;
+      } catch (_) {}
+    }));
+    try {
+      const res = await fetch("./data/daily-reports-index.json", { cache: "no-store" });
+      if (res.ok) {
+        const idx = await res.json();
+        state.dailyReportDates = idx.dates || [];
+        for (const d of state.dailyReportDates) {
+          if (!d.startsWith(ym)) continue;
+          if (!map[d]) map[d] = { version: 1, date: d, tasks: [], schedule: [], meta: {} };
+          map[d].meta = Object.assign({}, map[d].meta || {}, { hasDailyReport: true });
+        }
+      }
+    } catch (_) {}
+    state.scheduleByDate = map;
+    state.scheduleLoadedMonth = ym;
+  }
+  function shiftCalMonth(delta) {
+    const [y, m] = (state.calMonth || "2026-10").split("-").map(Number);
+    const dt = new Date(y, m - 1 + delta, 1);
+    state.calMonth = dt.getFullYear() + "-" + String(dt.getMonth() + 1).padStart(2, "0");
+    state.scheduleLoadedMonth = null;
+    render();
+  }
+  function renderScheduleCenter() {
+    const ym = state.calMonth || new Date().toISOString().slice(0, 7);
+    state.calMonth = ym;
+    const [y, m] = ym.split("-").map(Number);
+    const first = new Date(y, m - 1, 1);
+    let startPad = (first.getDay() + 6) % 7;
+    const daysInMonth = new Date(y, m, 0).getDate();
+    const cells = [];
+    for (let i = 0; i < startPad; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(ym + "-" + String(d).padStart(2, "0"));
+    while (cells.length % 7) cells.push(null);
+    const today = new Date();
+    const todayStr = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+    const week = ["一","二","三","四","五","六","日"].map(w => `<div class="cal-weekday">${w}</div>`).join("");
+    const grid = cells.map(date => {
+      if (!date) return `<div class="cal-cell cal-cell--empty"></div>`;
+      const doc = (state.scheduleByDate || {})[date] || {};
+      const tn = (doc.tasks || []).length, sn = (doc.schedule || []).length;
+      const hasEmail = !!(doc.meta && doc.meta.hasEmailSummary);
+      const hasReport = !!(doc.meta && doc.meta.hasDailyReport);
+      const isToday = date === todayStr, sel = date === state.calSelected;
+      return `<button type="button" class="cal-cell ${isToday ? "cal-cell--today" : ""} ${sel ? "cal-cell--sel" : ""}" data-cal-day="${date}">
+        <div class="cal-cell__day">${Number(date.slice(8))}${isToday ? '<span class="cal-dot"></span>' : ""}</div>
+        <div class="cal-cell__meta">${tn ? `<span class="cal-tag cal-tag--task">${tn} 任务</span>` : ""}${sn ? `<span class="cal-tag cal-tag--sched">${sn} 日程</span>` : ""}
+        <span class="cal-flags">${hasEmail ? "✉️" : ""}${hasReport ? "📄" : ""}</span></div></button>`;
+    }).join("");
+    const detail = state.calSelected ? renderCalDayDetail(state.calSelected) : `<p class="muted">点击日期查看当日详情。</p>`;
+    return `<h2 class="section-title">任务与日程中心</h2>
+      <p class="muted">仅加载当月 · 邮件正文不在 Pages 展示</p>
+      <div class="cal-toolbar"><button type="button" class="btn" data-cal-shift="-1">‹</button><strong>${y}年 ${m}月</strong>
+      <button type="button" class="btn" data-cal-shift="1">›</button><button type="button" class="btn" data-cal-today="1">今天</button></div>
+      <div class="cal-weekdays">${week}</div><div class="cal-grid">${grid}</div><div class="cal-detail">${detail}</div>`;
+  }
+  function renderCalDayDetail(date) {
+    const doc = (state.scheduleByDate || {})[date] || { tasks: [], schedule: [], meta: {} };
+    const tasks = (doc.tasks || []).map(t => `<div class="cal-item"><span class="pill">${esc(t.status || "待办")}</span> <strong>${esc(t.title)}</strong>
+      <div class="muted" style="font-size:12px">${esc(t.ownerName || t.ownerBotId || "")}</div></div>`).join("") || `<p class="muted">本日暂无任务</p>`;
+    const sched = (doc.schedule || []).map(s => `<div class="cal-item"><strong>${esc(s.title)}</strong> <span class="muted">${esc(s.who || "")}</span></div>`).join("") || `<p class="muted">本日暂无日程</p>`;
+    const hasEmail = !!(doc.meta && doc.meta.hasEmailSummary);
+    const hasReport = !!(doc.meta && doc.meta.hasDailyReport);
+    const emailBlock = hasEmail ? `<div class="callout warn"><strong>有邮件总结</strong>正文仅 Mac 本地可读。</div>` : `<p class="muted">无邮件总结标记</p>`;
+    const reportBlock = hasReport ? `<button type="button" class="btn primary" data-open-daily="${date}">打开「每日总结」</button>` : `<p class="muted">无纪纪日报</p>`;
+    return `<div class="cal-detail-card"><h3>${esc(date)}</h3><h4>任务</h4>${tasks}<h4>日程</h4>${sched}<h4>邮件</h4>${emailBlock}<h4>日报</h4>${reportBlock}</div>`;
+  }
+  function renderDailySummary() {
+    const dates = state.dailyReportDates || [];
+    const sel = state.dailyReportDate || dates[0] || null;
+    if (sel) state.dailyReportDate = sel;
+    const list = dates.length ? dates.map(d => `<button type="button" class="daily-date ${d === sel ? "active" : ""}" data-daily-date="${d}">${d}</button>`).join("") : `<p class="muted">暂无日报索引</p>`;
+    let hosted = false;
+    try { hosted = (location.hostname || "").endsWith("github.io") || (location.hostname || "").endsWith("pages.dev"); } catch (_) {}
+    const pane = !sel ? `<p class="muted">选择日期</p>` : `<h3>团队日报 ${esc(sel)}</h3><div class="callout warn"><strong>隐私降级</strong>日报全文不进 Pages，请用 Mac 应用查看。</div>
+      <div class="daily-cards"><div class="daily-card"><h4>完成事项</h4><p class="muted">仅本地可见</p></div><div class="daily-card"><h4>交付物</h4><p class="muted">仅本地可见</p></div><div class="daily-card"><h4>卡住的事</h4><p class="muted">仅本地可见</p></div><div class="daily-card"><h4>待用户决定的事</h4><p class="muted">仅本地可见</p></div></div>`;
+    return `<h2 class="section-title">每日总结</h2><div class="daily-layout"><aside class="daily-aside">${list}</aside><section class="daily-main">${pane}</section></div>`;
+  }
+  function renderTradeModule(kind) {
+    const c = (state.tradeIndex && state.tradeIndex.counts) || {};
+    const act = (state.tradeIndex && state.tradeIndex.latestActivity) || "—";
+    const title = kind === "leads" ? "客户与线索" : kind === "pipeline" ? "开发进度" : "询盘与报价";
+    const cards = kind === "leads" ? [["线索总数", c.leadsTotal], ["已分层优质", c.leadsQualified], ["客户档案", c.profiles]]
+      : kind === "pipeline" ? [["开发中", c.inProgressDev], ["员工（本台）", scopedBots().length], ["待办+进行中", scopedTasks().filter(t => t.status === "待办" || t.status === "进行中").length]]
+      : [["开口询盘", c.inquiriesOpen], ["报价草稿", c.quotesDraft]];
+    const grid = cards.map(([k, v]) => `<div class="daily-card"><div class="muted" style="font-size:12px">${esc(k)}</div><div style="font-size:28px;font-weight:700">${v == null ? "—" : v}</div></div>`).join("");
+    return `<h2 class="section-title">${title}</h2><p class="muted">公开仅聚合计数</p><div class="daily-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">${grid}</div><p class="muted" style="margin-top:12px">最近动态：${esc(act)}</p>`;
+  }
 
   function isHostedPages() {
     try {
@@ -507,7 +684,7 @@
       return Math.min(100, (Number(n) / Number(d)) * 100);
     };
     const ringStyle = (pct, color) => {
-      if (pct == null) return `background:conic-gradient(${color} 0%, var(--sw-ring-track) 0)`;
+      if (pct == null) return `${renderWorkbenchCards()}background:conic-gradient(${color} 0%, var(--sw-ring-track) 0)`;
       return `background:conic-gradient(${color} ${pct.toFixed(1)}%, var(--sw-ring-track) 0)`;
     };
     const urgencyClass = (u) => {
@@ -660,7 +837,7 @@
             ${day.source ? `<p class="muted" style="font-size:12px;margin:8px 0">${esc(day.source)}</p>` : ""}
             ${catStr ? `<p class="muted" style="font-size:12px">清理：${esc(catStr)}</p>` : ""}
             <div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">${tags}</div>
-            <div class="email-grid">${cards || '<p class="muted">无重要邮件</p>'}</div>
+            <div class="email-grid">${cards || '<p class="muted">重要邮件正文仅 Mac 本地可读（Pages 已脱敏）</p>'}</div>
           </div>` : ""}
         </div>`;
       }).join("");
@@ -897,24 +1074,24 @@ function webCard(w) {
   }
 
 function renderKanban() {
-    const tasks = state.data.tasks;
+    const tasks = scopedTasks();
     const edit = selectedTask();
     const names = botNames();
     const cols = COLS.map((c) => {
       const items = tasks.filter((t) => t.status === c).map((t) =>
-        `<div class="task ${edit && t.id === edit.id ? "selected" : ""}" data-task="${esc(t.id)}">
+        `<div class="task ${edit && t.id === edit.id ? "selected" : ""}" data-task="${esc(t.id)}" draggable="true">
           <div class="t">${esc(t.title)}</div>
           <div class="m">执行：${esc(t.executor)} · 验收：${esc(t.reviewer)}</div>
           <div class="m">${esc(t.note)}</div>
         </div>`
       ).join("");
-      return `<div class="col"><h3>${c}（${tasks.filter((t)=>t.status===c).length}）</h3>${items || '<p class="muted">空</p>'}</div>`;
+      return `<div class="col" data-col="${esc(c)}"><h3>${c}（${tasks.filter((t)=>t.status===c).length}）</h3>${items || '<p class="muted">拖入卡片</p>'}</div>`;
     }).join("");
     const optBots = names.map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join("");
     const optReview = names.concat(["用户"]).map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join("");
     return `
       <h2 class="section-title">任务看板</h2>
-      <p class="muted">点击卡片选中；用 ← / → 在 待办→进行中→验收→完成 间移动。执行人与验收人必须不同。</p>
+      <p class="muted">拖拽卡片到任意列改状态（localStorage；Pages 不能写仓库文件）。亦可 ←/→。</p>
       <div class="kanban">${cols}</div>
       ${edit ? `
       <h3>编辑选中任务</h3>
@@ -1002,6 +1179,11 @@ function renderKanban() {
       "总览": renderOverview,
       "员工档案": renderRoster,
       "任务看板": renderKanban,
+      "任务与日程中心": renderScheduleCenter,
+      "每日总结": renderDailySummary,
+      "客户与线索": () => renderTradeModule("leads"),
+      "开发进度": () => renderTradeModule("pipeline"),
+      "询盘与报价": () => renderTradeModule("quotes"),
       "群聊协作": renderGroups,
       "定时巡检": renderRoutines,
       "招聘规划": renderHire,
@@ -1054,12 +1236,71 @@ function renderKanban() {
     if (dt) dt.onclick = () => { deleteTask(selectedTask().id); toast("已删除"); };
     const at = document.getElementById("addTask");
     if (at) at.onclick = addTask;
+    let dragId = null;
+    document.querySelectorAll(".task[draggable]").forEach((el) => {
+      el.addEventListener("dragstart", (e) => {
+        dragId = el.getAttribute("data-task");
+        el.classList.add("task--dragging");
+        try { e.dataTransfer.setData("text/plain", dragId); e.dataTransfer.effectAllowed = "move"; } catch (_) {}
+      });
+      el.addEventListener("dragend", () => {
+        el.classList.remove("task--dragging");
+        document.querySelectorAll(".col.col--drop").forEach((c) => c.classList.remove("col--drop"));
+        dragId = null;
+      });
+    });
+    document.querySelectorAll(".col[data-col]").forEach((col) => {
+      col.addEventListener("dragover", (e) => { e.preventDefault(); col.classList.add("col--drop"); });
+      col.addEventListener("dragleave", () => col.classList.remove("col--drop"));
+      col.addEventListener("drop", (e) => {
+        e.preventDefault();
+        col.classList.remove("col--drop");
+        const id = dragId || (e.dataTransfer && e.dataTransfer.getData("text/plain"));
+        const status = col.getAttribute("data-col");
+        if (id && status) { updateTask(id, { status }); toast("已移动到「" + status + "」（localStorage）"); }
+      });
+    });
+    document.querySelectorAll("[data-cal-shift]").forEach((el) => {
+      el.onclick = () => shiftCalMonth(Number(el.getAttribute("data-cal-shift")));
+    });
+    const calToday = document.querySelector("[data-cal-today]");
+    if (calToday) calToday.onclick = () => {
+      const n = new Date();
+      state.calMonth = n.getFullYear() + "-" + String(n.getMonth() + 1).padStart(2, "0");
+      state.scheduleLoadedMonth = null;
+      state.calSelected = state.calMonth + "-" + String(n.getDate()).padStart(2, "0");
+      render();
+    };
+    document.querySelectorAll("[data-cal-day]").forEach((el) => {
+      el.onclick = () => { state.calSelected = el.getAttribute("data-cal-day"); render(); };
+    });
+    document.querySelectorAll("[data-open-daily]").forEach((el) => {
+      el.onclick = () => { state.dailyReportDate = el.getAttribute("data-open-daily"); state.tab = "每日总结"; render(); };
+    });
+    document.querySelectorAll("[data-daily-date]").forEach((el) => {
+      el.onclick = () => { state.dailyReportDate = el.getAttribute("data-daily-date"); render(); };
+    });
+    document.querySelectorAll("[data-wb]").forEach((el) => {
+      el.onclick = () => switchWorkbench(el.getAttribute("data-wb"));
+    });
+    if (state.tab === "任务与日程中心" && state.scheduleLoadedMonth !== state.calMonth) {
+      loadScheduleMonth(state.calMonth).then(() => render());
+    }
+    if (state.tab === "每日总结" && !(state.dailyReportDates || []).length) {
+      fetch("./data/daily-reports-index.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(idx => {
+        if (!idx) return;
+        state.dailyReportDates = idx.dates || [];
+        if (!state.dailyReportDate && state.dailyReportDates[0]) state.dailyReportDate = state.dailyReportDates[0];
+        render();
+      }).catch(() => {});
+    }
   }
+
 
   function render() {
     document.getElementById("dataSource").textContent = "数据源：" + state.source;
     const tabs = document.getElementById("tabs");
-    tabs.innerHTML = TABS.map((t) =>
+    tabs.innerHTML = workbenchTabs().map((t) =>
       `<button type="button" class="${state.tab === t ? "active" : ""}" data-tab="${t}">${t}</button>`
     ).join("");
     tabs.querySelectorAll("[data-tab]").forEach((el) => {
@@ -1072,6 +1313,12 @@ function renderKanban() {
   }
 
   async function boot() {
+    state.calMonth = state.calMonth || new Date().toISOString().slice(0, 7);
+    state.scheduleByDate = state.scheduleByDate || {};
+    state.dailyReportDates = state.dailyReportDates || [];
+    state.workbenches = state.workbenches || [];
+    state.tradeIndex = state.tradeIndex || null;
+    await loadWorkbenches();
     document.getElementById("btnExport").onclick = doExport;
     document.getElementById("btnReset").onclick = resetDefault;
     document.getElementById("fileImport").onchange = (e) => {

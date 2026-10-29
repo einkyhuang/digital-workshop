@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "defaultId": "general",
+  "workbenches": [
+    {
+      "id": "general",
+      "name": "超级工作台（综合）",
+      "shortName": "综合",
+      "icon": "square.grid.2x2",
+      "description": "全员数字员工、网站项目与日程总控",
+      "botGroupIds": null,
+      "modules": [
+        "overview",
+        "roster",
+        "tasks",
+        "scheduleCenter",
+        "dailySummary",
+        "rooms",
+        "routines",
+        "projects",
+        "hiring",
+        "rules"
+      ],
+      "summaryHints": {
+        "showWebsiteProjects": true,
+        "showEmail": true
+      }
+    },
+    {
+      "id": "trade",
+      "name": "外贸工作台",
+      "shortName": "外贸",
+      "icon": "globe",
+      "description": "服装外贸 · 外贸营销 · 照明外贸：线索、背调、开发进度、询盘报价",
+      "botGroupIds": ["服装外贸", "外贸营销", "照明外贸"],
+      "modules": [
+        "overview",
+        "roster",
+        "tasks",
+        "tradeLeads",
+        "tradePipeline",
+        "tradeQuotes",
+        "scheduleCenter",
+        "dailySummary",
+        "rooms"
+      ],
+      "data": {
+        "leadsPrivate": "超级工作台应用/data/private/trade-leads.local.json",
+        "leadsIndex": "超级工作台应用/data/trade-leads-index.json"
+      },
+      "summaryHints": {
+        "showWebsiteProjects": false,
+        "showEmail": true,
+        "showTradeCounts": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "date": "2026-10-30",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-10-30T00:50:00+08:00",
+  "tasks": [
+    {
+      "id": "t-scale-1",
+      "title": "工作台扩展性优化（索引/懒加载/压测）",
+      "ownerBotId": "seo",
+      "ownerName": "码码-前端程序员",
+      "status": "完成",
+      "dueAt": "2026-10-30T01:00:00+08:00",
+      "note": "10× 合成数据仅 /tmp"
+    },
+    {
+      "id": "t-cal-1",
+      "title": "任务与日程中心 + 每日总结页",
+      "ownerBotId": "seo",
+      "ownerName": "码码-前端程序员",
+      "status": "进行中",
+      "dueAt": "2026-10-30T12:00:00+08:00",
+      "note": "日历月视图与纪纪日报"
+    }
+  ],
+  "schedule": [
+    {
+      "id": "s-build",
+      "title": "侧栏新页面开发",
+      "startAt": "2026-10-30T00:54:00+08:00",
+      "endAt": "2026-10-30T02:30:00+08:00",
+      "who": "码码-前端程序员",
+      "kind": "focus"
+    }
+  ],
+  "meta": {
+    "hasEmailSummary": false,
+    "hasDailyReport": false
+  }
+}

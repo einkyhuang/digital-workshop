@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "date": "2026-10-29",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-10-29T22:00:00+08:00",
+  "tasks": [
+    {
+      "id": "t-perf-1",
+      "title": "看板性能修复与验收",
+      "ownerBotId": "seo",
+      "ownerName": "码码-前端程序员",
+      "status": "完成",
+      "dueAt": "2026-10-29T18:00:00+08:00",
+      "note": "Mac/网页启动耗时验收"
+    },
+    {
+      "id": "t-sph-1",
+      "title": "智能日程管理：搜搜主导站点审计与上线检查清单",
+      "ownerBotId": "seo",
+      "ownerName": "搜搜-SEO专家",
+      "status": "待办",
+      "dueAt": "2026-10-29T20:00:00+08:00",
+      "note": "工作台任务同步"
+    }
+  ],
+  "schedule": [
+    {
+      "id": "s-patrol",
+      "title": "巡逻官心跳检查（规划）",
+      "startAt": "2026-10-29T10:00:00+08:00",
+      "endAt": "2026-10-29T10:15:00+08:00",
+      "who": "超级茉莉-巡逻官",
+      "kind": "routine"
+    },
+    {
+      "id": "s-daily",
+      "title": "纪纪团队日报整理",
+      "startAt": "2026-10-29T22:00:00+08:00",
+      "endAt": "2026-10-29T22:45:00+08:00",
+      "who": "纪纪-总结助手",
+      "kind": "focus"
+    }
+  ],
+  "meta": {
+    "hasEmailSummary": true,
+    "hasDailyReport": true,
+    "emailSource": "bots/外贸营销/超级邮件助手/deliverables/email-daily/2026-10-29.json",
+    "dailyReportSource": "bots/管理中枢/总结助手/deliverables/日报-2026-10-29.md"
+  }
+}

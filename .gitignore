@@ -42,3 +42,7 @@ projects/印花产品图库/images/
 **/stress-workspace.local.json
 /tmp/sw-stress-workspace.json
 
+
+# Optional local mirrors of email-daily (prefer bots/ path; never publish extras)
+超级工作台应用/data/private/email-daily/
+超级工作台应用/app/data/private/email-daily/

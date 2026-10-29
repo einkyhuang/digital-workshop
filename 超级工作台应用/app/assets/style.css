@@ -611,3 +611,37 @@ th { color: var(--muted); font-weight: 600; }
   min-width: var(--roster-card-min, 160px);
   max-width: var(--roster-card-min, 160px);
 }
+
+/* workbench + schedule + daily + kanban dnd */
+.wb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:8px}
+.wb-card{text-align:left;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.wb-card--active{border-color:#111;box-shadow:0 0 0 1.5px #111}
+.wb-card__top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wb-card__stats{display:flex;gap:16px;font-size:13px}
+.wb-card__stats b{font-size:18px;margin-right:4px}
+.cal-toolbar{display:flex;align-items:center;gap:12px;margin:12px 0 16px}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:6px}
+.cal-weekday{text-align:center;font-size:12px;font-weight:600;color:#8A8A8E}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.cal-cell{text-align:left;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:10px;min-height:88px;cursor:pointer}
+.cal-cell--empty{visibility:hidden;pointer-events:none}
+.cal-cell--today{outline:2px solid #3B82F6}
+.cal-cell--sel{border-color:#3B82F6;box-shadow:0 0 0 2px rgba(59,130,246,.25)}
+.cal-cell__day{display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:14px;margin-bottom:6px}
+.cal-dot{width:6px;height:6px;border-radius:50%;background:#3B82F6;display:inline-block}
+.cal-cell__meta{display:flex;flex-direction:column;gap:3px;font-size:10px}
+.cal-tag{display:inline-block;padding:1px 6px;border-radius:999px;background:#F1F5F9}
+.cal-tag--task{background:#DBEAFE;color:#1D4ED8}
+.cal-detail{margin-top:20px}
+.cal-detail-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:16px}
+.cal-item{padding:8px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+.daily-layout{display:grid;grid-template-columns:220px 1fr;gap:16px;min-height:420px}
+.daily-aside{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:8px}
+.daily-date{display:flex;width:100%;text-align:left;padding:10px 12px;border:0;background:transparent;border-radius:10px;cursor:pointer}
+.daily-date.active{background:rgba(0,0,0,.06);font-weight:700}
+.daily-cards{display:grid;gap:12px}
+.daily-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:16px}
+.task{cursor:grab}
+.task--dragging{opacity:.85;transform:scale(1.03);box-shadow:0 12px 28px rgba(0,0,0,.22)}
+.col.col--drop{outline:2px solid #3B82F6;background:rgba(59,130,246,.08)!important}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#F1F5F9;font-size:11px;margin-right:6px}

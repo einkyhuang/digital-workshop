@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "updatedAt": "2026-10-30T01:00:00+08:00",
+  "privacy": "仅聚合计数；客户名/金额见 data/private/trade-leads.local.json（gitignore）",
+  "counts": {
+    "leadsTotal": 23,
+    "leadsQualified": 5,
+    "profiles": 20,
+    "inProgressDev": 5,
+    "inquiriesOpen": 0,
+    "quotesDraft": 1
+  },
+  "latestActivity": "丝路完成优先 5 家深度报告（日期见纪纪日报）"
+}

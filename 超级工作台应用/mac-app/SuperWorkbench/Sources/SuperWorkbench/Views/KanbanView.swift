@@ -2,6 +2,8 @@ import SwiftUI
 
 struct KanbanView: View {
     @EnvironmentObject var store: WorkspaceStore
+    @State private var draggingTaskId: String? = nil
+    @State private var dropTargetColumn: TaskColumn? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -14,6 +16,9 @@ struct KanbanView: View {
                     }
                 }
                 Spacer()
+                Text("拖拽卡片到任意列改状态 · 自动写入 workspace.json")
+                    .font(.caption2)
+                    .foregroundStyle(SWTheme.textMuted)
             }
 
             HStack(alignment: .top, spacing: 12) {
@@ -31,6 +36,7 @@ struct KanbanView: View {
 
     private func column(_ col: TaskColumn) -> some View {
         let items = store.filteredTasks.filter { $0.status == col.rawValue }
+        let highlighted = dropTargetColumn == col
         return VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Circle().fill(SWTheme.columnColor(col)).frame(width: 8, height: 8)
@@ -43,27 +49,45 @@ struct KanbanView: View {
                     .clipShape(Capsule())
                 Spacer()
             }
-            if items.isEmpty {
-                Text("暂无\(col.rawValue)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 80)
-            } else {
-                ForEach(items) { t in
-                    taskCard(t, col: col)
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 10) {
+                    if items.isEmpty {
+                        Text("暂无\(col.rawValue) · 拖入卡片")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, minHeight: 80)
+                    } else {
+                        ForEach(items) { t in
+                            taskCard(t, col: col)
+                        }
+                    }
                 }
             }
+            .frame(maxHeight: 520)
             Spacer(minLength: 0)
         }
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 280, alignment: .top)
-        .background(Color.white.opacity(0.55))
+        .background(highlighted ? SWTheme.focus.opacity(0.08) : Color.white.opacity(0.55))
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(SWTheme.border))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(highlighted ? SWTheme.focus : SWTheme.border, lineWidth: highlighted ? 2 : 1)
+        )
+        .dropDestination(for: String.self) { ids, _ in
+            guard let id = ids.first else { return false }
+            store.setTaskStatus(id: id, status: col.rawValue)
+            draggingTaskId = nil
+            dropTargetColumn = nil
+            return true
+        } isTargeted: { hovering in
+            dropTargetColumn = hovering ? col : (dropTargetColumn == col ? nil : dropTargetColumn)
+        }
     }
 
     private func taskCard(_ t: WorkbenchTask, col: TaskColumn) -> some View {
         let selected = store.selectedTaskId == t.id
+        let lifting = draggingTaskId == t.id
         return Button {
             store.selectedTaskId = t.id
         } label: {
@@ -85,8 +109,25 @@ struct KanbanView: View {
                 RoundedRectangle(cornerRadius: 12)
                     .stroke(selected ? Color.black : SWTheme.border, lineWidth: selected ? 1.5 : 1)
             )
+            .shadow(color: lifting ? Color.black.opacity(0.18) : .clear, radius: lifting ? 12 : 0, y: lifting ? 6 : 0)
+            .scaleEffect(lifting ? 1.03 : 1.0)
+            .opacity(lifting ? 0.92 : 1.0)
+            .animation(.easeOut(duration: 0.15), value: lifting)
         }
         .buttonStyle(.plain)
+        .draggable(t.id) {
+            // Lifted preview while dragging
+            VStack(alignment: .leading, spacing: 6) {
+                Text(t.title).font(.subheadline.weight(.semibold)).lineLimit(2)
+                Text(col.rawValue).font(.caption2).foregroundStyle(.secondary)
+            }
+            .padding(12)
+            .frame(width: 200, alignment: .leading)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: .black.opacity(0.25), radius: 16, y: 8)
+            .onAppear { draggingTaskId = t.id }
+        }
     }
 }
 
@@ -118,10 +159,12 @@ struct TaskEditor: View {
                 Button("删除", role: .destructive) { store.deleteTask(task.id) }
             }
         }
-        .padding(16)
-        .swCard()
-        .onAppear { reload() }
+        .padding(14)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(SWTheme.border))
         .onChange(of: store.selectedTaskId) { _, _ in reload() }
+        .onChange(of: store.data.tasks) { _, _ in reload() }
     }
 
     private func reload() {

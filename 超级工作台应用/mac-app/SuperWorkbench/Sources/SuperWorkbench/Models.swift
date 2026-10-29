@@ -289,6 +289,11 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
     case overview = "总览"
     case roster = "员工档案"
     case tasks = "任务看板"
+    case scheduleCenter = "任务与日程中心"
+    case dailySummary = "每日总结"
+    case tradeLeads = "客户与线索"
+    case tradePipeline = "开发进度"
+    case tradeQuotes = "询盘与报价"
     case rooms = "群聊协作"
     case routines = "定时巡检"
     case hiring = "招聘规划"
@@ -297,11 +302,39 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
 
     var id: String { rawValue }
 
+    /// Stable module id used in workbenches.json
+    var moduleId: String {
+        switch self {
+        case .overview: return "overview"
+        case .roster: return "roster"
+        case .tasks: return "tasks"
+        case .scheduleCenter: return "scheduleCenter"
+        case .dailySummary: return "dailySummary"
+        case .tradeLeads: return "tradeLeads"
+        case .tradePipeline: return "tradePipeline"
+        case .tradeQuotes: return "tradeQuotes"
+        case .rooms: return "rooms"
+        case .routines: return "routines"
+        case .hiring: return "hiring"
+        case .rules: return "rules"
+        case .projects: return "projects"
+        }
+    }
+
+    static func fromModuleId(_ id: String) -> SidebarSection? {
+        allCases.first { $0.moduleId == id }
+    }
+
     var icon: String {
         switch self {
         case .overview: return "square.grid.2x2"
         case .roster: return "person.2"
         case .tasks: return "rectangle.split.3x1"
+        case .scheduleCenter: return "calendar"
+        case .dailySummary: return "doc.text"
+        case .tradeLeads: return "person.crop.rectangle.stack"
+        case .tradePipeline: return "chart.bar.doc.horizontal"
+        case .tradeQuotes: return "doc.richtext"
         case .rooms: return "bubble.left.and.bubble.right"
         case .routines: return "clock.arrow.2.circlepath"
         case .hiring: return "person.badge.plus"
@@ -312,12 +345,100 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
 
     var group: String {
         switch self {
-        case .overview, .roster, .tasks: return "工作台"
+        case .overview, .roster, .tasks, .scheduleCenter, .dailySummary: return "工作台"
+        case .tradeLeads, .tradePipeline, .tradeQuotes: return "外贸业务"
         case .rooms, .routines: return "协作与运维"
         case .hiring, .rules: return "组织与规则"
         case .projects: return "网站项目"
         }
     }
+}
+
+// MARK: - Multi-workbench (超级工作台应用/data/workbenches.json)
+
+struct WorkbenchesFile: Codable, Equatable {
+    var version: Int?
+    var defaultId: String?
+    var workbenches: [WorkbenchConfig]
+}
+
+struct WorkbenchConfig: Codable, Equatable, Identifiable, Hashable {
+    var id: String
+    var name: String
+    var shortName: String?
+    var icon: String?
+    var description: String?
+    var botGroupIds: [String]?
+    var modules: [String]
+    var data: WorkbenchDataPaths?
+    var summaryHints: WorkbenchSummaryHints?
+}
+
+struct WorkbenchDataPaths: Codable, Equatable, Hashable {
+    var leadsPrivate: String?
+    var leadsIndex: String?
+}
+
+struct WorkbenchSummaryHints: Codable, Equatable, Hashable {
+    var showWebsiteProjects: Bool?
+    var showEmail: Bool?
+    var showTradeCounts: Bool?
+}
+
+struct TradeLeadsIndex: Codable, Equatable {
+    var version: Int?
+    var updatedAt: String?
+    var privacy: String?
+    var counts: TradeCounts?
+    var latestActivity: String?
+}
+
+struct TradeCounts: Codable, Equatable {
+    var leadsTotal: Int?
+    var leadsQualified: Int?
+    var profiles: Int?
+    var inProgressDev: Int?
+    var inquiriesOpen: Int?
+    var quotesDraft: Int?
+}
+
+// MARK: - Schedule day files (超级工作台应用/data/schedule/YYYY-MM-DD.json)
+
+struct ScheduleDayDoc: Codable, Equatable, Identifiable {
+    var version: Int?
+    var date: String
+    var timezone: String?
+    var updatedAt: String?
+    var tasks: [ScheduleTaskItem]?
+    var schedule: [ScheduleBlockItem]?
+    var meta: ScheduleDayMeta?
+    var id: String { date }
+}
+
+struct ScheduleTaskItem: Codable, Equatable, Identifiable, Hashable {
+    var id: String
+    var title: String
+    var ownerBotId: String?
+    var ownerName: String?
+    var status: String?
+    var dueAt: String?
+    var note: String?
+}
+
+struct ScheduleBlockItem: Codable, Equatable, Identifiable, Hashable {
+    var id: String
+    var title: String
+    var startAt: String?
+    var endAt: String?
+    var who: String?
+    var kind: String?
+}
+
+struct ScheduleDayMeta: Codable, Equatable, Hashable {
+    var hasEmailSummary: Bool?
+    var hasDailyReport: Bool?
+    var emailSource: String?
+    var dailyReportSource: String?
 }
 
 enum TaskColumn: String, CaseIterable, Identifiable {
