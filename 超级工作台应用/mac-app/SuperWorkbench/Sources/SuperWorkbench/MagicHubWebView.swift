@@ -73,7 +73,13 @@ struct MagicHubWebView: NSViewRepresentable {
             }
             // Allow read access to 超级工作台应用 so private/crm + public assets resolve
             let access = repoRoot.appendingPathComponent("超级工作台应用")
-            webView.loadFileURL(index, allowingReadAccessTo: access)
+            var url = index
+            if let tab = UserDefaults.standard.string(forKey: "sw.mhTab"), !tab.isEmpty,
+               var comps = URLComponents(url: index, resolvingAgainstBaseURL: false) {
+                comps.queryItems = [URLQueryItem(name: "tab", value: tab)]
+                if let u = comps.url { url = u }
+            }
+            webView.loadFileURL(url, allowingReadAccessTo: access)
             didLoad = true
         }
     }

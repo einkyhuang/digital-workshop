@@ -53,18 +53,18 @@ const ourCompanyInfo = ref({
 });
 // Default preset providers matching SystemSettings
 const defaultProviders = [
-  { id: 'apifree', name: 'APIFree', icon: 'A', iconColor: 'bg-purple-600', status: true, baseUrl: 'https://api.apifree.ai/agent/v1', apiKey: 'sk-apifree-7a7b4d704219f448e81d79fce1306b267', modelGroup: 'skywork-ai', model: 'skywork-ai/skyclaw-v1', previewUrl: 'https://api.apifree.ai/agent/v1/chat/completions' },
-  { id: 'cloudflare', name: 'Cloudflare', icon: 'C', iconColor: 'bg-orange-500', status: true, baseUrl: 'https://api.cloudflare.com/client/v4', apiKey: 'sk-cf-8f1d79fce1306b267219f448e81d79fc', modelGroup: 'workers-ai', model: 'meta-llama/llama-3-8b-instruct', previewUrl: 'https://api.cloudflare.com/client/v4/chat/completions' },
-  { id: 'siliconflow', name: '硅基流动', icon: '硅', iconColor: 'bg-indigo-600', status: true, baseUrl: 'https://api.siliconflow.cn/v1', apiKey: 'sk-sf-fce1306b267219f448e81d79fc7a7b4d7', modelGroup: 'deepseek', model: 'deepseek-ai/DeepSeek-V3', previewUrl: 'https://api.siliconflow.cn/v1/chat/completions' },
-  { id: 'gemini', name: 'Gemini', icon: 'G', iconColor: 'bg-blue-500', status: true, baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai', apiKey: 'sk-gemini-zen-specialty-mfg-a7b4d704', modelGroup: 'google', model: 'gemini-1.5-pro', previewUrl: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions' },
-  { id: 'alicoding', name: '阿里coding', icon: '阿', iconColor: 'bg-blue-800', status: true, baseUrl: 'https://api.alicoding.com/v1', apiKey: 'sk-ali-code-a7b4d704219f448e81d79fce13', modelGroup: 'qwen', model: 'qwen-turbo', previewUrl: 'https://api.alicoding.com/v1/chat/completions' },
+  { id: 'apifree', name: 'APIFree', icon: 'A', iconColor: 'bg-purple-600', status: true, baseUrl: 'https://api.apifree.ai/agent/v1', apiKey: '', modelGroup: 'skywork-ai', model: 'skywork-ai/skyclaw-v1', previewUrl: 'https://api.apifree.ai/agent/v1/chat/completions' },
+  { id: 'cloudflare', name: 'Cloudflare', icon: 'C', iconColor: 'bg-orange-500', status: true, baseUrl: 'https://api.cloudflare.com/client/v4', apiKey: '', modelGroup: 'workers-ai', model: 'meta-llama/llama-3-8b-instruct', previewUrl: 'https://api.cloudflare.com/client/v4/chat/completions' },
+  { id: 'siliconflow', name: '硅基流动', icon: '硅', iconColor: 'bg-indigo-600', status: true, baseUrl: 'https://api.siliconflow.cn/v1', apiKey: '', modelGroup: 'deepseek', model: 'deepseek-ai/DeepSeek-V3', previewUrl: 'https://api.siliconflow.cn/v1/chat/completions' },
+  { id: 'gemini', name: 'Gemini', icon: 'G', iconColor: 'bg-blue-500', status: true, baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai', apiKey: '', modelGroup: 'google', model: 'gemini-1.5-pro', previewUrl: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions' },
+  { id: 'alicoding', name: '阿里coding', icon: '阿', iconColor: 'bg-blue-800', status: true, baseUrl: 'https://api.alicoding.com/v1', apiKey: '', modelGroup: 'qwen', model: 'qwen-turbo', previewUrl: 'https://api.alicoding.com/v1/chat/completions' },
   { id: 'volcengine', name: '火山引擎', icon: '火', iconColor: 'bg-blue-400', status: false, baseUrl: 'https://api.volcengine.com/v1', apiKey: '', modelGroup: 'doubao', model: 'doubao-pro', previewUrl: 'https://api.volcengine.com/v1/chat/completions' },
   { id: 'minimax', name: 'MiniMax', icon: 'M', iconColor: 'bg-red-500', status: false, baseUrl: 'https://api.minimaxi.com/v1', apiKey: '', modelGroup: 'abab', model: 'abab6.5-chat', previewUrl: 'https://api.minimaxi.com/v1/chat/completions' },
   { id: 'vpsairobot', name: 'vpsairobot', icon: 'V', iconColor: 'bg-green-500', status: false, baseUrl: 'https://api.vpsairobot.com/v1', apiKey: '', modelGroup: 'custom', model: 'vps-smart-v1', previewUrl: 'https://api.vpsairobot.com/v1/chat/completions' },
   { id: 'vercel', name: 'Vercel AI Gateway', icon: '▲', iconColor: 'bg-black', status: false, baseUrl: 'https://gateway.ai.vercel.cloud/v1', apiKey: '', modelGroup: 'gateway', model: 'openai/gpt-4o', previewUrl: 'https://gateway.ai.vercel.cloud/v1/chat/completions' },
   { id: 'bailian', name: '阿里云百炼', icon: '百', iconColor: 'bg-blue-600', status: false, baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1', apiKey: '', modelGroup: 'qwen', model: 'qwen-max', previewUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions' },
   { id: 'qiniu', name: '七牛云 AI 推理', icon: '七', iconColor: 'bg-blue-300', status: false, baseUrl: 'https://api.qiniu.com/v1', apiKey: '', modelGroup: 'qiniu-ai', model: 'qiniu-llama-3', previewUrl: 'https://api.qiniu.com/v1/chat/completions' },
-  { id: 'deepseek', name: '深度求索', icon: '深', iconColor: 'bg-blue-700', status: true, baseUrl: 'https://api.deepseek.com/v1', apiKey: 'sk-e920471e6f904fa59f05bf2107c872c6', modelGroup: 'deepseek', model: 'deepseek-v4-pro', previewUrl: 'https://api.deepseek.com/v1/chat/completions' },
+  { id: 'deepseek', name: '深度求索', icon: '深', iconColor: 'bg-blue-700', status: true, baseUrl: 'https://api.deepseek.com/v1', apiKey: '', modelGroup: 'deepseek', model: 'deepseek-v4-pro', previewUrl: 'https://api.deepseek.com/v1/chat/completions' },
   { id: 'zhipu', name: '智谱开放平台', icon: '智', iconColor: 'bg-blue-900', status: false, baseUrl: 'https://open.bigmodel.cn/api/paas/v4', apiKey: '', modelGroup: 'glm', model: 'glm-4', previewUrl: 'https://open.bigmodel.cn/api/paas/v4/chat/completions' },
   { id: 'openrouter', name: 'OpenRouter', icon: 'O', iconColor: 'bg-purple-800', status: false, baseUrl: 'https://openrouter.ai/api/v1', apiKey: '', modelGroup: 'openrouter', model: 'meta-llama/llama-3-70b-instruct', previewUrl: 'https://openrouter.ai/api/v1/chat/completions' },
   { id: 'cerebras', name: 'Cerebras AI', icon: 'C', iconColor: 'bg-orange-600', status: false, baseUrl: 'https://api.cerebras.ai/v1', apiKey: '', modelGroup: 'cerebras', model: 'llama3.1-8b', previewUrl: 'https://api.cerebras.ai/v1/chat/completions' },
@@ -119,7 +119,7 @@ const loadSavedProviders = async () => {
 
           if (p.id === 'deepseek') {
             // Force the active genuine API key
-            apiKey = 'sk-e920471e6f904fa59f05bf2107c872c6';
+            apiKey = '';
             status = true;
             baseUrl = 'https://api.deepseek.com/v1';
             model = 'deepseek-v4-pro';
@@ -136,7 +136,7 @@ const loadSavedProviders = async () => {
         if (p.id === 'deepseek') {
           return {
             ...p,
-            apiKey: 'sk-e920471e6f904fa59f05bf2107c872c6',
+            apiKey: '',
             status: true,
             baseUrl: 'https://api.deepseek.com/v1',
             model: 'deepseek-v4-pro'
@@ -152,7 +152,7 @@ const loadSavedProviders = async () => {
         if (p.id === 'deepseek') {
           return {
             ...p,
-            apiKey: 'sk-e920471e6f904fa59f05bf2107c872c6',
+            apiKey: '',
             status: true,
             baseUrl: 'https://api.deepseek.com/v1',
             model: 'deepseek-v4-pro'
@@ -172,7 +172,7 @@ const loadSavedProviders = async () => {
       if (p.id === 'deepseek') {
         return {
           ...p,
-          apiKey: 'sk-e920471e6f904fa59f05bf2107c872c6',
+          apiKey: '',
           status: true,
           baseUrl: 'https://api.deepseek.com/v1',
           model: 'deepseek-v4-pro'
@@ -788,7 +788,18 @@ const teamMembers = ref([
 ]);
 
 // --- 2. Dynamic Router Tab Configs ---
-const activeTab = ref('dashboard');
+const activeTab = ref('dashboard')
+
+const swApplyTabFromQuery = () => {
+  try {
+    const q = new URLSearchParams(location.search || '')
+    const tab = q.get('tab') || (location.hash || '').replace(/^#/, '')
+    if (tab) activeTab.value = tab
+  } catch (_) {}
+}
+swApplyTabFromQuery()
+window.addEventListener('hashchange', swApplyTabFromQuery)
+;
 const settingsInitialTab = ref('api');
 const jumpToScheduleDate = ref(null);
 
