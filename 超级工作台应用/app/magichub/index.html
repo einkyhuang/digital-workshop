@@ -27,10 +27,30 @@
     openPath: async function () { return { success: false, error: 'web' }; },
     scanDirectory: async function () { return { success: true, files: [] }; },
     saveSettings: async function (key, data) {
+      try {
+        var r = await fetch('/api/mh/settings/' + encodeURIComponent(key), {
+          method: 'PUT', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: data })
+        });
+        if (r.ok) {
+          try { localStorage.setItem(storeKey(key), JSON.stringify(data)); } catch (_) {}
+          return { success: true };
+        }
+      } catch (_) {}
       try { localStorage.setItem(storeKey(key), JSON.stringify(data)); return { success: true }; }
       catch (e) { return { success: false, error: String(e) }; }
     },
     loadSettings: async function (key) {
+      try {
+        var r = await fetch('/api/mh/settings/' + encodeURIComponent(key), {
+          credentials: 'same-origin', cache: 'no-store'
+        });
+        if (r.ok) {
+          var j = await r.json();
+          if (j && j.success) return j;
+        }
+      } catch (_) {}
       try { var raw = localStorage.getItem(storeKey(key)); return { success: true, data: raw ? JSON.parse(raw) : null }; }
       catch (e) { return { success: false, error: String(e) }; }
     },

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.ky.superworkbench.lan</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/node</string>
+    <string>REPO_PLACEHOLDER/超级工作台应用/lan/server.mjs</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>REPO_PLACEHOLDER</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>SW_LAN_HOST</key>
+    <string>0.0.0.0</string>
+    <key>SW_LAN_PORT</key>
+    <string>8787</string>
+    <key>SW_LAN_REPO</key>
+    <string>REPO_PLACEHOLDER</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>REPO_PLACEHOLDER/超级工作台应用/data/private/lan/server.stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>REPO_PLACEHOLDER/超级工作台应用/data/private/lan/server.stderr.log</string>
+</dict>
+</plist>
