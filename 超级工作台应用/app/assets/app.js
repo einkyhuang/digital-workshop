@@ -129,6 +129,16 @@
       if (res.ok) state.tradeIndex = await res.json();
     } catch (_) {}
   }
+  function fillWorkbenchSelect() {
+    const list = state.workbenches || [];
+    const html = list.map(w => `<option value="${esc(w.id)}" ${w.id===state.activeWorkbenchId?"selected":""}>${esc(w.name)}</option>`).join("");
+    for (const id of ["workbenchSelect", "workbenchSelectMain"]) {
+      const sel = document.getElementById(id);
+      if (!sel) continue;
+      sel.innerHTML = html;
+      sel.onchange = () => switchWorkbench(sel.value);
+    }
+  }
   function switchWorkbench(id) {
     state.activeWorkbenchId = id;
     try { localStorage.setItem("sw.activeWorkbenchId", id); } catch (_) {}
@@ -859,7 +869,8 @@
 
     return `
       <div class="overview-main">
-      <h2 class="section-title">工作台总览</h2>
+      <div class="section-title-row"><h2 class="section-title">工作台总览</h2>
+      <label class="wb-switcher-label"><select id="workbenchSelectMain" class="wb-switcher" aria-label="切换工作台"></select></label></div>
       <p class="muted"><b>网站业绩</b> · 日程 · 邮件 · 员工 · 基准 ${esc(kpi.asOf)} · ${privacy ? "金额" + PRIVACY_LABEL : "本地完整金额"} · v2</p>
       <div class="overview-stack">
       <section class="section-shell">
@@ -1306,6 +1317,7 @@ function renderKanban() {
     tabs.querySelectorAll("[data-tab]").forEach((el) => {
       el.onclick = () => setTab(el.getAttribute("data-tab"));
     });
+    fillWorkbenchSelect();
     renderMain();
     const more = document.getElementById("webLoadMore");
     if (more) more.onclick = () => { state.webShown = (state.webShown || state.webPageSize) + state.webPageSize; render(); };
@@ -1319,6 +1331,7 @@ function renderKanban() {
     state.workbenches = state.workbenches || [];
     state.tradeIndex = state.tradeIndex || null;
     await loadWorkbenches();
+    fillWorkbenchSelect();
     document.getElementById("btnExport").onclick = doExport;
     document.getElementById("btnReset").onclick = resetDefault;
     document.getElementById("fileImport").onchange = (e) => {

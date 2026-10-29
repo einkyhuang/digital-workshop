@@ -2,6 +2,10 @@
 
 路径：`超级工作台应用/data/workbenches.json`（网页副本：`超级工作台应用/app/data/workbenches.json`）
 
+## 切换入口
+
+工作台切换器在 **「工作台总览」标题行**（标题右侧下拉），不在侧栏。网页端同步在页眉品牌旁提供同一选择器。
+
 ## 如何新增一个工作台
 
 1. 在 `workbenches` 数组追加一项，填写唯一 `id`、`name`、`shortName`、`icon`（SF Symbol 名 / 网页用 emoji 映射）、`description`。

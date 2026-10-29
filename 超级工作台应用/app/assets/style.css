@@ -645,3 +645,20 @@ th { color: var(--muted); font-weight: 600; }
 .task--dragging{opacity:.85;transform:scale(1.03);box-shadow:0 12px 28px rgba(0,0,0,.22)}
 .col.col--drop{outline:2px solid #3B82F6;background:rgba(59,130,246,.08)!important}
 .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#F1F5F9;font-size:11px;margin-right:6px}
+
+.section-title-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+.section-title-row .section-title{margin:0}
+.wb-switcher-label{display:inline-flex;align-items:center}
+.wb-switcher{
+  appearance:none;
+  font:inherit;
+  font-size:13px;
+  font-weight:600;
+  padding:8px 28px 8px 12px;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:10px;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' fill='none' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 10px center;
+  cursor:pointer;
+  max-width:min(320px,70vw);
+}
+.brand .wb-switcher{margin-left:8px}
