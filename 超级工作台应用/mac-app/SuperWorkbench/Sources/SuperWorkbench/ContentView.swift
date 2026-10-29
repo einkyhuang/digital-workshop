@@ -190,6 +190,40 @@ struct TopBar: View {
         .overlay(alignment: .bottom) { Divider() }
     }
 
+    @ViewBuilder
+    private var workbenchSegment: some View {
+        let items = store.availableWorkbenches
+        if items.count > 1 {
+            HStack(spacing: 0) {
+                ForEach(items) { wb in
+                    Button {
+                        store.setActiveWorkbench(wb.id)
+                    } label: {
+                        Text(wb.name)
+                            .font(.system(size: 13, weight: store.activeWorkbenchId == wb.id ? .semibold : .regular))
+                            .foregroundStyle(store.activeWorkbenchId == wb.id ? Color.white : Color.secondary)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 7)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    .fill(store.activeWorkbenchId == wb.id ? Color.accentColor : Color.clear)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(3)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Color(nsColor: .controlBackgroundColor).opacity(0.9))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
+            )
+        }
+    }
+
     private var pageTitle: String {
         if store.selectedSection == .roster, store.showingBotDetail, let b = store.bot(id: store.selectedBotId) {
             return b.name
