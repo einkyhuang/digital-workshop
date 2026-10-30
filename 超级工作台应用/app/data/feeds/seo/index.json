@@ -2,14 +2,14 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-10-30T01:13:10+00:00",
+  "updatedAt": "2026-10-30T01:26:35+00:00",
   "dates": [
     {
       "date": "2026-10-30",
       "file": "2026-10-30.json",
-      "summary": "Formore Lighting：UGR 文章已在线核验通过；今日新简报 Solar Street Light Manufacturer 已交墨墨写稿、画眉配图；日检无严重问题。",
+      "summary": "Formore Lighting：今日 Solar Street Light Manufacturer 文章已审稿并通过校验后上线；UGR 文此前已在线；日检无严重问题。R2 新图暂未上传（桶不在当前 Cloudflare 连接账户），页面配图改走 Vercel 同源 URL。",
       "articleCount": 2,
-      "issueCount": 2
+      "issueCount": 3
     },
     {
       "date": "2026-10-29",

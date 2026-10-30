@@ -3,10 +3,10 @@
   "feedId": "seo",
   "date": "2026-10-30",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-10-30T09:30:00+08:00",
+  "updatedAt": "2026-10-30T09:26:35+08:00",
   "botId": "seo",
   "botName": "搜搜-SEO专家",
-  "summary": "Formore Lighting：UGR 文章已在线核验通过；今日新简报 Solar Street Light Manufacturer 已交墨墨写稿、画眉配图；日检无严重问题。",
+  "summary": "Formore Lighting：今日 Solar Street Light Manufacturer 文章已审稿并通过校验后上线；UGR 文此前已在线；日检无严重问题。R2 新图暂未上传（桶不在当前 Cloudflare 连接账户），页面配图改走 Vercel 同源 URL。",
   "articles": [
     {
       "id": "ugr-office-lighting-explained",
@@ -14,7 +14,10 @@
       "url": "https://www.formorelightings.com/insights/ugr-office-lighting-explained",
       "status": "published",
       "primaryKeyword": "ugr office lighting",
-      "secondaryKeywords": ["led ugr", "ugr 19"],
+      "secondaryKeywords": [
+        "led ugr",
+        "ugr 19"
+      ],
       "image": null,
       "publishedAt": "2026-10-30",
       "notes": "线上 200，title、canonical、Article/FAQPage/BreadcrumbList schema 正确"
@@ -22,29 +25,97 @@
     {
       "id": "solar-street-light-manufacturer-guide",
       "title": "Solar Street Light Manufacturer: B2B Buyer's Guide",
-      "url": null,
-      "status": "draft",
+      "url": "https://www.formorelightings.com/insights/solar-street-light-manufacturer-guide",
+      "status": "published",
       "primaryKeyword": "solar street light manufacturer",
-      "secondaryKeywords": ["solar street light", "all in one solar street light", "split solar street light", "LiFePO4 solar street light"],
-      "image": null,
-      "publishedAt": null,
-      "notes": "简报已完成（briefs/2026-10-30-solar-street-light-manufacturer.md），等待墨墨交稿与画眉配图，审稿和校验通过后发布"
+      "secondaryKeywords": [
+        "solar street light",
+        "all in one solar street light",
+        "split solar street light",
+        "LiFePO4 solar street light"
+      ],
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/all-in-one-solar-street-light-road-dusk.webp",
+      "publishedAt": "2026-10-30",
+      "notes": "线上 200；title/canonical/Article+FAQPage+BreadcrumbList 正确；两处 cite 已改写；配图 Vercel 同源（R2 未写入）"
     }
   ],
   "keywords": [
-    { "term": "solar street light manufacturer", "intent": "commercial", "priority": "high" },
-    { "term": "solar street light", "intent": "informational", "priority": "high" }
+    {
+      "term": "solar street light manufacturer",
+      "intent": "commercial",
+      "priority": "high"
+    },
+    {
+      "term": "solar street light",
+      "intent": "informational",
+      "priority": "high"
+    }
   ],
-  "images": [],
+  "images": [
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/all-in-one-solar-street-light-road-dusk.webp",
+      "alt": "All-in-one solar street light on a pole beside a road at dusk.",
+      "ofArticleId": "solar-street-light-manufacturer-guide"
+    },
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/all-in-one-vs-split-solar-street-light-comparison.webp",
+      "alt": "All-in-one and split solar street light systems shown side by side.",
+      "ofArticleId": "solar-street-light-manufacturer-guide"
+    },
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/solar-street-light-factory-aging-test-qc.webp",
+      "alt": "Solar street lights undergoing an aging test in a factory QC room.",
+      "ofArticleId": "solar-street-light-manufacturer-guide"
+    }
+  ],
   "checks": [
-    { "id": "seo-daily", "name": "npm run seo:daily", "status": "warn", "detail": "运行成功，但缺少 PSI_API_KEY，性能分数跳过" },
-    { "id": "sitemap", "name": "Sitemap 覆盖", "status": "pass", "detail": "140 个 URL，含 UGR 新文" },
-    { "id": "core-pages", "name": "核心页面状态码", "status": "pass", "detail": "首页、robots、llms.txt、products、contact、oem-odm、sourcing 等均 200" },
-    { "id": "ugr-schema", "name": "UGR 文章 schema", "status": "pass", "detail": "Article、FAQPage、BreadcrumbList 齐全，canonical 正确" }
+    {
+      "id": "seo-daily",
+      "name": "npm run seo:daily",
+      "status": "warn",
+      "detail": "运行成功，但缺少 PSI_API_KEY，性能分数跳过"
+    },
+    {
+      "id": "sitemap",
+      "name": "Sitemap 覆盖",
+      "status": "pass",
+      "detail": "140 个 URL，含 UGR 新文"
+    },
+    {
+      "id": "core-pages",
+      "name": "核心页面状态码",
+      "status": "pass",
+      "detail": "首页、robots、llms.txt、products、contact、oem-odm、sourcing 等均 200"
+    },
+    {
+      "id": "ugr-schema",
+      "name": "UGR 文章 schema",
+      "status": "pass",
+      "detail": "Article、FAQPage、BreadcrumbList 齐全，canonical 正确"
+    },
+    {
+      "id": "solar-publish",
+      "name": "Solar 文章发布核验",
+      "status": "pass",
+      "detail": "live 200；schema 齐全；sitemap 已收录；内链 11 条此前均 200"
+    }
   ],
   "issues": [
-    { "severity": "medium", "title": "PSI_API_KEY 未配置", "detail": "日检拿不到性能和 Core Web Vitals 分数" },
-    { "severity": "low", "title": "日检任务映射过期", "detail": "daily-seo-check.mjs 仍按四月排期，未接入 30 天新排期" }
+    {
+      "severity": "medium",
+      "title": "PSI_API_KEY 未配置",
+      "detail": "日检拿不到性能和 Core Web Vitals 分数"
+    },
+    {
+      "severity": "low",
+      "title": "日检任务映射过期",
+      "detail": "daily-seo-check.mjs 仍按四月排期，未接入 30 天新排期"
+    },
+    {
+      "severity": "low",
+      "title": "新配图未写入 R2",
+      "detail": "formorelightings-images 桶不在当前 Cloudflare MCP 账户；页面已改用 Vercel 同源绝对 URL，资产 200"
+    }
   ],
-  "tomorrow": "排期 Day2：Organization/WebSite schema 与 llms.txt 复核；墨墨交稿后审稿 Solar 文章，校验通过则发布。"
+  "tomorrow": "排期 Day2：Organization/WebSite schema 与 llms.txt 复核；协调将今日 3 张 WebP 上传到 R2（需有桶写权限的账户）。"
 }
