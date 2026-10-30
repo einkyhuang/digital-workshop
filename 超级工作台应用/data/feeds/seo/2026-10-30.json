@@ -3,47 +3,48 @@
   "feedId": "seo",
   "date": "2026-10-30",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-10-30T18:00:00+08:00",
+  "updatedAt": "2026-10-30T09:30:00+08:00",
   "botId": "seo",
   "botName": "搜搜-SEO专家",
-  "summary": "Formore Lighting：完成 1 篇 Insights 定稿链路说明与日检；未批准不合并 main。",
+  "summary": "Formore Lighting：UGR 文章已在线核验通过；今日新简报 Solar Street Light Manufacturer 已交墨墨写稿、画眉配图；日检无严重问题。",
   "articles": [
     {
-      "id": "what-is-cri-in-lighting",
-      "title": "What Is CRI in Lighting? A Buyer’s Guide",
-      "url": "https://www.formorelightings.com/insights/what-is-cri-in-lighting",
+      "id": "ugr-office-lighting-explained",
+      "title": "What Is UGR in Office Lighting?",
+      "url": "https://www.formorelightings.com/insights/ugr-office-lighting-explained",
+      "status": "published",
+      "primaryKeyword": "ugr office lighting",
+      "secondaryKeywords": ["led ugr", "ugr 19"],
+      "image": null,
+      "publishedAt": "2026-10-30",
+      "notes": "线上 200，title、canonical、Article/FAQPage/BreadcrumbList schema 正确"
+    },
+    {
+      "id": "solar-street-light-manufacturer-guide",
+      "title": "Solar Street Light Manufacturer: B2B Buyer's Guide",
+      "url": null,
       "status": "draft",
-      "primaryKeyword": "what is cri in lighting",
-      "secondaryKeywords": ["cri 90 led", "color rendering index"],
+      "primaryKeyword": "solar street light manufacturer",
+      "secondaryKeywords": ["solar street light", "all in one solar street light", "split solar street light", "LiFePO4 solar street light"],
       "image": null,
       "publishedAt": null,
-      "notes": "草稿在 seo-drafts；待用户批准后上线"
+      "notes": "简报已完成（briefs/2026-10-30-solar-street-light-manufacturer.md），等待墨墨交稿与画眉配图，审稿和校验通过后发布"
     }
   ],
   "keywords": [
-    { "term": "what is cri in lighting", "intent": "informational", "priority": "high" },
-    { "term": "LED linear lights OEM", "intent": "commercial", "priority": "medium" }
+    { "term": "solar street light manufacturer", "intent": "commercial", "priority": "high" },
+    { "term": "solar street light", "intent": "informational", "priority": "high" }
   ],
   "images": [],
   "checks": [
-    {
-      "id": "sitemap",
-      "name": "Sitemap 覆盖",
-      "status": "pass",
-      "detail": "现网 sitemap 可访问；新稿未上线故未纳入"
-    },
-    {
-      "id": "title-length",
-      "name": "标题长度",
-      "status": "warn",
-      "detail": "草稿标题接近 60 字符，上线前再压主词前置"
-    }
+    { "id": "seo-daily", "name": "npm run seo:daily", "status": "warn", "detail": "运行成功，但缺少 PSI_API_KEY，性能分数跳过" },
+    { "id": "sitemap", "name": "Sitemap 覆盖", "status": "pass", "detail": "140 个 URL，含 UGR 新文" },
+    { "id": "core-pages", "name": "核心页面状态码", "status": "pass", "detail": "首页、robots、llms.txt、products、contact、oem-odm、sourcing 等均 200" },
+    { "id": "ugr-schema", "name": "UGR 文章 schema", "status": "pass", "detail": "Article、FAQPage、BreadcrumbList 齐全，canonical 正确" }
   ],
   "issues": [
-    {
-      "severity": "medium",
-      "title": "生产发布闸门",
-      "detail": "禁止自动合并 main / 自动部署；须用户明确批准"
-    }
-  ]
+    { "severity": "medium", "title": "PSI_API_KEY 未配置", "detail": "日检拿不到性能和 Core Web Vitals 分数" },
+    { "severity": "low", "title": "日检任务映射过期", "detail": "daily-seo-check.mjs 仍按四月排期，未接入 30 天新排期" }
+  ],
+  "tomorrow": "排期 Day2：Organization/WebSite schema 与 llms.txt 复核；墨墨交稿后审稿 Solar 文章，校验通过则发布。"
 }
