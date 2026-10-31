@@ -40,9 +40,6 @@ struct SuperWorkbenchApp: App {
             CommandGroup(replacing: .appSettings) {
                 Button("设置…") {
                     store.showGlobalModelSettings = true
-                    if store.activeWorkbenchId == "trade" {
-                        store.setMagicHubTab("settings")
-                    }
                 }
                 .keyboardShortcut(",", modifiers: [.command])
             }
@@ -57,9 +54,6 @@ struct SuperWorkbenchApp: App {
                 .keyboardShortcut("k", modifiers: [.command])
                 Button("全局模型设置…") {
                     store.showGlobalModelSettings = true
-                    if store.activeWorkbenchId == "trade" {
-                        store.setMagicHubTab("settings")
-                    }
                 }
             }
         }

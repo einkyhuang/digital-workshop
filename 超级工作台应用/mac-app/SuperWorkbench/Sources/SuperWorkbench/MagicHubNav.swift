@@ -1,7 +1,7 @@
 import Foundation
 
 /// MagicHub CRM tabs shown in the outer 超级工作台 sidebar when 外贸工作台 is active.
-/// Order matches crm-magichub App.vue `tabs` (驾驶舱 … Forwelike 专区). Settings is omitted from the primary list (reachable inside MagicHub).
+/// Order matches crm-magichub App.vue `tabs` (驾驶舱 … Forwelike 专区). Settings removed — use global KY gear / ⌘,.
 struct MagicHubNavItem: Identifiable, Hashable {
     let id: String
     let title: String
@@ -22,8 +22,7 @@ struct MagicHubNavItem: Identifiable, Hashable {
         .init(id: "company", name: "公司信息", icon: "building.2"),
         .init(id: "team", name: "团队管理", icon: "person.3"),
         .init(id: "agentRoom", name: "Agent 协同", icon: "sparkles"),
-        .init(id: "forwelike", name: "Forwelike 专区", icon: "star.circle"),
-        .init(id: "settings", name: "系统设置", icon: "gearshape")
+        .init(id: "forwelike", name: "Forwelike 专区", icon: "star.circle")
     ]
 
     init(id: String, name: String, icon: String) {

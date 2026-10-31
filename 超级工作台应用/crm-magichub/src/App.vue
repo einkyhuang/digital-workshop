@@ -14,7 +14,6 @@ import CompanyInfo from './components/CompanyInfo.vue';
 import TeamManager from './components/TeamManager.vue';
 import KnowledgeBase from './components/KnowledgeBase.vue'; // [NEW] Knowledge Base Component
 import ZenModal from './components/ZenModal.vue';
-import SystemSettings from './components/SystemSettings.vue'; // [NEW] System Settings Component
 import ScheduleManager from './components/ScheduleManager.vue'; // [NEW] Schedule Manager Component
 import SmartMarketing from './components/SmartMarketing.vue'; // [NEW] Smart Email Marketing Component
 import AgentRoom from './components/AgentRoom.vue'; // [NEW] Multi-Agent Group Chat
@@ -880,18 +879,28 @@ window.addEventListener('message', (ev) => {
   try {
     const d = ev && ev.data
     if (d && d.type === 'sw-set-tab' && d.tab) {
-      activeTab.value = String(d.tab)
+      const tab = String(d.tab)
+      if (tab === 'settings' || tab === 'smarttools') {
+        if (typeof window.__SW_OPEN_SETTINGS__ === 'function') window.__SW_OPEN_SETTINGS__()
+        return
+      }
+      activeTab.value = tab
     }
   } catch (_) {}
 })
 watch(activeTab, (v) => {
   if (isEmbedded.value) swNotifyHostTab(v)
 })
-;
-const settingsInitialTab = ref('api');
-const openGlobalModelSettings = () => {
-  activeTab.value = 'settings';
-  settingsInitialTab.value = 'api';
+
+const openGlobalModelSettings = async () => {
+  try {
+    if (window.electronAPI && typeof window.electronAPI.openGlobalSettings === 'function') {
+      const r = await window.electronAPI.openGlobalSettings();
+      // Mac bridge returns { success: true }; web stub returns { success: false }.
+      if (r && r.success === true) return;
+    }
+  } catch (_) {}
+  alert('请使用超级工作台侧栏 KY 卡片上的设置齿轮，或按 ⌘, 打开全局设置。');
 };
 if (typeof window !== 'undefined') {
   window.__SW_OPEN_SETTINGS__ = openGlobalModelSettings;
@@ -915,7 +924,6 @@ const activeComponent = computed(() => {
     company: CompanyInfo,
     team: TeamManager,
     agentRoom: AgentRoom,
-    settings: SystemSettings,
     forwelike: ForwelikeHub
   };
   return map[activeTab.value] || Dashboard;
@@ -972,15 +980,11 @@ const deals = ref([
 ]);
 
 const handleTabChange = (tabId, payload = null) => {
-  if (tabId === 'smarttools') {
-    activeTab.value = 'settings';
-    settingsInitialTab.value = 'skills';
-  } else {
-    activeTab.value = tabId;
-    if (tabId === 'settings') {
-      settingsInitialTab.value = 'api';
-    }
+  if (tabId === 'smarttools' || tabId === 'settings') {
+    openGlobalModelSettings();
+    return;
   }
+  activeTab.value = tabId;
   if (payload) {
     if (payload.customerId) {
       jumpToCustomerId.value = payload.customerId;
@@ -1131,7 +1135,7 @@ const callAiApi = async (userMessage, knowledgeContext = '', options = {}) => {
   // Find the provider that matches this provider ID and is enabled
   const provider = providers.value.find(p => p.id === activeProviderId && p.status);
   if (!provider) {
-    return '⚠️ 未启用包含所选算力平台，请前往「系统设置 → AI 模型平台接入」开启。';
+    return '⚠️ 未启用包含所选算力平台，请前往「超级工作台全局设置（KY 齿轮 / ⌘,）」开启。';
   }
 
   const apiKey = provider.apiKey;
@@ -1139,7 +1143,7 @@ const callAiApi = async (userMessage, knowledgeContext = '', options = {}) => {
   let url = provider.baseUrl;
   
   if (!apiKey || apiKey.startsWith('sk-ds-a7b4') || apiKey.startsWith('sk-gemini-zen') || apiKey.startsWith('sk-sf-fce') || apiKey.startsWith('sk-apifree')) {
-    return `⚠️ API Key 尚未配置或为演示占位符。\n\n[算力平台名称]: ${provider.name}\n[使用模型]: ${modelName}\n\n👉 请前往「系统设置 → AI 模型平台接入」，填写并保存您在该平台的真实有效 API 密钥！`;
+    return `⚠️ API Key 尚未配置或为演示占位符。\n\n[算力平台名称]: ${provider.name}\n[使用模型]: ${modelName}\n\n👉 请前往「超级工作台全局设置（KY 齿轮 / ⌘,）」，填写并保存您在该平台的真实有效 API 密钥！`;
   }
 
   // Construct complete completions URL
@@ -1433,23 +1437,7 @@ const syncToTimeline = () => {
             {{ tab.name }}
           </button>
         </nav>
-        <!-- Sidebar settings button at the bottom of sidebar [NEW] -->
-        <div class="pt-3 border-t border-white/20">
-          <button
-            @click="activeTab = 'settings'"
-            class="w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold tracking-wide transition-all duration-300 outline-none"
-            :class="activeTab === 'settings'
-              ? 'bg-white/60 text-zen-ink font-bold shadow-sm border border-white/50'
-              : 'text-zen-gray hover:bg-white/35 hover:text-zen-ink hover:pl-5'"
-          >
-            <span class="text-sm select-none shrink-0 transition-colors duration-300" :class="activeTab === 'settings' ? 'text-zen-green' : 'text-zen-gray/60'">
-              ⚙️
-            </span>
-            系统设置
-          </button>
-        </div>
-
-        <!-- AI Dialogue Session Archives below System Settings -->
+        <!-- AI Dialogue Session Archives -->
         <div class="pt-3 border-t border-white/20 space-y-2">
           <div class="px-3.5 flex items-center justify-between">
             <span class="text-[10px] text-zen-gray font-bold uppercase tracking-wider">💬 智能对话存档</span>
@@ -1510,7 +1498,7 @@ const syncToTimeline = () => {
       <header class="h-16 apple-header-glass flex items-center justify-between px-8 select-none">
         <div class="flex items-center gap-2">
           <h2 class="text-sm font-semibold font-serif-sc tracking-wider text-zen-ink">
-            {{ tabs.find(t => t.id === activeTab)?.name || '系统设置' }}
+            {{ tabs.find(t => t.id === activeTab)?.name || 'MagicHub' }}
           </h2>
           <span class="text-zen-light">|</span>
           <span class="text-[10px] text-zen-gray">高保真智能连接本地化 CRM</span>
@@ -1564,7 +1552,6 @@ const syncToTimeline = () => {
             :is="activeComponent"
             :is-secret-mode="isSecretMode"
             :leads="leads"
-            :initial-tab="settingsInitialTab"
             :timelineLogs="timelineLogs"
             :quoteLogs="quoteLogs"
             :contracts="contracts"

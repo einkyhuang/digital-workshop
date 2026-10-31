@@ -246,8 +246,5 @@ struct SidebarView: View {
 
     private func openGlobalSettings() {
         store.showGlobalModelSettings = true
-        if store.activeWorkbenchId == "trade" {
-            store.setMagicHubTab("settings")
-        }
     }
 }

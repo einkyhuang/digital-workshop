@@ -144,8 +144,7 @@
     { id: "company", name: "公司信息" },
     { id: "team", name: "团队管理" },
     { id: "agentRoom", name: "Agent 协同" },
-    { id: "forwelike", name: "Forwelike 专区" },
-    { id: "settings", name: "系统设置" }
+    { id: "forwelike", name: "Forwelike 专区" }
   ];
   function magicHubTabId() {
     return state.magicHubTab || localStorage.getItem("sw.mhTab") || "dashboard";
