@@ -140,12 +140,6 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
             } else if let d = safe as? [String: Any] {
                 providers = (d["providers"] as? [[String: Any]]) ?? []
             }
-            guard !providers.isEmpty || (safe as? [Any]) != nil else {
-                // Allow empty array clear
-                if let arr = safe as? [Any] {
-                    providers = arr.compactMap { $0 as? [String: Any] }
-                }
-            }
             let (ok, err) = SharedModelStore.saveProviders(providers, repoRoot: repoRoot)
             return (ok, ["success": ok, "error": err as Any], err)
         }

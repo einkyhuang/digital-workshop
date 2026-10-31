@@ -10,7 +10,7 @@ enum SharedModelStore {
     static let globalDocKey = "sw_global_models"     // full document
     static let keychainService = "com.ky.superworkbench.models"
 
-    struct Document: Equatable {
+    struct Document {
         var version: Int
         var activeProviderId: String
         var providers: [[String: Any]]
