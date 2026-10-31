@@ -128,6 +128,51 @@
     }
   }
 
+  function skillCatalog() {
+    const base = [
+      { value: "deep-client-analysis", label: "深度客户分析与调研", desc: "客商画像与竞争格局报告" },
+      { value: "a11y-debugging", label: "无障碍网页测试", desc: "" },
+      { value: "audit", label: "技术质量审计", desc: "" },
+      { value: "optimize", label: "性能极限调优", desc: "" },
+      { value: "polish", label: "设计微小细节精修", desc: "" }
+    ];
+    try {
+      const prefs = JSON.parse(localStorage.getItem("sw.workbench.prefs") || "null");
+      if (prefs && Array.isArray(prefs.importedSkills)) {
+        prefs.importedSkills.forEach((s) => {
+          if (!base.some((b) => b.value === s.value)) {
+            base.push({ value: s.value, label: s.label || s.value, desc: s.desc || "" });
+          }
+        });
+      }
+    } catch (_) {}
+    return base;
+  }
+
+  function enabledProvidersDetailed() {
+    try {
+      if (window.SWSharedModels && typeof window.SWSharedModels.loadProviders === "function") {
+        /* sync path may be promise — fall through to local */
+      }
+    } catch (_) {}
+    try {
+      const g = JSON.parse(localStorage.getItem("sw.global.models") || "null");
+      if (g && Array.isArray(g.providers)) {
+        return g.providers
+          .filter((p) => p && (p.status === true || p.status === undefined))
+          .map((p) => ({
+            id: p.id,
+            name: p.name || p.id,
+            model: p.model || "",
+            models: Array.isArray(p.availableModels) && p.availableModels.length ? p.availableModels : (p.model ? [p.model] : [])
+          }));
+      }
+    } catch (_) {}
+    return providersFromLocal().map((p) => ({
+      id: p.id, name: p.name || p.id, model: p.model || "", models: p.model ? [p.model] : []
+    }));
+  }
+
   function mount(api) {
     if (document.getElementById("swAgentRoot")) return;
     const root = document.createElement("div");
@@ -135,27 +180,159 @@
     root.innerHTML = `
       <button type="button" id="swAgentFab" title="全局 Agent">✦</button>
       <div id="swAgentPanel" hidden>
-        <div class="sw-agent-head"><strong>全局 Agent</strong><span class="muted">P3 Web 子集</span>
+        <div class="sw-agent-head"><strong>全局 Agent</strong><span class="muted">模型 · Skills</span>
           <button type="button" id="swAgentSettings">设置</button>
           <button type="button" id="swAgentClose">×</button></div>
         <div id="swAgentLog" class="sw-agent-log"></div>
-        <div class="sw-agent-composer">
-          <input id="swAgentInput" placeholder="例：快照 / 打开看板 / 建任务 …" />
-          <button type="button" id="swAgentSend">发送</button>
+        <div class="sw-agent-composer-card">
+          <div id="swAgentSkillTags" class="sw-agent-tags" hidden></div>
+          <textarea id="swAgentInput" rows="2" placeholder="向 AI 提问"></textarea>
+          <div class="sw-agent-toolbar">
+            <div class="sw-agent-tools">
+              <button type="button" id="swAgentAttach" class="sw-agent-icon-btn" title="添加文件（仅记录文件名）">+</button>
+              <div class="sw-agent-chip-wrap">
+                <button type="button" id="swAgentModelBtn" class="sw-agent-chip" title="选择模型">⚡ <span id="swAgentModelLabel">选择模型</span> ▾</button>
+                <div id="swAgentModelMenu" class="sw-agent-menu" hidden></div>
+              </div>
+              <div class="sw-agent-chip-wrap">
+                <button type="button" id="swAgentSkillBtn" class="sw-agent-chip" title="选择技能">✦ <span id="swAgentSkillLabel">技能</span> ▾</button>
+                <div id="swAgentSkillMenu" class="sw-agent-menu" hidden></div>
+              </div>
+              <div class="sw-agent-chip-wrap">
+                <button type="button" id="swAgentMoreBtn" class="sw-agent-chip">☰ 更多</button>
+                <div id="swAgentMoreMenu" class="sw-agent-menu" hidden>
+                  <button type="button" data-more="clear">清空对话</button>
+                  <button type="button" data-more="reload">刷新模型 / Skills</button>
+                  <button type="button" data-more="settings">打开全局设置…</button>
+                </div>
+              </div>
+            </div>
+            <div class="sw-agent-actions">
+              <button type="button" id="swAgentMic" class="sw-agent-icon-btn" disabled title="语音输入暂未启用">🎤</button>
+              <button type="button" id="swAgentSend" class="sw-agent-send" disabled title="发送（Enter；Shift+Enter 换行）">↑</button>
+            </div>
+          </div>
+          <input type="file" id="swAgentFile" multiple hidden />
         </div>
       </div>`;
     document.body.appendChild(root);
     const panel = document.getElementById("swAgentPanel");
     const log = document.getElementById("swAgentLog");
+    const input = document.getElementById("swAgentInput");
+    const sendBtn = document.getElementById("swAgentSend");
+    const skillTags = document.getElementById("swAgentSkillTags");
+
+    let selectedProviderId = localStorage.getItem("sw.agent.selectedProviderId") || "";
+    let selectedModel = localStorage.getItem("sw.agent.model") || "";
+    let selectedSkills = [];
+    try { selectedSkills = JSON.parse(localStorage.getItem("sw.agent.selectedSkills") || "[]"); } catch (_) { selectedSkills = []; }
+    let attachmentNames = [];
+
     function line(role, text) {
       const d = document.createElement("div");
       d.className = "sw-agent-msg sw-agent-" + role;
       d.textContent = text;
       log.appendChild(d); log.scrollTop = log.scrollHeight;
     }
-    line("assistant", "Web 子集：导航/快照/本地任务。CRM 与真发信请用 Mac。");
-    function open() { panel.hidden = false; document.getElementById("swAgentInput").focus(); }
-    function close() { panel.hidden = true; }
+    line("assistant", "Web 子集：导航/快照/本地任务。可选择模型与 Skills（Skills 正文在 Web 仅注入元数据摘要）。");
+
+    function persist() {
+      localStorage.setItem("sw.agent.selectedProviderId", selectedProviderId || "");
+      localStorage.setItem("sw.agent.model", selectedModel || "");
+      localStorage.setItem("sw.agent.selectedSkills", JSON.stringify(selectedSkills));
+    }
+
+    function updateSendState() {
+      sendBtn.disabled = !(input.value || "").trim();
+      sendBtn.classList.toggle("ready", !sendBtn.disabled);
+    }
+
+    function renderSkillTags() {
+      const cat = skillCatalog();
+      const map = Object.fromEntries(cat.map((s) => [s.value, s.label]));
+      if (!selectedSkills.length) {
+        skillTags.hidden = true;
+        skillTags.innerHTML = "";
+        document.getElementById("swAgentSkillLabel").textContent = "技能";
+        return;
+      }
+      skillTags.hidden = false;
+      skillTags.innerHTML = selectedSkills.map((id) =>
+        `<span class="sw-agent-tag">✦ ${map[id] || id}<button type="button" data-rm="${id}" aria-label="移除">×</button></span>`
+      ).join("");
+      document.getElementById("swAgentSkillLabel").textContent = "技能 " + selectedSkills.length;
+      skillTags.querySelectorAll("[data-rm]").forEach((b) => {
+        b.onclick = () => {
+          selectedSkills = selectedSkills.filter((x) => x !== b.getAttribute("data-rm"));
+          persist(); renderSkillTags();
+        };
+      });
+    }
+
+    function shortModel(m) {
+      if (!m) return "选择模型";
+      const s = String(m).split("/").pop();
+      return s.length > 18 ? s.slice(0, 16) + "…" : s;
+    }
+
+    function refreshModelChip() {
+      document.getElementById("swAgentModelLabel").textContent = shortModel(selectedModel);
+    }
+
+    function buildModelMenu() {
+      const menu = document.getElementById("swAgentModelMenu");
+      const groups = enabledProvidersDetailed();
+      if (!groups.length) {
+        menu.innerHTML = '<div class="sw-agent-menu-empty">无已启用模型</div>';
+        return;
+      }
+      if (!selectedProviderId || !groups.some((g) => g.id === selectedProviderId)) {
+        selectedProviderId = groups[0].id;
+        selectedModel = groups[0].models[0] || groups[0].model || selectedModel;
+      }
+      menu.innerHTML = groups.map((g) => {
+        const items = (g.models.length ? g.models : (g.model ? [g.model] : [])).map((mid) => {
+          const on = selectedProviderId === g.id && selectedModel === mid ? " ✓" : "";
+          return `<button type="button" data-pid="${g.id}" data-mid="${mid}">${mid}${on}</button>`;
+        }).join("");
+        const emptyModels = '<div class="sw-agent-menu-empty">无模型</div>';
+        return `<div class="sw-agent-menu-section"><div class="sw-agent-menu-title">${g.name}</div>${items || emptyModels}</div>`;
+      }).join("");
+      menu.querySelectorAll("[data-pid]").forEach((b) => {
+        b.onclick = () => {
+          selectedProviderId = b.getAttribute("data-pid");
+          selectedModel = b.getAttribute("data-mid");
+          persist(); refreshModelChip(); menu.hidden = true;
+        };
+      });
+      refreshModelChip();
+    }
+
+    function buildSkillMenu() {
+      const menu = document.getElementById("swAgentSkillMenu");
+      const cat = skillCatalog();
+      menu.innerHTML = cat.map((s) => {
+        const on = selectedSkills.includes(s.value) ? " ✓" : "";
+        return `<button type="button" data-sid="${s.value}">${s.label}${on}</button>`;
+      }).join("") || '<div class="sw-agent-menu-empty">暂无 Skills</div>';
+      menu.querySelectorAll("[data-sid]").forEach((b) => {
+        b.onclick = () => {
+          const id = b.getAttribute("data-sid");
+          if (selectedSkills.includes(id)) selectedSkills = selectedSkills.filter((x) => x !== id);
+          else selectedSkills.push(id);
+          persist(); renderSkillTags(); buildSkillMenu();
+        };
+      });
+    }
+
+    function hideMenus(except) {
+      ["swAgentModelMenu", "swAgentSkillMenu", "swAgentMoreMenu"].forEach((id) => {
+        if (id !== except) document.getElementById(id).hidden = true;
+      });
+    }
+
+    function open() { panel.hidden = false; input.focus(); buildModelMenu(); buildSkillMenu(); renderSkillTags(); updateSendState(); }
+    function close() { panel.hidden = true; hideMenus(); }
     document.getElementById("swAgentFab").onclick = () => { panel.hidden ? open() : close(); };
     document.getElementById("swAgentClose").onclick = close;
     document.addEventListener("keydown", (e) => {
@@ -163,27 +340,62 @@
       if (e.key === "Escape" && !panel.hidden) close();
     });
     document.getElementById("swAgentSettings").onclick = () => {
-      if (typeof window.SWOpenGlobalSettings === "function") {
-        window.SWOpenGlobalSettings();
-        return;
-      }
+      if (typeof window.SWOpenGlobalSettings === "function") { window.SWOpenGlobalSettings(); return; }
       const cur = providersFromLocal();
       const base = prompt("Provider Base URL", (cur[0] && cur[0].baseURL) || "https://api.deepseek.com");
       if (base == null) return;
-      const model = prompt("Model id", (cur[0] && cur[0].model) || "deepseek-chat");
+      const model = prompt("Model id", (cur[0] && cur[0].model) || selectedModel || "deepseek-chat");
       if (model == null) return;
       const key = prompt("API Key（明文存 localStorage，勿用生产密钥）", "");
       const list = [{ id: "default", baseURL: base, model, hasKey: !!(key && key.trim()) }];
       if (key && key.trim()) localStorage.setItem("sw.agent.apiKey", key.trim());
       saveProviders(list);
+      selectedProviderId = "default"; selectedModel = model; persist(); refreshModelChip();
       alert("已保存 Provider（建议用侧栏「设置」编辑全局配置）");
     };
+
+    document.getElementById("swAgentModelBtn").onclick = (e) => {
+      e.stopPropagation();
+      const m = document.getElementById("swAgentModelMenu");
+      const openNow = m.hidden; hideMenus(); buildModelMenu(); m.hidden = !openNow;
+    };
+    document.getElementById("swAgentSkillBtn").onclick = (e) => {
+      e.stopPropagation();
+      const m = document.getElementById("swAgentSkillMenu");
+      const openNow = m.hidden; hideMenus(); buildSkillMenu(); m.hidden = !openNow;
+    };
+    document.getElementById("swAgentMoreBtn").onclick = (e) => {
+      e.stopPropagation();
+      const m = document.getElementById("swAgentMoreMenu");
+      const openNow = m.hidden; hideMenus(); m.hidden = !openNow;
+    };
+    document.getElementById("swAgentMoreMenu").onclick = (e) => {
+      const t = e.target.closest("[data-more]");
+      if (!t) return;
+      const act = t.getAttribute("data-more");
+      if (act === "clear") { log.innerHTML = ""; line("assistant", "对话已清空。"); }
+      if (act === "reload") { buildModelMenu(); buildSkillMenu(); line("assistant", "已刷新模型 / Skills 列表。"); }
+      if (act === "settings") document.getElementById("swAgentSettings").click();
+      hideMenus();
+    };
+    document.addEventListener("click", () => hideMenus());
+
+    document.getElementById("swAgentAttach").onclick = () => document.getElementById("swAgentFile").click();
+    document.getElementById("swAgentFile").onchange = (e) => {
+      const files = Array.from(e.target.files || []);
+      attachmentNames = files.map((f) => f.name);
+      if (attachmentNames.length) line("assistant", "已选择附件（仅文件名）：" + attachmentNames.join(", "));
+      e.target.value = "";
+    };
+
     async function send() {
-      const input = document.getElementById("swAgentInput");
       const text = (input.value || "").trim();
       if (!text) return;
       input.value = "";
-      line("user", text);
+      updateSendState();
+      let display = text;
+      if (attachmentNames.length) display += "\\n\\n（附件：" + attachmentNames.join(", ") + "）";
+      line("user", display);
       const state = api.getState();
       const actions = [];
       if (/快照|状态/.test(text)) actions.push(["context.get_snapshot", {}]);
@@ -193,21 +405,40 @@
       if (/日报/.test(text)) actions.push(["nav.open_section", { sectionId: "dailySummary" }]);
       if (/SEO|seo/.test(text)) actions.push(["nav.open_section", { sectionId: "dailySeo" }]);
       if (/搜客户|找客户/.test(text)) actions.push(["crm.search_customers", { query: text.replace(/搜客户|找客户/g, "").trim() }]);
-      const m = text.match(/建任务\s*(.+)/);
+      const m = text.match(/建任务\\s*(.+)/);
       if (m) actions.push(["task.create", { title: m[1].trim() }]);
       if (!actions.length) actions.push(["context.get_snapshot", {}]);
+      if (selectedSkills.length) {
+        const cat = skillCatalog();
+        const labels = selectedSkills.map((id) => {
+          const s = cat.find((x) => x.value === id);
+          return s ? (s.label + "：" + (s.desc || id)) : id;
+        });
+        line("assistant", "【Skills 上下文摘要】\\n" + labels.join("\\n") + (selectedModel ? ("\\n模型：" + selectedModel) : ""));
+      } else if (selectedModel) {
+        line("assistant", "使用模型：" + selectedModel + (selectedProviderId ? (" @" + selectedProviderId) : ""));
+      }
       for (const [name, params] of actions) {
         const r = await execute(name, params, state, api);
         line("tool", name + " · " + (r.ok ? "OK" : "FAIL") + " · " + r.detail.slice(0, 400));
       }
+      attachmentNames = [];
     }
-    document.getElementById("swAgentSend").onclick = send;
-    document.getElementById("swAgentInput").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") send();
+    sendBtn.onclick = send;
+    input.addEventListener("input", updateSendState);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        send();
+      }
     });
+    buildModelMenu();
+    renderSkillTags();
+    updateSendState();
     if (/agentOpen=1/.test(location.search)) {
       open();
-      document.getElementById("swAgentInput").value = "快照";
+      input.value = "快照";
+      updateSendState();
       setTimeout(send, 400);
     }
   }
