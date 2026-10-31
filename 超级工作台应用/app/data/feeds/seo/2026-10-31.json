@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-10-31",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-10-31T09:50:00+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "Formore Lighting：今日选题 Magnetic Track Lighting，简报已完成并交给墨墨写稿、画眉做配图，等交稿后审核发布；日检无新的严重问题，昨日两篇文章线上正常。",
+  "articles": [
+    {
+      "id": "magnetic-track-lighting-guide",
+      "title": "Magnetic Track Lighting: A B2B Buyer's Guide",
+      "url": null,
+      "status": "draft",
+      "primaryKeyword": "magnetic track lighting",
+      "secondaryKeywords": [
+        "magnetic track light",
+        "magnetic track light supplier",
+        "48V magnetic track",
+        "track light system supplier"
+      ],
+      "image": null,
+      "publishedAt": null,
+      "notes": "简报完成（briefs/2026-10-31-magnetic-track-lighting.md），等墨墨交稿与画眉配图；尚未运行发布校验"
+    }
+  ],
+  "keywords": [
+    { "term": "magnetic track lighting", "intent": "informational", "priority": "high" },
+    { "term": "magnetic track light", "intent": "informational", "priority": "high" },
+    { "term": "magnetic track light supplier", "intent": "commercial", "priority": "medium" }
+  ],
+  "images": [],
+  "checks": [
+    { "id": "seo-daily", "name": "npm run seo:daily", "status": "warn", "detail": "运行成功，但缺少 PSI_API_KEY，性能分数跳过" },
+    { "id": "sitemap", "name": "Sitemap 覆盖", "status": "pass", "detail": "141 个 URL，含昨日 Solar 新文" },
+    { "id": "core-pages", "name": "核心页面状态码", "status": "pass", "detail": "首页、robots、llms.txt、insights、products、contact、oem-odm、sourcing、OQC、factory-first 均 200" },
+    { "id": "site-schema", "name": "首页 Organization/WebSite schema", "status": "pass", "detail": "Organization、WebSite、BreadcrumbList 齐全；sameAs 暂空" },
+    { "id": "solar-live", "name": "Solar 文章线上复核", "status": "pass", "detail": "200；title、canonical 正确；Article、FAQPage、BreadcrumbList 齐全" }
+  ],
+  "issues": [
+    { "severity": "medium", "title": "PSI_API_KEY 未配置", "detail": "日检拿不到性能和 Core Web Vitals 分数" },
+    { "severity": "low", "title": "日检任务映射过期", "detail": "daily-seo-check.mjs 仍按四月排期" },
+    { "severity": "low", "title": "Organization sameAs 为空", "detail": "等有真实社媒或目录主页 URL 再补" }
+  ],
+  "tomorrow": "收墨墨稿件和画眉配图，审核后存草稿、跑发布校验，通过即按既有许可上线；如时间允许推进排期 Day3/Day6 后续选题（3000K vs 4000K 已有旧文，优先 led linear light）。"
+}
