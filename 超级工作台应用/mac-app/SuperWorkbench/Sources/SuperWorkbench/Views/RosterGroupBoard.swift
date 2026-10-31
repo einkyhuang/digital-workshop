@@ -3,6 +3,7 @@ import SwiftUI
 /// Shared employee group board: fixed-size cards in one row per group shell;
 /// group shells flow-wrap via OverviewFlowLayout (overview + 员工档案).
 struct RosterGroupBoard: View {
+    @EnvironmentObject var store: WorkspaceStore
     let groups: [(title: String, bots: [Bot])]
     var cardWidth: CGFloat = SWTheme.Roster.cardMinWidth
     var spacing: CGFloat = 16
@@ -37,6 +38,10 @@ struct RosterGroupBoard: View {
                     }
                     .buttonStyle(.plain)
                     .frame(width: cardWidth, height: SWTheme.Roster.cardMinHeight, alignment: .top)
+                    .contextMenu {
+                        Button("对话") { store.employeeChatBotId = bot.id }
+                        Button("查看详情") { onSelect(bot) }
+                    }
                 }
             }
         }

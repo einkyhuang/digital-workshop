@@ -19,6 +19,7 @@ final class WorkspaceStore: ObservableObject {
     @Published var showGlobalAgent: Bool = false
     @Published var showGlobalModelSettings: Bool = false
     @Published var showingBotDetail: Bool = false
+    @Published var employeeChatBotId: String? = nil
     @Published var emailDaily: [OverviewMetrics.EmailDaily] = []
     @Published var targetsFile: OverviewMetrics.TargetsFile? = nil
     @Published var smartPlanTasks: [OverviewMetrics.SmartPlanTask] = []

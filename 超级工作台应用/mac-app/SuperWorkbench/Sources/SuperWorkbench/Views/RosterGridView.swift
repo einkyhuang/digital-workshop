@@ -97,6 +97,13 @@ struct BotDetailView: View {
                     Text("bots/\(bot.folderName)").font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
+                Button {
+                    store.employeeChatBotId = bot.id
+                } label: {
+                    Label("对话", systemImage: "bubble.left.and.bubble.right")
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.black)
                 Button { store.revealBotFolder(bot) } label: {
                     Label("在 Finder 中显示", systemImage: "folder")
                 }
@@ -142,6 +149,29 @@ struct BotDetailView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .overlay(RoundedRectangle(cornerRadius: 16).stroke(SWTheme.borderSoft))
             }
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("工作摘要").font(.headline)
+                    Spacer()
+                    Button("打开对话") { store.employeeChatBotId = bot.id }
+                        .buttonStyle(.bordered)
+                }
+                ScrollView {
+                    Text(EmployeeChatStore.loadSummaryMarkdown(botId: bot.id).isEmpty
+                       ? "暂无摘要。与该员工对话并结束后会自动写入私有目录。"
+                       : EmployeeChatStore.loadSummaryMarkdown(botId: bot.id))
+                        .font(.system(size: 12))
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .frame(maxHeight: 180)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(SWTheme.borderSoft))
+
             Spacer(minLength: 80)
         }
         .onAppear { bot = store.bot(id: bot.id) ?? bot }

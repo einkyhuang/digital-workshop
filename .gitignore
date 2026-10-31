@@ -80,3 +80,8 @@ bots/*/*/deliverables/email-daily-private/
 # TikTok short-drama media binaries (keep outside repo; never commit)
 /workspace/media/
 media/tiktok/
+
+# Employee chat transcripts (may contain client data) — never commit
+# Canonical store is ~/Library/Application Support/超级工作台/conversations/
+bots/**/对话/
+**/conversations/

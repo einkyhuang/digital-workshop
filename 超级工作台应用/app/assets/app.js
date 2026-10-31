@@ -1172,6 +1172,7 @@ function renderRoster() {
     }).join("");
     return `
       <h2 class="section-title">员工档案 <span class="badge">${all.length}</span></h2>
+      <p class="muted">员工实时对话与工作摘要请在 Mac「超级工作台」App 打开（私有目录 Application Support/超级工作台/conversations/）。</p>
       <div class="filters">${chipHtml}</div>
       <div class="roster-groups-ov">${groups}</div>`;
   }

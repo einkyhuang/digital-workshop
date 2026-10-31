@@ -64,6 +64,17 @@ struct ContentView: View {
             if store.showGlobalAgent {
                 GlobalAgentPanel(isPresented: $store.showGlobalAgent)
             }
+            if let chatId = store.employeeChatBotId, let bot = store.bot(id: chatId) {
+                EmployeeChatPanel(
+                    bot: bot,
+                    isPresented: Binding(
+                        get: { store.employeeChatBotId != nil },
+                        set: { if !$0 { store.employeeChatBotId = nil } }
+                    )
+                )
+                .id(bot.id)
+                .zIndex(30)
+            }
         }
         .background(SWTheme.pageBg)
         .alert("同步", isPresented: Binding(

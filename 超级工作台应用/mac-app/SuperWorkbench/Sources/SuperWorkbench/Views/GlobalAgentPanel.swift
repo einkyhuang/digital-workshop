@@ -20,15 +20,8 @@ struct GlobalAgentPanel: View {
                 Divider()
                 ScrollViewReader { proxy in
                     ScrollView {
-                        LazyVStack(alignment: .leading, spacing: 10) {
-                            ForEach(vm.transcriptItems) { item in
-                                transcriptRow(item).id(item.id)
-                            }
-                            if vm.isStreaming {
-                                typingIndicator.id("typing")
-                            }
-                        }
-                        .padding(16)
+                        AgentTranscriptView(messages: vm.messages, isStreaming: vm.isStreaming)
+                            .padding(16)
                     }
                     .onChange(of: vm.messages.count) { _, _ in
                         scrollTranscript(proxy)
@@ -130,7 +123,7 @@ struct GlobalAgentPanel: View {
     }
 
     private var selectedSkillTags: some View {
-        FlowSkillTags(ids: vm.selectedSkillIds, labels: vm.skillLabelMap) { id in
+        AgentSkillTagsBar(ids: vm.selectedSkillIds, labels: vm.skillLabelMap) { id in
             vm.toggleSkill(id)
         }
     }
@@ -318,201 +311,8 @@ struct GlobalAgentPanel: View {
             withAnimation { proxy.scrollTo("typing", anchor: .bottom) }
             return
         }
-        if let last = vm.transcriptItems.last {
+        if let last = AgentTranscriptBuilder.items(from: vm.messages).last {
             withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
-        }
-    }
-
-    @ViewBuilder
-    private func transcriptRow(_ item: GlobalAgentViewModel.TranscriptItem) -> some View {
-        switch item {
-        case .user(let msg):
-            userBubble(msg)
-        case .assistant(let msg):
-            assistantMarkdown(msg)
-        case .toolGroup(let tools):
-            ToolCallGroupView(tools: tools)
-        }
-    }
-
-    private func userBubble(_ msg: AgentChatMessage) -> some View {
-        HStack(alignment: .top) {
-            Spacer(minLength: 48)
-            Text(msg.content)
-                .font(.system(size: SWTheme.Typography.body))
-                .textSelection(.enabled)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(Color.accentColor.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        }
-    }
-
-    private func assistantMarkdown(_ msg: AgentChatMessage) -> some View {
-        HStack(alignment: .top) {
-            markdownText(msg.content)
-                .font(.system(size: SWTheme.Typography.body))
-                .textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Spacer(minLength: 24)
-        }
-        .padding(.vertical, 2)
-    }
-
-    private func markdownText(_ raw: String) -> Text {
-        let options = AttributedString.MarkdownParsingOptions(
-            interpretedSyntax: .inlineOnlyPreservingWhitespace
-        )
-        if let attr = try? AttributedString(markdown: raw, options: options) {
-            return Text(attr)
-        }
-        return Text(raw)
-    }
-
-    private var typingIndicator: some View {
-        HStack(spacing: 6) {
-            ProgressView()
-                .controlSize(.small)
-            Text("正在思考…")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-            Spacer()
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-// MARK: - Codex-style collapsible tool rows
-
-private struct ToolCallGroupView: View {
-    let tools: [AgentChatMessage]
-    @State private var groupExpanded = false
-
-    var body: some View {
-        if tools.count == 1, let only = tools.first {
-            ToolCallRowView(msg: only)
-        } else {
-            VStack(alignment: .leading, spacing: 6) {
-                Button {
-                    withAnimation(.easeInOut(duration: 0.15)) { groupExpanded.toggle() }
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "wrench.and.screwdriver")
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(.secondary)
-                        Text("已调用 \(tools.count) 个工具")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(.secondary)
-                        Image(systemName: groupExpanded ? "chevron.down" : "chevron.right")
-                            .font(.system(size: 9, weight: .semibold))
-                            .foregroundStyle(.tertiary)
-                        Spacer()
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(Color.black.opacity(0.04))
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                }
-                .buttonStyle(.plain)
-                if groupExpanded {
-                    VStack(alignment: .leading, spacing: 4) {
-                        ForEach(tools) { msg in
-                            ToolCallRowView(msg: msg)
-                        }
-                    }
-                    .padding(.leading, 8)
-                }
-            }
-        }
-    }
-}
-
-private struct ToolCallRowView: View {
-    let msg: AgentChatMessage
-    @State private var expanded = false
-
-    private var tool: String { msg.toolName ?? "tool" }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Button {
-                withAnimation(.easeInOut(duration: 0.12)) { expanded.toggle() }
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: AgentToolPresentation.iconName(tool))
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 14)
-                    Text(AgentToolPresentation.summary(tool: tool, detail: msg.content, argsSummary: msg.toolArgsSummary))
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(expanded ? 3 : 1)
-                    Image(systemName: expanded ? "chevron.down" : "chevron.right")
-                        .font(.system(size: 9, weight: .semibold))
-                        .foregroundStyle(.tertiary)
-                    Spacer(minLength: 0)
-                    if let ms = msg.ms {
-                        Text("\(ms)ms")
-                            .font(.system(size: 10).monospacedDigit())
-                            .foregroundStyle(.tertiary)
-                    }
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(Color.black.opacity(0.035))
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            }
-            .buttonStyle(.plain)
-            if expanded {
-                ScrollView(.vertical, showsIndicators: true) {
-                    Text(AgentToolPresentation.prettyJSON(msg.content))
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundStyle(.secondary)
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .frame(maxHeight: 160)
-                .padding(8)
-                .background(Color.black.opacity(0.03))
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            }
-        }
-    }
-}
-
-// MARK: - Simple wrapping tags (no Equatable on dictionaries)
-
-private struct FlowSkillTags: View {
-    let ids: [String]
-    let labels: [String: String]
-    let onRemove: (String) -> Void
-
-    var body: some View {
-        // Horizontal scroll avoids custom Layout complexity on macOS 14.
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 6) {
-                ForEach(ids, id: \.self) { id in
-                    HStack(spacing: 4) {
-                        Image(systemName: "sparkle")
-                            .font(.system(size: 10))
-                        Text(labels[id] ?? id)
-                            .font(.system(size: 11, weight: .medium))
-                            .lineLimit(1)
-                        Button {
-                            onRemove(id)
-                        } label: {
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.system(size: 11))
-                                .foregroundStyle(.secondary)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.accentColor.opacity(0.12))
-                    .clipShape(Capsule())
-                }
-            }
         }
     }
 }
@@ -541,51 +341,6 @@ final class GlobalAgentViewModel: ObservableObject {
         var providerId: String
         var providerName: String
         var models: [ModelPick]
-    }
-
-    enum TranscriptItem: Identifiable {
-        case user(AgentChatMessage)
-        case assistant(AgentChatMessage)
-        case toolGroup([AgentChatMessage])
-
-        var id: String {
-            switch self {
-            case .user(let m), .assistant(let m):
-                return m.id.uuidString
-            case .toolGroup(let tools):
-                let ids = tools.map { $0.id.uuidString }.joined(separator: "|")
-                return "tools:" + ids
-            }
-        }
-    }
-
-    /// Codex-style transcript: hide empty assistants; group consecutive tool calls.
-    var transcriptItems: [TranscriptItem] {
-        var items: [TranscriptItem] = []
-        var toolBuf: [AgentChatMessage] = []
-        func flushTools() {
-            guard !toolBuf.isEmpty else { return }
-            items.append(.toolGroup(toolBuf))
-            toolBuf = []
-        }
-        for msg in messages {
-            switch msg.role {
-            case .user:
-                flushTools()
-                items.append(.user(msg))
-            case .assistant:
-                flushTools()
-                let trimmed = msg.content.trimmingCharacters(in: .whitespacesAndNewlines)
-                if trimmed.isEmpty { continue }
-                items.append(.assistant(msg))
-            case .tool:
-                toolBuf.append(msg)
-            case .system:
-                continue
-            }
-        }
-        flushTools()
-        return items
     }
 
     @Published var messages: [AgentChatMessage] = []
