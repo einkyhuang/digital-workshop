@@ -102,7 +102,7 @@ struct GlobalAgentPanel: View {
                 .textFieldStyle(.plain)
                 .font(.system(size: 15))
                 .focused($inputFocused)
-                .onKeyPress(.return) { press in
+                .onKeyPress(keys: [.return]) { press in
                     if press.modifiers.contains(.shift) {
                         return .ignored
                     }
