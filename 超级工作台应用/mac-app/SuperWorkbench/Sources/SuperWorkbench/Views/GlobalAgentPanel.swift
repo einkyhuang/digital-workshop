@@ -20,23 +20,21 @@ struct GlobalAgentPanel: View {
                 Divider()
                 ScrollViewReader { proxy in
                     ScrollView {
-                        LazyVStack(alignment: .leading, spacing: 12) {
-                            ForEach(vm.messages) { msg in
-                                messageRow(msg).id(msg.id)
-                            }
-                            ForEach(vm.steps) { step in
-                                stepRow(step).id(step.id)
+                        LazyVStack(alignment: .leading, spacing: 10) {
+                            ForEach(vm.transcriptItems) { item in
+                                transcriptRow(item).id(item.id)
                             }
                             if vm.isStreaming {
-                                ProgressView().scaleEffect(0.8).padding(.leading, 8)
+                                typingIndicator.id("typing")
                             }
                         }
                         .padding(16)
                     }
                     .onChange(of: vm.messages.count) { _, _ in
-                        if let last = vm.messages.last {
-                            withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
-                        }
+                        scrollTranscript(proxy)
+                    }
+                    .onChange(of: vm.isStreaming) { _, _ in
+                        scrollTranscript(proxy)
                     }
                 }
                 composerCard
@@ -315,38 +313,170 @@ struct GlobalAgentPanel: View {
         .help("发送（Enter；Shift+Enter 换行）")
     }
 
-    private func messageRow(_ msg: AgentChatMessage) -> some View {
-        HStack(alignment: .top) {
-            if msg.role == .user { Spacer(minLength: 40) }
-            VStack(alignment: .leading, spacing: 4) {
-                Text(msg.role == .user ? "你" : (msg.role == .tool ? "工具" : "Agent"))
-                    .font(.caption2).foregroundStyle(.secondary)
-                Text(msg.content)
-                    .font(.system(size: SWTheme.Typography.body))
-                    .textSelection(.enabled)
-            }
-            .padding(10)
-            .background(msg.role == .user ? Color.accentColor.opacity(0.12) : Color.black.opacity(0.04))
-            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-            if msg.role != .user { Spacer(minLength: 40) }
+    private func scrollTranscript(_ proxy: ScrollViewProxy) {
+        if vm.isStreaming {
+            withAnimation { proxy.scrollTo("typing", anchor: .bottom) }
+            return
+        }
+        if let last = vm.transcriptItems.last {
+            withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
         }
     }
 
-    private func stepRow(_ step: AgentStepEvent) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(systemName: step.ok ? "checkmark.circle.fill" : "xmark.octagon.fill")
-                .foregroundStyle(step.ok ? .green : .red)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(step.name).font(.system(size: 13, weight: .semibold))
-                Text(step.argsSummary).font(.caption).foregroundStyle(.secondary)
-                Text(step.detail).font(.caption).lineLimit(8).textSelection(.enabled)
-            }
-            Spacer()
-            Text("\(step.ms)ms").font(.caption2).foregroundStyle(.secondary)
+    @ViewBuilder
+    private func transcriptRow(_ item: GlobalAgentViewModel.TranscriptItem) -> some View {
+        switch item {
+        case .user(let msg):
+            userBubble(msg)
+        case .assistant(let msg):
+            assistantMarkdown(msg)
+        case .toolGroup(let tools):
+            ToolCallGroupView(tools: tools)
         }
-        .padding(8)
-        .background(Color.black.opacity(0.03))
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func userBubble(_ msg: AgentChatMessage) -> some View {
+        HStack(alignment: .top) {
+            Spacer(minLength: 48)
+            Text(msg.content)
+                .font(.system(size: SWTheme.Typography.body))
+                .textSelection(.enabled)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color.accentColor.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+    }
+
+    private func assistantMarkdown(_ msg: AgentChatMessage) -> some View {
+        HStack(alignment: .top) {
+            markdownText(msg.content)
+                .font(.system(size: SWTheme.Typography.body))
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Spacer(minLength: 24)
+        }
+        .padding(.vertical, 2)
+    }
+
+    private func markdownText(_ raw: String) -> Text {
+        let options = AttributedString.MarkdownParsingOptions(
+            interpretedSyntax: .inlineOnlyPreservingWhitespace
+        )
+        if let attr = try? AttributedString(markdown: raw, options: options) {
+            return Text(attr)
+        }
+        return Text(raw)
+    }
+
+    private var typingIndicator: some View {
+        HStack(spacing: 6) {
+            ProgressView()
+                .controlSize(.small)
+            Text("正在思考…")
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+            Spacer()
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+// MARK: - Codex-style collapsible tool rows
+
+private struct ToolCallGroupView: View {
+    let tools: [AgentChatMessage]
+    @State private var groupExpanded = false
+
+    var body: some View {
+        if tools.count == 1, let only = tools.first {
+            ToolCallRowView(msg: only)
+        } else {
+            VStack(alignment: .leading, spacing: 6) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.15)) { groupExpanded.toggle() }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "wrench.and.screwdriver")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                        Text("已调用 \(tools.count) 个工具")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(.secondary)
+                        Image(systemName: groupExpanded ? "chevron.down" : "chevron.right")
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundStyle(.tertiary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.black.opacity(0.04))
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                if groupExpanded {
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(tools) { msg in
+                            ToolCallRowView(msg: msg)
+                        }
+                    }
+                    .padding(.leading, 8)
+                }
+            }
+        }
+    }
+}
+
+private struct ToolCallRowView: View {
+    let msg: AgentChatMessage
+    @State private var expanded = false
+
+    private var tool: String { msg.toolName ?? "tool" }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.12)) { expanded.toggle() }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: AgentToolPresentation.iconName(tool))
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 14)
+                    Text(AgentToolPresentation.summary(tool: tool, detail: msg.content, argsSummary: msg.toolArgsSummary))
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(expanded ? 3 : 1)
+                    Image(systemName: expanded ? "chevron.down" : "chevron.right")
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(.tertiary)
+                    Spacer(minLength: 0)
+                    if let ms = msg.ms {
+                        Text("\(ms)ms")
+                            .font(.system(size: 10).monospacedDigit())
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Color.black.opacity(0.035))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            if expanded {
+                ScrollView(.vertical, showsIndicators: true) {
+                    Text(AgentToolPresentation.prettyJSON(msg.content))
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .frame(maxHeight: 160)
+                .padding(8)
+                .background(Color.black.opacity(0.03))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            }
+        }
     }
 }
 
@@ -411,6 +541,51 @@ final class GlobalAgentViewModel: ObservableObject {
         var providerId: String
         var providerName: String
         var models: [ModelPick]
+    }
+
+    enum TranscriptItem: Identifiable {
+        case user(AgentChatMessage)
+        case assistant(AgentChatMessage)
+        case toolGroup([AgentChatMessage])
+
+        var id: String {
+            switch self {
+            case .user(let m), .assistant(let m):
+                return m.id.uuidString
+            case .toolGroup(let tools):
+                let ids = tools.map { $0.id.uuidString }.joined(separator: "|")
+                return "tools:" + ids
+            }
+        }
+    }
+
+    /// Codex-style transcript: hide empty assistants; group consecutive tool calls.
+    var transcriptItems: [TranscriptItem] {
+        var items: [TranscriptItem] = []
+        var toolBuf: [AgentChatMessage] = []
+        func flushTools() {
+            guard !toolBuf.isEmpty else { return }
+            items.append(.toolGroup(toolBuf))
+            toolBuf = []
+        }
+        for msg in messages {
+            switch msg.role {
+            case .user:
+                flushTools()
+                items.append(.user(msg))
+            case .assistant:
+                flushTools()
+                let trimmed = msg.content.trimmingCharacters(in: .whitespacesAndNewlines)
+                if trimmed.isEmpty { continue }
+                items.append(.assistant(msg))
+            case .tool:
+                toolBuf.append(msg)
+            case .system:
+                continue
+            }
+        }
+        flushTools()
+        return items
     }
 
     @Published var messages: [AgentChatMessage] = []
@@ -732,12 +907,18 @@ final class GlobalAgentViewModel: ObservableObject {
         if !selectedSkillIds.isEmpty {
             skillNote = "\n已选 Skills：\(selectedSkillIds.joined(separator: ", "))（本地模式未注入全文）"
         }
-        var lines: [String] = ["（本地模式 · 未配置 API Key）\(skillNote)"]
+        var toolMsgs: [AgentChatMessage] = []
         for (name, params) in actions {
             let step = await executor.execute(name: name, params: params)
             steps.append(step)
-            messages.append(AgentChatMessage(role: .tool, content: step.detail, toolName: name, toolArgsSummary: step.argsSummary, ok: step.ok, ms: step.ms))
-            lines.append("• \(name): \(step.ok ? "OK" : "FAIL")")
+            let tm = AgentChatMessage(role: .tool, content: step.detail, toolName: name, toolArgsSummary: step.argsSummary, ok: step.ok, ms: step.ms)
+            messages.append(tm)
+            toolMsgs.append(tm)
+        }
+        var lines: [String] = ["（本地模式 · 未配置 API Key）\(skillNote)"]
+        for tm in toolMsgs {
+            let n = tm.toolName ?? "tool"
+            lines.append("• " + AgentToolPresentation.summary(tool: n, detail: tm.content, argsSummary: tm.toolArgsSummary))
         }
         messages.append(AgentChatMessage(role: .assistant, content: lines.joined(separator: "\n")))
     }
@@ -745,6 +926,15 @@ final class GlobalAgentViewModel: ObservableObject {
     private func runLLM(userText: String, apiKey: String) async {
         let snap = await executor.execute(name: "context.get_snapshot", params: ["scope": "brief"])
         steps.append(snap)
+        // Show snapshot as a compact tool row (not raw duplicate step list).
+        messages.append(AgentChatMessage(
+            role: .tool,
+            content: snap.detail,
+            toolName: "context.get_snapshot",
+            toolArgsSummary: snap.argsSummary,
+            ok: snap.ok,
+            ms: snap.ms
+        ))
         let skillBlock = AgentSkillCatalog.systemContext(
             selectedIds: selectedSkillIds,
             repoRoot: store?.repoRoot
@@ -754,26 +944,37 @@ final class GlobalAgentViewModel: ObservableObject {
             attachNote = "\n用户附带文件（仅文件名，未上传内容）：\(attachmentNames.joined(separator: ", "))"
         }
         let system = """
-        你是超级工作台全局 Agent。只使用提供的 tools 操控工作台。当前上下文：
+        你是超级工作台全局 Agent。可用 tools 操控工作台。当前上下文：
         \(snap.detail)\(attachNote)
 
         \(skillBlock)
 
-        用中文简短回复。单轮 tool 不超过 8 次。
+        规则：
+        1. 用中文给出对用户有用的最终文字回答；不要只调用工具不说话。
+        2. 工具往返最多 6 轮；若搜索结果为 0，换思路或直接说明，禁止用近义词反复空搜。
+        3. 工具返回后必须总结结果；若无需再调工具，直接输出最终回答。
         """
         var apiMessages: [[String: Any]] = [
             ["role": "system", "content": system],
             ["role": "user", "content": userText]
         ]
-        let tools = AgentLLMClient.openAIToolsFromSchema()
+        let toolsSchema = AgentLLMClient.openAIToolsFromSchema()
         let cfg = AgentLLMClient.Config(baseURL: baseURL, model: model, apiKey: apiKey)
-        var assistantId = UUID()
-        messages.append(AgentChatMessage(id: assistantId, role: .assistant, content: ""))
+        let maxLoops = 6
         var loops = 0
-        while loops < 8 {
+        var emptySearchStreak = 0
+        var forceTextOnly = false
+        var roundToolMessages: [AgentChatMessage] = []
+        var assistantId = UUID()
+        // Placeholder for streaming; hidden while empty via transcriptItems.
+        messages.append(AgentChatMessage(id: assistantId, role: .assistant, content: ""))
+
+        while loops < maxLoops {
             loops += 1
+            let allowTools = !forceTextOnly && loops < maxLoops
             do {
-                let result = try await llm.streamChat(config: cfg, messages: apiMessages, tools: tools) { delta in
+                let toolsPayload: [[String: Any]] = allowTools ? toolsSchema : []
+                let result = try await llm.streamChat(config: cfg, messages: apiMessages, tools: toolsPayload) { delta in
                     Task { @MainActor in
                         if let idx = self.messages.firstIndex(where: { $0.id == assistantId }) {
                             self.messages[idx].content += delta
@@ -781,16 +982,29 @@ final class GlobalAgentViewModel: ObservableObject {
                     }
                 }
                 if let idx = messages.firstIndex(where: { $0.id == assistantId }),
-                   messages[idx].content.isEmpty,
-                   !result.content.isEmpty {
+                   messages[idx].content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                   !result.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     messages[idx].content = result.content
                 }
-                if result.toolCalls.isEmpty { break }
+
+                if result.toolCalls.isEmpty || forceTextOnly {
+                    pruneEmptyAssistant(id: assistantId)
+                    break
+                }
+
                 apiMessages.append([
                     "role": "assistant",
                     "content": result.content,
                     "tool_calls": result.toolCalls
                 ])
+
+                // Drop empty streaming shell before tool rows.
+                if let idx = messages.firstIndex(where: { $0.id == assistantId }),
+                   messages[idx].content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    messages.remove(at: idx)
+                }
+
+                var roundHadEmptySearch = false
                 for tc in result.toolCalls {
                     guard let fn = tc["function"] as? [String: Any] else { continue }
                     guard let name = fn["name"] as? String else { continue }
@@ -798,19 +1012,69 @@ final class GlobalAgentViewModel: ObservableObject {
                     let params = (try? JSONSerialization.jsonObject(with: Data(argStr.utf8))) as? [String: Any] ?? [:]
                     let step = await executor.execute(name: name, params: params)
                     steps.append(step)
-                    messages.append(AgentChatMessage(role: .tool, content: step.detail, toolName: name, toolArgsSummary: step.argsSummary, ok: step.ok, ms: step.ms))
+                    let toolMsg = AgentChatMessage(
+                        role: .tool,
+                        content: step.detail,
+                        toolName: name,
+                        toolArgsSummary: step.argsSummary,
+                        ok: step.ok,
+                        ms: step.ms
+                    )
+                    messages.append(toolMsg)
+                    roundToolMessages.append(toolMsg)
                     apiMessages.append([
                         "role": "tool",
                         "tool_call_id": tc["id"] as? String ?? name,
                         "content": step.detail
                     ])
+                    if AgentToolPresentation.isEmptySearchResult(tool: name, detail: step.detail) {
+                        roundHadEmptySearch = true
+                    }
                 }
+
+                if roundHadEmptySearch {
+                    emptySearchStreak += 1
+                } else {
+                    emptySearchStreak = 0
+                }
+
+                if emptySearchStreak >= 2 || loops >= maxLoops - 1 {
+                    forceTextOnly = true
+                    apiMessages.append([
+                        "role": "user",
+                        "content": "工具已返回（含空结果）。请停止继续调用 tools，用中文写一段最终回答：说明尝试了什么、结果如何、下一步建议。"
+                    ])
+                }
+
                 assistantId = UUID()
                 messages.append(AgentChatMessage(id: assistantId, role: .assistant, content: ""))
             } catch {
+                pruneEmptyAssistant(id: assistantId)
                 messages.append(AgentChatMessage(role: .assistant, content: "调用失败：\(error.localizedDescription)"))
-                break
+                return
             }
+        }
+
+        // Ensure a visible final answer.
+        let hasAssistantText = messages.contains {
+            $0.role == .assistant && !$0.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        if !hasAssistantText {
+            pruneEmptyAssistant(id: assistantId)
+            let fromUser = messages.lastIndex(where: { $0.role == .user }) ?? 0
+            let toolsOnly = Array(messages.suffix(from: fromUser).filter { $0.role == .tool })
+            let fallback = AgentToolPresentation.fallbackAnswer(fromToolMessages: toolsOnly, userText: userText)
+            messages.append(AgentChatMessage(role: .assistant, content: fallback))
+        } else {
+            pruneEmptyAssistant(id: assistantId)
+        }
+    }
+
+    private func pruneEmptyAssistant(id: UUID) {
+        guard let idx = messages.firstIndex(where: { $0.id == id }) else { return }
+        let trimmed = messages[idx].content.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            messages.remove(at: idx)
         }
     }
 }

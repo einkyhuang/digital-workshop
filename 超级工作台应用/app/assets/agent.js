@@ -128,6 +128,38 @@
     }
   }
 
+  function chineseToolName(name) {
+    const map = {
+      "context.get_snapshot": "读取工作台快照",
+      "nav.open_section": "打开模块",
+      "nav.switch_workbench": "切换工作台",
+      "task.create": "创建任务",
+      "task.set_status": "更新任务状态",
+      "task.delete": "删除任务",
+      "crm.search_customers": "搜索客户",
+      "crm.send_email": "发送邮件",
+      "external.publish": "外发发布",
+      "agent.undo_last": "撤销上一步"
+    };
+    return map[name] || name;
+  }
+  function toolSummary(name, detail) {
+    const label = chineseToolName(name);
+    let obj = null;
+    try { obj = typeof detail === "string" ? JSON.parse(detail) : detail; } catch (_) {}
+    if (name === "crm.search_customers" && obj) {
+      const q = obj.query || "";
+      const c = obj.count != null ? obj.count : (Array.isArray(obj.results) ? obj.results.length : 0);
+      return q ? (label + "「" + q + "」· " + c + " 条") : (label + " · " + c + " 条");
+    }
+    if (obj && obj.note) return label + " · " + String(obj.note).slice(0, 40);
+    const s = String(detail || "").replace(/\s+/g, " ").slice(0, 80);
+    return s ? (label + " · " + s) : label;
+  }
+  function prettyToolJSON(detail) {
+    try { return JSON.stringify(JSON.parse(detail), null, 2); } catch (_) { return String(detail || ""); }
+  }
+
   function skillCatalog() {
     const base = [
       { value: "deep-client-analysis", label: "深度客户分析与调研", desc: "客商画像与竞争格局报告" },
@@ -418,10 +450,23 @@
       } else if (selectedModel) {
         line("assistant", "使用模型：" + selectedModel + (selectedProviderId ? (" @" + selectedProviderId) : ""));
       }
+      const toolResults = [];
       for (const [name, params] of actions) {
         const r = await execute(name, params, state, api);
-        line("tool", name + " · " + (r.ok ? "OK" : "FAIL") + " · " + r.detail.slice(0, 400));
+        toolResults.push({ name, r });
       }
+      if (toolResults.length === 1) {
+        const { name, r } = toolResults[0];
+        line("tool", "▸ " + toolSummary(name, r.detail));
+      } else if (toolResults.length > 1) {
+        line("tool", "▸ 已调用 " + toolResults.length + " 个工具");
+        toolResults.forEach(({ name, r }) => {
+          line("tool", "  · " + toolSummary(name, r.detail));
+        });
+      }
+      // Always leave a short assistant summary (web has no LLM loop).
+      const summaryLines = toolResults.map(({ name, r }) => "• " + toolSummary(name, r.detail));
+      line("assistant", summaryLines.join("\n") || "已处理。");
       attachmentNames = [];
     }
     sendBtn.onclick = send;
