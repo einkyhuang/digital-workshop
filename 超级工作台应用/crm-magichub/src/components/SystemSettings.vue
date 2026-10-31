@@ -219,7 +219,7 @@
             <div class="flex justify-between items-center select-none">
               <div class="flex items-center gap-2">
                 <label class="block text-[10px] text-zen-gray font-bold">模型</label>
-                <span class="px-1.5 py-0.5 rounded-full bg-black/[0.04] text-[8px] font-bold text-zen-gray">1</span>
+                <span class="px-1.5 py-0.5 rounded-full bg-black/[0.04] text-[8px] font-bold text-zen-gray">{{ (selectedProvider.availableModels && selectedProvider.availableModels.length) || 1 }}</span>
                 <span class="text-zen-gray text-[9px]">🎚️</span>
                 <span class="text-zen-gray text-[9px]">🔍</span>
               </div>
@@ -241,27 +241,35 @@
               </div>
             </div>
 
-            <!-- Preloaded model hierarchy list -->
+            <!-- Model hierarchy list (from /models or current selection) -->
             <div class="bg-black/[0.02] border border-black/[0.04] rounded-2xl p-4 space-y-3 shadow-inner">
               <div class="text-xs">
-                <!-- Group name -->
                 <div class="font-bold text-zen-gray text-[9px] mb-2 uppercase select-none tracking-wider font-mono">
                   {{ selectedProvider.modelGroup }}
                 </div>
-                <!-- Model row -->
-                <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-black/[0.02] shadow-sm">
-                  <div class="flex items-center gap-2 select-none">
-                    <span class="w-5 h-5 rounded-full bg-[#ECEFF1] text-[#455A64] text-[9px] font-mono font-bold flex items-center justify-center">S</span>
-                    <span class="font-semibold text-zen-ink font-mono text-[10px]">{{ selectedProvider.model }}</span>
-                  </div>
-                  <div class="flex items-center gap-2 select-none">
-                    <span class="text-zen-gray text-[10px] cursor-pointer hover:text-zen-ink">⚙️</span>
-                    <span
-                      @click="deleteModel"
-                      class="text-zen-gray text-[10px] cursor-pointer hover:text-zen-crimson font-bold w-4 h-4 flex items-center justify-center rounded hover:bg-black/5"
-                    >
-                      －
-                    </span>
+                <div v-if="modelsFetchError" class="mb-2 p-2 rounded-xl bg-red-50 border border-red-200 text-[10px] text-red-700 whitespace-pre-wrap break-words">
+                  {{ modelsFetchError }}
+                </div>
+                <div class="max-h-48 overflow-y-auto space-y-1.5 pr-0.5">
+                  <div
+                    v-for="mid in (selectedProvider.availableModels && selectedProvider.availableModels.length ? selectedProvider.availableModels : [selectedProvider.model])"
+                    :key="mid"
+                    @click="selectModel(mid)"
+                    class="flex items-center justify-between p-2 bg-white rounded-xl border shadow-sm cursor-pointer transition-all"
+                    :class="mid === selectedProvider.model ? 'border-zen-green/60 ring-1 ring-zen-green/30' : 'border-black/[0.02] hover:border-black/10'"
+                  >
+                    <div class="flex items-center gap-2 select-none min-w-0">
+                      <span class="w-5 h-5 shrink-0 rounded-full bg-[#ECEFF1] text-[#455A64] text-[9px] font-mono font-bold flex items-center justify-center">{{ mid === selectedProvider.model ? 'S' : '·' }}</span>
+                      <span class="font-semibold text-zen-ink font-mono text-[10px] truncate" :title="mid">{{ mid }}</span>
+                    </div>
+                    <div v-if="mid === selectedProvider.model" class="flex items-center gap-2 select-none shrink-0">
+                      <span
+                        @click.stop="deleteModel"
+                        class="text-zen-gray text-[10px] cursor-pointer hover:text-zen-crimson font-bold w-4 h-4 flex items-center justify-center rounded hover:bg-black/5"
+                      >
+                        －
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1002,6 +1010,7 @@ const customProviderForm = reactive({
 const isAddModelModalOpen = ref(false);
 const newModelInput = ref('');
 const showApiKey = ref(false);
+const modelsFetchError = ref('');
 const providerSearchQuery = ref('');
 const activeChapter = ref(0);
 
@@ -1038,6 +1047,7 @@ const sortedFilteredProviders = computed(() => {
 const selectProvider = (p) => {
   selectedProvider.value = p;
   showApiKey.value = false;
+  modelsFetchError.value = '';
 };
 
 // Add custom model platform at bottom of list
@@ -1122,6 +1132,59 @@ const deleteCustomProvider = (p) => {
   }
 };
 
+// ---- Models / connection helpers (OpenAI-compatible + Gemini native) ----
+const normalizeBaseUrl = (base) => String(base || '').trim().replace(/\/+$/, '');
+
+const buildModelsRequest = (provider) => {
+  const key = String(provider.apiKey || '').trim();
+  const base = normalizeBaseUrl(provider.baseUrl);
+  // Native Gemini models list when base is Google AI (not the OpenAI-compat shim)
+  const isGeminiNative = provider.id === 'gemini'
+    && /googleapis\.com/i.test(base)
+    && !/\/openai(\/|$)/i.test(base);
+  if (isGeminiNative || (provider.id === 'gemini' && /api\.gemini\.net/i.test(base))) {
+    return {
+      url: `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`,
+      headers: {},
+      style: 'gemini'
+    };
+  }
+  const url = /\/models$/i.test(base) ? base : `${base}/models`;
+  return {
+    url,
+    headers: { Authorization: `Bearer ${key}` },
+    style: 'openai'
+  };
+};
+
+const parseModelIds = (json) => {
+  if (!json) return [];
+  if (Array.isArray(json.data)) {
+    return json.data.map((m) => (typeof m === 'string' ? m : (m && (m.id || m.name)))).filter(Boolean);
+  }
+  if (Array.isArray(json.models)) {
+    return json.models.map((m) => {
+      const n = typeof m === 'string' ? m : (m && (m.name || m.id)) || '';
+      return String(n).replace(/^models\//, '');
+    }).filter(Boolean);
+  }
+  if (Array.isArray(json)) {
+    return json.map((m) => (typeof m === 'string' ? m : (m && (m.id || m.name)))).filter(Boolean);
+  }
+  return [];
+};
+
+const explainFetchError = (err, httpDetail) => {
+  let errMsg = httpDetail || (err && err.message) || '未知错误';
+  if (err && err.name === 'AbortError') {
+    errMsg = '请求超时（请检查 Base URL / 是否需要代理）';
+  }
+  if (/Failed to fetch|NetworkError|Load failed|Network request failed/i.test(errMsg)) {
+    errMsg += '\n可能原因：CORS（用浏览器打开时）、网络不通、或 Base URL 错误。Mac 内嵌 WKWebView 一般不受 CORS 限制。';
+  }
+  return errMsg;
+};
+
 // Real-world API connection checker
 const testingConnection = ref(false);
 const testProviderConnection = async () => {
@@ -1129,36 +1192,26 @@ const testProviderConnection = async () => {
     alert(`请输入有效的 API 密钥！`);
     return;
   }
-  
+
   testingConnection.value = true;
   const startTime = Date.now();
-  
+
   try {
-    let testUrl = `${selectedProvider.value.baseUrl}/models`;
-    let headers = {
-      'Authorization': `Bearer ${selectedProvider.value.apiKey}`
-    };
-    
-    if (selectedProvider.value.id === 'gemini' && selectedProvider.value.baseUrl.includes('api.gemini.net')) {
-      testUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${selectedProvider.value.apiKey}`;
-      headers = {};
-    }
-    
+    const { url, headers } = buildModelsRequest(selectedProvider.value);
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
-    
-    const response = await fetch(testUrl, {
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(url, {
       method: 'GET',
-      headers: headers,
+      headers,
       signal: controller.signal
     });
-    
+
     clearTimeout(timeoutId);
-    const endTime = Date.now();
-    const latency = endTime - startTime;
-    
+    const latency = Date.now() - startTime;
+
     if (response.ok) {
-      alert(`「${selectedProvider.value.name} 连接检测成功」\n物理通道延迟：${latency}ms\n鉴权状态：Authorized 🟢\n密钥已通过云端接口双向校验，通路完好！`);
+      alert(`「${selectedProvider.value.name} 连接检测成功」\n物理通道延迟：${latency}ms\n鉴权状态：Authorized 🟢\n探测地址：${url}\n密钥已通过云端接口校验，通路完好！`);
     } else {
       let errMsg = `HTTP Error ${response.status} ${response.statusText}`;
       try {
@@ -1169,14 +1222,11 @@ const testProviderConnection = async () => {
           errMsg = errJson.message;
         }
       } catch (e) {}
-      
-      alert(`「${selectedProvider.value.name} 密钥验证失败」\n状态代码：${response.status}\n详细信息：${errMsg} 🔴\n请检查该平台 API Key 是否有效或余额是否充足。`);
+
+      alert(`「${selectedProvider.value.name} 密钥验证失败」\n状态代码：${response.status}\n探测地址：${url}\n详细信息：${errMsg} 🔴\n请检查 API Key、Base URL（勿漏 /v1）或余额。`);
     }
   } catch (err) {
-    let errMsg = err.message || '网络连接超时';
-    if (err.name === 'AbortError') {
-      errMsg = '请求连接超时（请检查 Base URL 是否需要代理网络环境）';
-    }
+    const errMsg = explainFetchError(err);
     alert(`「${selectedProvider.value.name} 物理网络检测失败」\n网络状态：Disconnected 🔴\n错误描述：${errMsg}\n请确认接口端点 (Base URL) 以及本机的网络代理配置！`);
   } finally {
     testingConnection.value = false;
@@ -1208,13 +1258,95 @@ const resetBaseUrl = () => {
 };
 
 const syncingModels = ref(false);
-const syncModels = () => {
+
+const selectModel = (mid) => {
+  if (!selectedProvider.value || !mid) return;
+  selectedProvider.value.model = mid;
+  if (String(mid).includes('/')) {
+    selectedProvider.value.modelGroup = String(mid).split('/')[0];
+  }
+  emit('update:providers', [...localProviders.value]);
+};
+
+const syncModels = async () => {
   if (!selectedProvider.value) return;
+  if (!selectedProvider.value.apiKey || !String(selectedProvider.value.apiKey).trim()) {
+    modelsFetchError.value = '请先填写 API 密钥后再拉取模型列表';
+    alert(modelsFetchError.value);
+    return;
+  }
+  if (!selectedProvider.value.baseUrl || !String(selectedProvider.value.baseUrl).trim()) {
+    modelsFetchError.value = '请先填写 API 地址 (Base URL)';
+    alert(modelsFetchError.value);
+    return;
+  }
+
   syncingModels.value = true;
-  setTimeout(() => {
+  modelsFetchError.value = '';
+  const { url, headers } = buildModelsRequest(selectedProvider.value);
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      let errMsg = `HTTP ${response.status} ${response.statusText}`;
+      try {
+        const errJson = await response.json();
+        if (errJson && errJson.error && errJson.error.message) errMsg = errJson.error.message;
+        else if (errJson && errJson.message) errMsg = errJson.message;
+      } catch (e) {
+        try {
+          const t = await response.text();
+          if (t) errMsg = t.slice(0, 400);
+        } catch (_) {}
+      }
+      throw new Error(`${errMsg}
+探测地址：${url}`);
+    }
+
+    const data = await response.json();
+    const ids = parseModelIds(data);
+    if (!ids.length) {
+      throw new Error(`接口返回成功，但未解析到模型（期望 data[].id 或 models[].name）
+探测地址：${url}`);
+    }
+
+    selectedProvider.value.availableModels = ids;
+    if (!ids.includes(selectedProvider.value.model)) {
+      selectedProvider.value.model = ids[0];
+    }
+    if (String(selectedProvider.value.model).includes('/')) {
+      selectedProvider.value.modelGroup = String(selectedProvider.value.model).split('/')[0];
+    }
+
+    emit('update:providers', [...localProviders.value]);
+    try {
+      localStorage.setItem('magichub_ai_providers', JSON.stringify(localProviders.value));
+      if (window.electronAPI && window.electronAPI.saveSettings) {
+        window.electronAPI.saveSettings('magichub_ai_providers', JSON.parse(JSON.stringify(localProviders.value)));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    alert(`「${selectedProvider.value.name}」已拉取 ${ids.length} 个模型 🟢
+当前选用：${selectedProvider.value.model}
+探测地址：${url}`);
+  } catch (err) {
+    const errMsg = explainFetchError(err);
+    modelsFetchError.value = errMsg;
+    alert(`「${selectedProvider.value.name}」拉取模型失败 🔴
+${errMsg}`);
+  } finally {
     syncingModels.value = false;
-    alert(`「${selectedProvider.value.name}」模型同步就绪！已成功从算力网关拉取最新模型：[${selectedProvider.value.model}] 🟢`);
-  }, 900);
+  }
 };
 
 const addNewModel = () => {

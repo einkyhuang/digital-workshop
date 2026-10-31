@@ -64,7 +64,7 @@ const defaultProviders = [
   { id: 'vercel', name: 'Vercel AI Gateway', icon: '▲', iconColor: 'bg-black', status: false, baseUrl: 'https://gateway.ai.vercel.cloud/v1', apiKey: '', modelGroup: 'gateway', model: 'openai/gpt-4o', previewUrl: 'https://gateway.ai.vercel.cloud/v1/chat/completions' },
   { id: 'bailian', name: '阿里云百炼', icon: '百', iconColor: 'bg-blue-600', status: false, baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1', apiKey: '', modelGroup: 'qwen', model: 'qwen-max', previewUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions' },
   { id: 'qiniu', name: '七牛云 AI 推理', icon: '七', iconColor: 'bg-blue-300', status: false, baseUrl: 'https://api.qiniu.com/v1', apiKey: '', modelGroup: 'qiniu-ai', model: 'qiniu-llama-3', previewUrl: 'https://api.qiniu.com/v1/chat/completions' },
-  { id: 'deepseek', name: '深度求索', icon: '深', iconColor: 'bg-blue-700', status: true, baseUrl: 'https://api.deepseek.com/v1', apiKey: '', modelGroup: 'deepseek', model: 'deepseek-v4-pro', previewUrl: 'https://api.deepseek.com/v1/chat/completions' },
+  { id: 'deepseek', name: '深度求索', icon: '深', iconColor: 'bg-blue-700', status: true, baseUrl: 'https://api.deepseek.com/v1', apiKey: '', modelGroup: 'deepseek', model: 'deepseek-chat', previewUrl: 'https://api.deepseek.com/v1/chat/completions' },
   { id: 'zhipu', name: '智谱开放平台', icon: '智', iconColor: 'bg-blue-900', status: false, baseUrl: 'https://open.bigmodel.cn/api/paas/v4', apiKey: '', modelGroup: 'glm', model: 'glm-4', previewUrl: 'https://open.bigmodel.cn/api/paas/v4/chat/completions' },
   { id: 'openrouter', name: 'OpenRouter', icon: 'O', iconColor: 'bg-purple-800', status: false, baseUrl: 'https://openrouter.ai/api/v1', apiKey: '', modelGroup: 'openrouter', model: 'meta-llama/llama-3-70b-instruct', previewUrl: 'https://openrouter.ai/api/v1/chat/completions' },
   { id: 'cerebras', name: 'Cerebras AI', icon: 'C', iconColor: 'bg-orange-600', status: false, baseUrl: 'https://api.cerebras.ai/v1', apiKey: '', modelGroup: 'cerebras', model: 'llama3.1-8b', previewUrl: 'https://api.cerebras.ai/v1/chat/completions' },
@@ -118,11 +118,10 @@ const loadSavedProviders = async () => {
           let model = matched.model !== undefined ? matched.model : p.model;
 
           if (p.id === 'deepseek') {
-            // Force the active genuine API key
-            apiKey = '';
+            // Keep user-saved key/model; only fill defaults when missing
             status = true;
-            baseUrl = 'https://api.deepseek.com/v1';
-            model = 'deepseek-v4-pro';
+            if (!baseUrl) baseUrl = 'https://api.deepseek.com/v1';
+            if (!model) model = 'deepseek-chat';
           }
 
           return {
@@ -130,7 +129,8 @@ const loadSavedProviders = async () => {
             apiKey,
             baseUrl,
             model,
-            status
+            status,
+            availableModels: Array.isArray(matched.availableModels) ? matched.availableModels : (p.availableModels || [])
           };
         }
         if (p.id === 'deepseek') {
@@ -139,7 +139,7 @@ const loadSavedProviders = async () => {
             apiKey: '',
             status: true,
             baseUrl: 'https://api.deepseek.com/v1',
-            model: 'deepseek-v4-pro'
+            model: 'deepseek-chat'
           };
         }
         return p;
@@ -155,7 +155,7 @@ const loadSavedProviders = async () => {
             apiKey: '',
             status: true,
             baseUrl: 'https://api.deepseek.com/v1',
-            model: 'deepseek-v4-pro'
+            model: 'deepseek-chat'
           };
         }
         return p;
@@ -175,7 +175,7 @@ const loadSavedProviders = async () => {
           apiKey: '',
           status: true,
           baseUrl: 'https://api.deepseek.com/v1',
-          model: 'deepseek-v4-pro'
+          model: 'deepseek-chat'
         };
       }
       return p;
