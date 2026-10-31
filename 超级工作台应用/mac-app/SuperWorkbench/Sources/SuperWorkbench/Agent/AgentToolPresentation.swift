@@ -4,6 +4,10 @@ import Foundation
 enum AgentToolPresentation {
     static func chineseName(_ tool: String) -> String {
         switch tool {
+        case "list_employees": return "列出员工"
+        case "delegate_to_employee": return "派工"
+        case "crm_stats": return "客户统计"
+        case "system_overview": return "系统总览"
         case "crm.search_customers": return "搜索客户"
         case "crm.open_customer": return "打开客户"
         case "crm.add_followup": return "添加跟进"
@@ -29,6 +33,10 @@ enum AgentToolPresentation {
 
     static func iconName(_ tool: String) -> String {
         switch tool {
+        case "list_employees": return "person.3"
+        case "delegate_to_employee": return "arrow.right.circle"
+        case "crm_stats": return "chart.bar"
+        case "system_overview": return "square.grid.2x2"
         case "crm.search_customers": return "magnifyingglass"
         case "crm.open_customer": return "person.crop.circle"
         case "crm.add_followup": return "text.bubble"
@@ -47,11 +55,29 @@ enum AgentToolPresentation {
         let json = parseJSON(detail)
         let name = chineseName(tool)
         switch tool {
+        case "list_employees":
+            let c = intValue(json["count"]) ?? 0
+            return "\(name) · \(c) 人"
+        case "delegate_to_employee":
+            let botName = stringValue(json["botName"]) ?? extractArg(argsSummary, key: "botId") ?? "员工"
+            let task = stringValue(json["task"]) ?? extractArg(argsSummary, key: "task") ?? ""
+            let status = stringValue(json["status"]) ?? ((json["ok"] as? Bool) == false ? "失败" : "完成")
+            let taskShort = task.count > 28 ? String(task.prefix(26)) + "…" : task
+            if taskShort.isEmpty { return "派给 \(botName) · \(status)" }
+            return "派给 \(botName)：\(taskShort) · \(status)"
+        case "crm_stats":
+            let total = intValue(json["total"]) ?? 0
+            return "\(name) · 共 \(total) 客户"
+        case "system_overview":
+            let c = intValue(json["customers"]) ?? intValue(json["customerTotal"]) ?? 0
+            let b = intValue(json["bots"]) ?? intValue(json["botCount"]) ?? 0
+            return "\(name) · 客户 \(c) · 员工 \(b)"
         case "crm.search_customers":
             let q = stringValue(json["query"]) ?? extractArg(argsSummary, key: "query") ?? ""
+            let matchTotal = intValue(json["matchTotal"]) ?? intValue(json["total"]) ?? intValue(json["count"]) ?? 0
             let count = intValue(json["count"]) ?? 0
-            if q.isEmpty { return "\(name) · \(count) 条" }
-            return "\(name)「\(q)」· \(count) 条"
+            if q.isEmpty { return "\(name) · 命中 \(matchTotal)" }
+            return "\(name)「\(q)」· 命中 \(matchTotal)（本页 \(count)）"
         case "context.get_snapshot":
             return "\(name) · 已获取"
         case "nav.open_section":
@@ -95,9 +121,11 @@ enum AgentToolPresentation {
     static func isEmptySearchResult(tool: String, detail: String) -> Bool {
         guard tool == "crm.search_customers" else { return false }
         let json = parseJSON(detail)
+        if let m = intValue(json["matchTotal"]) { return m == 0 }
         if let c = intValue(json["count"]) { return c == 0 }
         if let arr = json["results"] as? [Any] { return arr.isEmpty }
-        return detail.contains("\"count\": 0") || detail.contains("\"count\":0")
+        return detail.contains("\"matchTotal\": 0") || detail.contains("\"matchTotal\":0")
+            || detail.contains("\"count\": 0") || detail.contains("\"count\":0")
     }
 
     static func fallbackAnswer(fromToolMessages tools: [AgentChatMessage], userText: String) -> String {

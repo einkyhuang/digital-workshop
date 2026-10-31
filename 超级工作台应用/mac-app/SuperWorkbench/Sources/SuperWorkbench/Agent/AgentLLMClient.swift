@@ -77,6 +77,8 @@ actor AgentLLMClient {
 
     static func openAIToolsFromSchema() -> [[String: Any]] {
         [
+            tool("list_employees", "列出工作台全部数字员工（id/姓名/简介），供总调度选型", [String: Any](), []),
+            tool("delegate_to_employee", "把任务委派给指定员工；员工用其人设与模型作答并写入私有会话与工作摘要", ["botId": ["type": "string"], "task": ["type": "string"]], ["botId", "task"]),
             tool("context.get_snapshot", "只读快照", ["scope": ["type": "string", "enum": ["brief", "full"]]], []),
             tool("nav.open_section", "打开模块", ["sectionId": ["type": "string"]], ["sectionId"]),
             tool("nav.switch_workbench", "切换工作台", ["workbenchId": ["type": "string"]], ["workbenchId"]),
@@ -87,7 +89,9 @@ actor AgentLLMClient {
             tool("task.set_status", "改任务状态", ["id": ["type": "string"], "status": ["type": "string"]], ["id", "status"]),
             tool("task.delete", "删除任务(需确认)", ["id": ["type": "string"]], ["id"]),
             tool("agent.undo_last", "撤销上次可逆写", [String: Any](), []),
-            tool("crm.search_customers", "本地搜索客户", ["query": ["type": "string"], "page": ["type": "integer"], "limit": ["type": "integer"]], []),
+            tool("crm_stats", "客户库统计：总数/国家/阶段/星级/来源分布与近期样本（同源 leads-index）", ["topN": ["type": "integer"]], []),
+            tool("system_overview", "工作台总览：客户/员工/任务/项目/deliverables 计数", [String: Any](), []),
+            tool("crm.search_customers", "模糊搜索客户（company/country/product/notes）；返回 matchTotal；countOnly=true 只计数不翻页", ["query": ["type": "string"], "page": ["type": "integer"], "limit": ["type": "integer"], "countOnly": ["type": "boolean"]], []),
             tool("crm.open_customer", "打开客户", ["customerId": ["type": "string"]], ["customerId"]),
             tool("crm.upsert_followup", "追加跟进", ["customerId": ["type": "string"], "note": ["type": "string"]], ["customerId", "note"]),
             tool("crm.create_quote", "报价草稿(L2)", ["customerId": ["type": "string"], "title": ["type": "string"], "amount": ["type": "string"], "currency": ["type": "string"], "note": ["type": "string"]], ["customerId"]),

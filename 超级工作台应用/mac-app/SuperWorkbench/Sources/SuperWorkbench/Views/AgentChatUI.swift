@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 // MARK: - Shared transcript building
 
@@ -37,7 +38,13 @@ enum AgentTranscriptBuilder {
                 if trimmed.isEmpty { continue }
                 out.append(.assistant(msg))
             case .tool:
-                toolBuf.append(msg)
+                // Keep each delegation as its own compact row (not buried in a group).
+                if msg.toolName == "delegate_to_employee" {
+                    flush()
+                    out.append(.toolGroup([msg]))
+                } else {
+                    toolBuf.append(msg)
+                }
             case .system:
                 continue
             }
@@ -183,6 +190,18 @@ struct ToolCallRowView: View {
 
     private var tool: String { msg.toolName ?? "tool" }
 
+    private var expandedBody: String {
+        if tool == "delegate_to_employee" {
+            if let data = msg.content.data(using: .utf8),
+               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let output = obj["output"] as? String,
+               !output.isEmpty {
+                return output
+            }
+        }
+        return AgentToolPresentation.prettyJSON(msg.content)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Button {
@@ -215,13 +234,13 @@ struct ToolCallRowView: View {
             .buttonStyle(.plain)
             if expanded {
                 ScrollView(.vertical, showsIndicators: true) {
-                    Text(AgentToolPresentation.prettyJSON(msg.content))
-                        .font(.system(size: 10, design: .monospaced))
+                    Text(expandedBody)
+                        .font(.system(size: tool == "delegate_to_employee" ? 12 : 10, design: tool == "delegate_to_employee" ? .default : .monospaced))
                         .foregroundStyle(.secondary)
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .frame(maxHeight: 160)
+                .frame(maxHeight: tool == "delegate_to_employee" ? 220 : 160)
                 .padding(8)
                 .background(Color.black.opacity(0.03))
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))

@@ -10,6 +10,8 @@
     "task.set_status": "L1",
     "task.delete": "L2",
     "agent.undo_last": "L1",
+    "crm_stats": "L0",
+    "system_overview": "L0",
     "crm.search_customers": "L0",
     "crm.send_email": "L3",
     "external.publish": "L3"
@@ -136,6 +138,8 @@
       "task.create": "创建任务",
       "task.set_status": "更新任务状态",
       "task.delete": "删除任务",
+      "crm_stats": "客户统计",
+      "system_overview": "系统总览",
       "crm.search_customers": "搜索客户",
       "crm.send_email": "发送邮件",
       "external.publish": "外发发布",

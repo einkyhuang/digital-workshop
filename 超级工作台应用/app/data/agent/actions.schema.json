@@ -234,13 +234,43 @@
       }
     },
     {
+      "name": "crm_stats",
+      "risk": "L0",
+      "undoable": false,
+      "platforms": [
+        "mac"
+      ],
+      "description": "客户库统计：总数与国家/阶段/星级/来源分布（同源 leads-index.total）",
+      "params": {
+        "type": "object",
+        "properties": {
+          "topN": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    {
+      "name": "system_overview",
+      "risk": "L0",
+      "undoable": false,
+      "platforms": [
+        "mac"
+      ],
+      "description": "工作台总览：客户/员工/任务/项目/deliverables 计数",
+      "params": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
       "name": "crm.search_customers",
       "risk": "L0",
       "undoable": false,
       "platforms": [
         "mac"
       ],
-      "description": "本地搜索客户（private CRM 分页索引）",
+      "description": "模糊搜索客户（company/country/product/notes）；返回 matchTotal；countOnly 只计数",
       "params": {
         "type": "object",
         "properties": {
@@ -252,6 +282,9 @@
           },
           "limit": {
             "type": "integer"
+          },
+          "countOnly": {
+            "type": "boolean"
           }
         }
       }

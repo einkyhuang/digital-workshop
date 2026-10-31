@@ -7,7 +7,8 @@ enum AgentRisk: String {
         case "task.delete", "crm.create_quote": return .L2
         case "crm.send_email", "external.publish": return .L3
         case "task.create", "task.update", "task.set_status", "agent.undo_last", "crm.upsert_followup": return .L1
-        case "crm.search_customers", "crm.open_customer", "context.get_snapshot",
+        case "list_employees", "delegate_to_employee", "crm_stats", "system_overview",
+             "crm.search_customers", "crm.open_customer", "context.get_snapshot",
              "nav.open_section", "nav.switch_workbench", "schedule.open_day", "daily.open_report":
             return .L0
         default: return .L0
@@ -120,12 +121,36 @@ final class AgentExecutor {
             return (true, "deleted \(id)")
         case "agent.undo_last":
             return undoLast()
+        case "crm_stats":
+            guard let store else { return (false, "no store") }
+            let topN = params["topN"] as? Int ?? 8
+            return AgentCRM.crmStats(repoRoot: store.repoRoot, topN: topN)
+        case "system_overview":
+            guard let store else { return (false, "no store") }
+            let projects = (store.data.websiteProjects ?? []).count
+            return AgentCRM.systemOverview(
+                repoRoot: store.repoRoot,
+                storeBots: store.data.bots.count,
+                storeTasks: store.data.tasks.count,
+                storeProjects: projects
+            )
         case "crm.search_customers":
             guard let store else { return (false, "no store") }
             let query = params["query"] as? String ?? ""
             let page = params["page"] as? Int ?? 0
-            let limit = params["limit"] as? Int ?? 20
-            return AgentCRM.searchCustomers(repoRoot: store.repoRoot, query: query, page: page, limit: limit)
+            let limit = params["limit"] as? Int ?? 30
+            let countOnly: Bool = {
+                if let b = params["countOnly"] as? Bool { return b }
+                if let n = params["countOnly"] as? NSNumber { return n.boolValue }
+                return false
+            }()
+            return AgentCRM.searchCustomers(
+                repoRoot: store.repoRoot,
+                query: query,
+                page: page,
+                limit: limit,
+                countOnly: countOnly
+            )
         case "crm.open_customer":
             guard let store, let id = params["customerId"] as? String else { return (false, "missing customerId") }
             return AgentCRM.openCustomer(store: store, customerId: id)

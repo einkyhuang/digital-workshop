@@ -57,8 +57,8 @@ struct GlobalAgentPanel: View {
     private var header: some View {
         HStack {
             Image(systemName: "sparkles")
-            Text("全局 Agent").font(.headline)
-            Text("模型 · Skills").font(.caption).foregroundStyle(.secondary)
+            Text("大可可 · 总调度").font(.headline)
+            Text("全局对话默认由 chief 调度员工").font(.caption).foregroundStyle(.secondary)
             Spacer()
             Button("设置") { vm.showSettings = true }
                 .buttonStyle(.borderless)
@@ -406,7 +406,7 @@ final class GlobalAgentViewModel: ObservableObject {
         if messages.isEmpty {
             messages.append(AgentChatMessage(
                 role: .assistant,
-                content: "全局 Agent：选择模型与 Skills 后提问。配置与外贸工作台共用（Application Support/超级工作台/models.json）。"
+                content: "我是 **大可可（总调度）**。直接说需求即可；需要时我会 `list_employees` / `delegate_to_employee` 派给合适的数字员工，并汇总结果。浏览器/发信/发帖请走 Grok Bot App 里的大可可。"
             ))
         }
         reloadGlobalProviders()
@@ -679,9 +679,12 @@ final class GlobalAgentViewModel: ObservableObject {
     }
 
     private func runLLM(userText: String, apiKey: String) async {
+        guard let store else {
+            messages.append(AgentChatMessage(role: .assistant, content: "内部错误：未绑定 WorkspaceStore。"))
+            return
+        }
         let snap = await executor.execute(name: "context.get_snapshot", params: ["scope": "brief"])
         steps.append(snap)
-        // Show snapshot as a compact tool row (not raw duplicate step list).
         messages.append(AgentChatMessage(
             role: .tool,
             content: snap.detail,
@@ -692,23 +695,24 @@ final class GlobalAgentViewModel: ObservableObject {
         ))
         let skillBlock = AgentSkillCatalog.systemContext(
             selectedIds: selectedSkillIds,
-            repoRoot: store?.repoRoot
+            repoRoot: store.repoRoot
         )
         var attachNote = ""
         if !attachmentNames.isEmpty {
             attachNote = "\n用户附带文件（仅文件名，未上传内容）：\(attachmentNames.joined(separator: ", "))"
         }
-        let system = """
-        你是超级工作台全局 Agent。可用 tools 操控工作台。当前上下文：
-        \(snap.detail)\(attachNote)
-
-        \(skillBlock)
-
-        规则：
-        1. 用中文给出对用户有用的最终文字回答；不要只调用工具不说话。
-        2. 工具往返最多 6 轮；若搜索结果为 0，换思路或直接说明，禁止用近义词反复空搜。
-        3. 工具返回后必须总结结果；若无需再调工具，直接输出最终回答。
-        """
+        let projects = (store.data.websiteProjects ?? []).count
+        let liveLine = AgentCRM.liveSnapshotLine(
+            repoRoot: store.repoRoot,
+            bots: store.data.bots.count,
+            tasks: store.data.tasks.count,
+            projects: projects
+        )
+        let system = ChiefDispatchService.chiefSystemPrompt(
+            store: store,
+            skillBlock: skillBlock + attachNote,
+            snapshot: liveLine + "\n" + snap.detail
+        )
         var apiMessages: [[String: Any]] = [
             ["role": "system", "content": system],
             ["role": "user", "content": userText]
@@ -719,14 +723,13 @@ final class GlobalAgentViewModel: ObservableObject {
         var loops = 0
         var emptySearchStreak = 0
         var forceTextOnly = false
-        var roundToolMessages: [AgentChatMessage] = []
+        var delegationRounds = 0
         var assistantId = UUID()
-        // Placeholder for streaming; hidden while empty via transcriptItems.
         messages.append(AgentChatMessage(id: assistantId, role: .assistant, content: ""))
 
         while loops < maxLoops {
             loops += 1
-            let allowTools = !forceTextOnly && loops < maxLoops
+            let allowTools = !forceTextOnly && loops <= maxLoops && delegationRounds < maxLoops
             do {
                 let toolsPayload: [[String: Any]] = allowTools ? toolsSchema : []
                 let result = try await llm.streamChat(config: cfg, messages: apiMessages, tools: toolsPayload) { delta in
@@ -753,18 +756,73 @@ final class GlobalAgentViewModel: ObservableObject {
                     "tool_calls": result.toolCalls
                 ])
 
-                // Drop empty streaming shell before tool rows.
                 if let idx = messages.firstIndex(where: { $0.id == assistantId }),
                    messages[idx].content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     messages.remove(at: idx)
                 }
 
+                struct PendingDelegate {
+                    var callId: String
+                    var botId: String
+                    var task: String
+                }
+                var pendingDelegates: [PendingDelegate] = []
                 var roundHadEmptySearch = false
+                var roundHadDelegate = false
+
                 for tc in result.toolCalls {
                     guard let fn = tc["function"] as? [String: Any] else { continue }
                     guard let name = fn["name"] as? String else { continue }
+                    let callId = (tc["id"] as? String) ?? name
                     let argStr = fn["arguments"] as? String ?? "{}"
                     let params = (try? JSONSerialization.jsonObject(with: Data(argStr.utf8))) as? [String: Any] ?? [:]
+
+                    if name == "list_employees" {
+                        let detail = ChiefDispatchService.listEmployeesJSON(store: store)
+                        let toolMsg = AgentChatMessage(
+                            role: .tool,
+                            content: detail,
+                            toolName: name,
+                            toolArgsSummary: "count",
+                            ok: true,
+                            ms: 0
+                        )
+                        messages.append(toolMsg)
+                        steps.append(AgentStepEvent(name: name, argsSummary: "all", ok: true, detail: detail, ms: 0))
+                        apiMessages.append([
+                            "role": "tool",
+                            "tool_call_id": callId,
+                            "content": detail
+                        ])
+                        continue
+                    }
+
+                    if name == "delegate_to_employee" {
+                        let botId = (params["botId"] as? String) ?? ""
+                        let task = (params["task"] as? String) ?? ""
+                        if botId.isEmpty || task.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            let detail = "{\"ok\":false,\"status\":\"失败\",\"error\":\"缺少 botId 或 task\"}"
+                            let toolMsg = AgentChatMessage(
+                                role: .tool,
+                                content: detail,
+                                toolName: name,
+                                toolArgsSummary: "botId=\(botId)",
+                                ok: false,
+                                ms: 0
+                            )
+                            messages.append(toolMsg)
+                            apiMessages.append([
+                                "role": "tool",
+                                "tool_call_id": callId,
+                                "content": detail
+                            ])
+                            continue
+                        }
+                        pendingDelegates.append(PendingDelegate(callId: callId, botId: botId, task: task))
+                        roundHadDelegate = true
+                        continue
+                    }
+
                     let step = await executor.execute(name: name, params: params)
                     steps.append(step)
                     let toolMsg = AgentChatMessage(
@@ -776,10 +834,9 @@ final class GlobalAgentViewModel: ObservableObject {
                         ms: step.ms
                     )
                     messages.append(toolMsg)
-                    roundToolMessages.append(toolMsg)
                     apiMessages.append([
                         "role": "tool",
-                        "tool_call_id": tc["id"] as? String ?? name,
+                        "tool_call_id": callId,
                         "content": step.detail
                     ])
                     if AgentToolPresentation.isEmptySearchResult(tool: name, detail: step.detail) {
@@ -787,17 +844,120 @@ final class GlobalAgentViewModel: ObservableObject {
                     }
                 }
 
+                // Parallel delegation, max 3 at a time.
+                if !pendingDelegates.isEmpty {
+                    var i = 0
+                    while i < pendingDelegates.count {
+                        let end = min(i + ChiefDispatchService.maxParallelDelegations, pendingDelegates.count)
+                        let batch = Array(pendingDelegates[i..<end])
+                        i = end
+
+                        var prepared: [(PendingDelegate, ChiefDispatchService.PreparedEmployee?)] = []
+                        for job in batch {
+                            prepared.append((job, ChiefDispatchService.prepareEmployee(botId: job.botId, store: store)))
+                        }
+
+                        var llmResults: [(PendingDelegate, Bool, String, Int, String)] = []
+                        // name fallback when prepare fails
+                        await withTaskGroup(of: (Int, Bool, String, Int, String).self) { group in
+                            for (idx, pair) in prepared.enumerated() {
+                                let job = pair.0
+                                guard let prep = pair.1 else {
+                                    llmResults.append((job, false, "无法准备员工 \(job.botId)：未找到员工或缺少 API Key / 模型。", 0, job.botId))
+                                    continue
+                                }
+                                let botName = prep.botName
+                                group.addTask {
+                                    let r = await ChiefDispatchService.runEmployeeLLM(
+                                        prepared: prep,
+                                        task: job.task,
+                                        llm: self.llm
+                                    )
+                                    return (idx, r.ok, r.output, r.ms, botName)
+                                }
+                            }
+                            for await item in group {
+                                let job = prepared[item.0].0
+                                llmResults.append((job, item.1, item.2, item.3, item.4))
+                            }
+                        }
+
+                        // Stable order by original batch index
+                        llmResults.sort { a, b in
+                            let ia = batch.firstIndex(where: { $0.callId == a.0.callId }) ?? 0
+                            let ib = batch.firstIndex(where: { $0.callId == b.0.callId }) ?? 0
+                            return ia < ib
+                        }
+
+                        for (job, ok, output, ms, botName) in llmResults {
+                            let displayName: String
+                            if let bot = store.bot(id: job.botId) {
+                                displayName = bot.name
+                            } else {
+                                displayName = botName
+                            }
+                            let persisted: ChiefDispatchService.DelegationResult
+                            if ok || !output.isEmpty {
+                                persisted = ChiefDispatchService.persistDelegation(
+                                    botId: job.botId,
+                                    botName: displayName,
+                                    task: job.task,
+                                    output: output,
+                                    ok: ok,
+                                    ms: ms
+                                )
+                            } else {
+                                persisted = ChiefDispatchService.DelegationResult(
+                                    botId: job.botId,
+                                    botName: displayName,
+                                    task: job.task,
+                                    ok: false,
+                                    output: output,
+                                    summary: output,
+                                    ms: ms,
+                                    sessionFileName: ""
+                                )
+                            }
+                            let detail = ChiefDispatchService.delegationToolContent(persisted)
+                            let toolMsg = AgentChatMessage(
+                                role: .tool,
+                                content: detail,
+                                toolName: "delegate_to_employee",
+                                toolArgsSummary: "botId=\(job.botId), task=\(job.task)",
+                                ok: persisted.ok,
+                                ms: ms
+                            )
+                            messages.append(toolMsg)
+                            steps.append(AgentStepEvent(
+                                name: "delegate_to_employee",
+                                argsSummary: toolMsg.toolArgsSummary ?? "",
+                                ok: persisted.ok,
+                                detail: detail,
+                                ms: ms
+                            ))
+                            apiMessages.append([
+                                "role": "tool",
+                                "tool_call_id": job.callId,
+                                "content": detail
+                            ])
+                        }
+                    }
+                }
+
+                if roundHadDelegate {
+                    delegationRounds += 1
+                }
                 if roundHadEmptySearch {
                     emptySearchStreak += 1
                 } else {
                     emptySearchStreak = 0
                 }
 
-                if emptySearchStreak >= 2 || loops >= maxLoops - 1 {
+                if emptySearchStreak >= 2 || loops >= maxLoops || delegationRounds >= maxLoops {
                     forceTextOnly = true
                     apiMessages.append([
                         "role": "user",
-                        "content": "工具已返回（含空结果）。请停止继续调用 tools，用中文写一段最终回答：说明尝试了什么、结果如何、下一步建议。"
+                        "content": "请停止继续调用 tools，用中文写最终回答：汇总已派工结果、结论与下一步。浏览器/发信/发帖提醒用户去 Grok Bot App 的大可可处理。"
                     ])
                 }
 
@@ -810,7 +970,6 @@ final class GlobalAgentViewModel: ObservableObject {
             }
         }
 
-        // Ensure a visible final answer.
         let hasAssistantText = messages.contains {
             $0.role == .assistant && !$0.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         }

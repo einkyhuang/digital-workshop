@@ -35,3 +35,22 @@ UUID 形式的 id 会原样用作目录名（仅保留字母数字与 `-_`）。
 ## Web
 
 Web 端仅提供入口说明；完整能力在 Mac「超级工作台」App。
+
+
+## 全局对话 = 大可可总调度（chief）
+
+全局 Agent 面板默认以 `bots[].id == chief`（大可可-最强大脑）身份对话，并可用：
+
+- `list_employees` — 列出员工 id / 姓名 / 简介
+- `delegate_to_employee(botId, task)` — 用该员工的模型与人设跑子对话，写入
+  `~/Library/Application Support/超级工作台/conversations/<botId>/sessions/*.jsonl`
+  并追加 `工作摘要.md`；同一轮最多并行 3 个；每条用户消息最多 6 轮工具往返。
+
+浏览器 / 邮件 / 发帖仍应交给 Grok Bot App 里的大可可。
+
+- `crm_stats` — 客户库统计（总数 / 国家 / 阶段 / 星级 / 来源）；总数与「客户管理」同源：`leads-index.json` 的 `total`（优先 private）
+- `system_overview` — 客户 / 员工 / 任务 / 项目 / deliverables 总览
+- `crm.search_customers` — 模糊匹配 company/country/product/notes；返回 `matchTotal`；`countOnly=true` 只计数
+
+每轮 system prompt 注入一行实时快照（仅 totals）。问数量先看快照或 `crm_stats` / `system_overview`，禁止翻页扫全库。客户明细只读本地 private CRM，不入库。
+
