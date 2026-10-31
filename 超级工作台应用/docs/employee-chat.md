@@ -54,3 +54,10 @@ Web 端仅提供入口说明；完整能力在 Mac「超级工作台」App。
 
 每轮 system prompt 注入一行实时快照（仅 totals）。问数量先看快照或 `crm_stats` / `system_overview`，禁止翻页扫全库。客户明细只读本地 private CRM，不入库。
 
+## 面板双选项卡
+
+- **全局对话**：系统工具 + `crm_stats` / `semantic_search_customers`，不委派。
+- **大可可**：总调度，可 `list_employees` / `delegate_to_employee`；会话写入 `conversations/chief/`。
+
+各选项卡独立保留 transcript / 模型 / 技能；记忆上次选项卡。向量索引位于 `~/Library/Application Support/超级工作台/vectors/`（不进 git）；全局设置可选向量模型并「重建索引」。
+

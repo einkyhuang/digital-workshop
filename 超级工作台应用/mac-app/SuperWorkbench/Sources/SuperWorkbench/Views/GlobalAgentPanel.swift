@@ -55,20 +55,31 @@ struct GlobalAgentPanel: View {
     }
 
     private var header: some View {
-        HStack {
-            Image(systemName: "sparkles")
-            Text("大可可 · 总调度").font(.headline)
-            Text("全局对话默认由 chief 调度员工").font(.caption).foregroundStyle(.secondary)
-            Spacer()
-            Button("设置") { vm.showSettings = true }
-                .buttonStyle(.borderless)
-            Button {
-                isPresented = false
-            } label: {
-                Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Image(systemName: "sparkles")
+                Text(vm.panelMode == .chief ? "大可可 · 总调度" : "全局对话").font(.headline)
+                Text(vm.panelMode == .chief ? "委派员工并汇总" : "系统工具 · 客户统计/语义检索")
+                    .font(.caption).foregroundStyle(.secondary)
+                Spacer()
+                Button("设置") { vm.showSettings = true }
+                    .buttonStyle(.borderless)
+                Button {
+                    isPresented = false
+                } label: {
+                    Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .keyboardShortcut(.cancelAction)
             }
-            .buttonStyle(.plain)
-            .keyboardShortcut(.cancelAction)
+            Picker("", selection: $vm.panelMode) {
+                Text("全局对话").tag(GlobalAgentViewModel.PanelMode.global)
+                Text("大可可").tag(GlobalAgentViewModel.PanelMode.chief)
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: vm.panelMode) { oldMode, newMode in
+                vm.switchPanelMode(from: oldMode, to: newMode)
+            }
         }
         .padding(14)
         .background(SWTheme.card)
@@ -343,6 +354,27 @@ final class GlobalAgentViewModel: ObservableObject {
         var models: [ModelPick]
     }
 
+    enum PanelMode: String, CaseIterable, Identifiable {
+        case global
+        case chief
+        var id: String { rawValue }
+    }
+
+    struct TabSession {
+        var messages: [AgentChatMessage] = []
+        var selectedProviderId: String = ""
+        var model: String = ""
+        var baseURL: String = ""
+        var selectedSkillIds: [String] = []
+    }
+
+    @Published var panelMode: PanelMode = {
+        let raw = UserDefaults.standard.string(forKey: "sw.agent.panelMode") ?? "global"
+        return PanelMode(rawValue: raw) ?? .global
+    }()
+    private var sessions: [PanelMode: TabSession] = [:]
+    private var chiefSessionURL: URL?
+
     @Published var messages: [AgentChatMessage] = []
     @Published var steps: [AgentStepEvent] = []
     @Published var draft: String = ""
@@ -403,14 +435,84 @@ final class GlobalAgentViewModel: ObservableObject {
             guard let self else { return false }
             return await self.askConfirm(name: name, summary: summary)
         }
-        if messages.isEmpty {
-            messages.append(AgentChatMessage(
-                role: .assistant,
-                content: "我是 **大可可（总调度）**。直接说需求即可；需要时我会 `list_employees` / `delegate_to_employee` 派给合适的数字员工，并汇总结果。浏览器/发信/发帖请走 Grok Bot App 里的大可可。"
-            ))
+        // Restore last tab session or seed welcome.
+        if sessions[panelMode] == nil {
+            var seed = TabSession()
+            seed.messages = [welcomeMessage(for: panelMode)]
+            seed.selectedProviderId = selectedProviderId
+            seed.model = model
+            seed.baseURL = baseURL
+            seed.selectedSkillIds = selectedSkillIds
+            sessions[panelMode] = seed
+        }
+        applySession(sessions[panelMode] ?? TabSession())
+        if panelMode == .chief {
+            ensureChiefSession()
         }
         reloadGlobalProviders()
         reloadSkills()
+    }
+
+    private func welcomeMessage(for mode: PanelMode) -> AgentChatMessage {
+        switch mode {
+        case .global:
+            return AgentChatMessage(
+                role: .assistant,
+                content: "我是 **全局助手**。可直接查客户统计、语义搜客户、任务与导航；不委派员工。问数量先看快照 / `crm_stats`；找客户优先 `semantic_search_customers`。"
+            )
+        case .chief:
+            return AgentChatMessage(
+                role: .assistant,
+                content: "我是 **大可可（总调度）**。需要时会 `list_employees` / `delegate_to_employee` 派给数字员工并汇总。会话写入 chief 私有目录。浏览器/发信请走 Grok Bot App。"
+            )
+        }
+    }
+
+    func switchPanelMode(from old: PanelMode, to mode: PanelMode) {
+        guard old != mode else { return }
+        // Save the tab we left (binding already flipped panelMode to `mode`).
+        sessions[old] = TabSession(
+            messages: messages,
+            selectedProviderId: selectedProviderId,
+            model: model,
+            baseURL: baseURL,
+            selectedSkillIds: selectedSkillIds
+        )
+        panelMode = mode
+        UserDefaults.standard.set(mode.rawValue, forKey: "sw.agent.panelMode")
+        if sessions[mode] == nil {
+            var seed = TabSession()
+            seed.messages = [welcomeMessage(for: mode)]
+            seed.selectedProviderId = selectedProviderId
+            seed.model = model
+            seed.baseURL = baseURL
+            seed.selectedSkillIds = selectedSkillIds
+            sessions[mode] = seed
+        }
+        applySession(sessions[mode]!)
+        if mode == .chief {
+            ensureChiefSession()
+        }
+        persistComposerPrefs()
+    }
+
+    private func applySession(_ s: TabSession) {
+        messages = s.messages
+        if !s.selectedProviderId.isEmpty { selectedProviderId = s.selectedProviderId }
+        if !s.model.isEmpty { model = s.model }
+        if !s.baseURL.isEmpty { baseURL = s.baseURL }
+        selectedSkillIds = s.selectedSkillIds
+    }
+
+    private func ensureChiefSession() {
+        if chiefSessionURL == nil {
+            chiefSessionURL = EmployeeChatStore.createSessionFile(botId: ChiefDispatchService.chiefBotId)
+        }
+    }
+
+    private func persistChiefMessage(_ msg: AgentChatMessage) {
+        guard panelMode == .chief, let url = chiefSessionURL else { return }
+        EmployeeChatStore.appendMessage(msg, to: url)
     }
 
     func reloadSkills() {
@@ -565,10 +667,12 @@ final class GlobalAgentViewModel: ObservableObject {
     }
 
     func clearChat() {
-        messages = [
-            AgentChatMessage(role: .assistant, content: "对话已清空。继续提问即可。")
-        ]
+        messages = [welcomeMessage(for: panelMode)]
         steps = []
+        snapshotCurrentSession()
+        if panelMode == .chief {
+            chiefSessionURL = EmployeeChatStore.createSessionFile(botId: ChiefDispatchService.chiefBotId)
+        }
     }
 
     func pickAttachments() {
@@ -596,10 +700,12 @@ final class GlobalAgentViewModel: ObservableObject {
         UserDefaults.standard.set(selectedProviderId, forKey: "sw.agent.selectedProviderId")
         UserDefaults.standard.set(model, forKey: "sw.agent.model")
         UserDefaults.standard.set(baseURL, forKey: "sw.agent.baseURL")
+        snapshotCurrentSession()
     }
 
     private func persistSkills() {
         UserDefaults.standard.set(selectedSkillIds, forKey: "sw.agent.selectedSkills")
+        snapshotCurrentSession()
     }
 
     func send() async {
@@ -611,9 +717,14 @@ final class GlobalAgentViewModel: ObservableObject {
         if !attachmentNames.isEmpty {
             display += "\n\n（附件：\(attachmentNames.joined(separator: ", "))）"
         }
-        messages.append(AgentChatMessage(role: .user, content: display))
+        let userMsg = AgentChatMessage(role: .user, content: display)
+        messages.append(userMsg)
+        persistChiefMessage(userMsg)
         isStreaming = true
-        defer { isStreaming = false }
+        defer {
+            isStreaming = false
+            snapshotCurrentSession()
+        }
 
         let pid = selectedProviderId.isEmpty ? "deepseek" : selectedProviderId
         let key = SharedModelStore.loadKey(providerId: pid)
@@ -625,6 +736,17 @@ final class GlobalAgentViewModel: ObservableObject {
             await runLocal(userText: text)
         }
         attachmentPaths = []
+        if panelMode == .chief, let last = messages.last(where: { $0.role == .assistant }) {
+            persistChiefMessage(last)
+            if let url = chiefSessionURL {
+                let summary = String(last.content.prefix(160))
+                EmployeeChatStore.appendSummary(
+                    botId: ChiefDispatchService.chiefBotId,
+                    sessionFileName: url.lastPathComponent,
+                    summary: summary
+                )
+            }
+        }
     }
 
     private func runLocal(userText: String) async {
@@ -708,16 +830,26 @@ final class GlobalAgentViewModel: ObservableObject {
             tasks: store.data.tasks.count,
             projects: projects
         )
-        let system = ChiefDispatchService.chiefSystemPrompt(
-            store: store,
-            skillBlock: skillBlock + attachNote,
-            snapshot: liveLine + "\n" + snap.detail
-        )
+        let snapshotBlob = liveLine + "\n" + snap.detail
+        let system: String
+        if panelMode == .chief {
+            system = ChiefDispatchService.chiefSystemPrompt(
+                store: store,
+                skillBlock: skillBlock + attachNote,
+                snapshot: snapshotBlob
+            )
+        } else {
+            system = ChiefDispatchService.globalSystemPrompt(
+                store: store,
+                skillBlock: skillBlock + attachNote,
+                snapshot: snapshotBlob
+            )
+        }
         var apiMessages: [[String: Any]] = [
             ["role": "system", "content": system],
             ["role": "user", "content": userText]
         ]
-        let toolsSchema = AgentLLMClient.openAIToolsFromSchema()
+        let toolsSchema = AgentLLMClient.openAIToolsFromSchema(includeDelegation: panelMode == .chief)
         let cfg = AgentLLMClient.Config(baseURL: baseURL, model: model, apiKey: apiKey)
         let maxLoops = 6
         var loops = 0
@@ -778,6 +910,12 @@ final class GlobalAgentViewModel: ObservableObject {
                     let params = (try? JSONSerialization.jsonObject(with: Data(argStr.utf8))) as? [String: Any] ?? [:]
 
                     if name == "list_employees" {
+                        if panelMode != .chief {
+                            let detail = #"{"ok":false,"error":"全局对话模式不支持 list_employees，请切换到「大可可」选项卡"}"#
+                            messages.append(AgentChatMessage(role: .tool, content: detail, toolName: name, toolArgsSummary: "blocked", ok: false, ms: 0))
+                            apiMessages.append(["role": "tool", "tool_call_id": callId, "content": detail])
+                            continue
+                        }
                         let detail = ChiefDispatchService.listEmployeesJSON(store: store)
                         let toolMsg = AgentChatMessage(
                             role: .tool,
@@ -798,6 +936,12 @@ final class GlobalAgentViewModel: ObservableObject {
                     }
 
                     if name == "delegate_to_employee" {
+                        if panelMode != .chief {
+                            let detail = #"{"ok":false,"status":"失败","error":"全局对话模式不支持派工，请切换到「大可可」"}"#
+                            messages.append(AgentChatMessage(role: .tool, content: detail, toolName: name, toolArgsSummary: "blocked", ok: false, ms: 0))
+                            apiMessages.append(["role": "tool", "tool_call_id": callId, "content": detail])
+                            continue
+                        }
                         let botId = (params["botId"] as? String) ?? ""
                         let task = (params["task"] as? String) ?? ""
                         if botId.isEmpty || task.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -955,9 +1099,15 @@ final class GlobalAgentViewModel: ObservableObject {
 
                 if emptySearchStreak >= 2 || loops >= maxLoops || delegationRounds >= maxLoops {
                     forceTextOnly = true
+                    let wrap: String
+                    if panelMode == .chief {
+                        wrap = "请停止继续调用 tools，用中文写最终回答：汇总已派工结果、结论与下一步。浏览器/发信/发帖提醒用户去 Grok Bot App 的大可可处理。"
+                    } else {
+                        wrap = "请停止继续调用 tools，用中文写最终回答：基于已有工具结果给出结论与下一步。勿再翻页搜客户。"
+                    }
                     apiMessages.append([
                         "role": "user",
-                        "content": "请停止继续调用 tools，用中文写最终回答：汇总已派工结果、结论与下一步。浏览器/发信/发帖提醒用户去 Grok Bot App 的大可可处理。"
+                        "content": wrap
                     ])
                 }
 
@@ -982,6 +1132,25 @@ final class GlobalAgentViewModel: ObservableObject {
         } else {
             pruneEmptyAssistant(id: assistantId)
         }
+    }
+
+    private func snapshotCurrentSession() {
+        sessions[panelMode] = TabSession(
+            messages: messages,
+            selectedProviderId: selectedProviderId,
+            model: model,
+            baseURL: baseURL,
+            selectedSkillIds: selectedSkillIds
+        )
+    }
+
+    private func persistComposerPrefs() {
+        UserDefaults.standard.set(selectedProviderId, forKey: "sw.agent.selectedProviderId")
+        UserDefaults.standard.set(model, forKey: "sw.agent.model")
+        UserDefaults.standard.set(baseURL, forKey: "sw.agent.baseURL")
+        UserDefaults.standard.set(selectedSkillIds, forKey: "sw.agent.selectedSkills")
+        UserDefaults.standard.set(panelMode.rawValue, forKey: "sw.agent.panelMode")
+        snapshotCurrentSession()
     }
 
     private func pruneEmptyAssistant(id: UUID) {

@@ -173,6 +173,7 @@ enum AgentCRM {
         var byStage: [String: Int] = [:]
         var byStar: [String: Int] = [:]
         var bySource: [String: Int] = [:]
+        var byIndustry: [String: Int] = [:]
         var recent: [[String: String]] = []
         var scanned = 0
 
@@ -190,6 +191,7 @@ enum AgentCRM {
                     let star = str(row["star"]).isEmpty ? str(row["tier"]).isEmpty ? str(row["rating"]) : str(row["tier"]) : str(row["star"])
                     bump(&byStar, key: nonEmpty(star, fallback: "未分级"))
                     bump(&bySource, key: nonEmpty(str(row["source"]), fallback: "未知"))
+                    bump(&byIndustry, key: AgentVectorIndex.inferIndustry(from: row))
                     if recent.count < n {
                         recent.append(redactRow(row))
                     }
@@ -199,6 +201,7 @@ enum AgentCRM {
             for row in sample {
                 bump(&byCountry, key: nonEmpty(str(row["country"]), fallback: "未知"))
                 bump(&byStatus, key: nonEmpty(str(row["status"]), fallback: "未知"))
+                bump(&byIndustry, key: AgentVectorIndex.inferIndustry(from: row))
                 recent.append(redactRow(row))
             }
             scanned = sample.count
@@ -208,6 +211,7 @@ enum AgentCRM {
             "source": hasPages
                 ? "private/crm/leads/leads-index.json + page-*.json"
                 : "data/crm/leads-index.json (public index; pages missing)",
+            "total": indexTotal,
             "indexTotal": indexTotal,
             "magichubWorkingSet": mhCount,
             "scannedRows": scanned,
@@ -218,6 +222,7 @@ enum AgentCRM {
             "byStage": topDict(byStage, n: n),
             "byStarTier": topDict(byStar, n: n),
             "bySource": topDict(bySource, n: n),
+            "byIndustry": topDict(byIndustry, n: n),
             "recentSample": Array(recent.prefix(n)),
             "note": "indexTotal 与客户管理/CRM 看板同源（leads-index.total）。MagicHub 页 leads.length 为 magichubWorkingSet。明细脱敏。"
         ]
@@ -251,7 +256,8 @@ enum AgentCRM {
     static func liveSnapshotLine(repoRoot: URL, bots: Int, tasks: Int, projects: Int) -> String {
         let customers = indexTotal(repoRoot: repoRoot)
         let mh = magichubLeadsCount(repoRoot: repoRoot)
-        return "实时快照：客户全库 \(customers)（MagicHub 工作集 \(mh)）· 员工 \(bots) · 任务 \(tasks) · 网站项目 \(projects）。问总数请直接用这些数字或 crm_stats / system_overview，禁止翻页扫库。"
+        let vec = AgentVectorIndex.statusSummary()
+        return "实时快照：客户全库 \(customers)（MagicHub 工作集 \(mh)）· 员工 \(bots) · 任务 \(tasks) · 网站项目 \(projects)。\(vec)。问总数用快照/crm_stats/system_overview；找客户优先 semantic_search_customers / crm_stats，禁止翻页扫库。"
     }
 
     // MARK: - Match helpers
@@ -400,6 +406,10 @@ enum AgentCRM {
         return (false, "L3 已拦截：不会对外发布。channel=\(channel) summary=\(String(summary.prefix(120)))")
     }
 
+    static func strPublic(_ v: Any?) -> String {
+        str(v)
+    }
+
     private static func str(_ v: Any?) -> String {
         if let s = v as? String { return s }
         if let n = v as? NSNumber { return n.stringValue }
@@ -409,6 +419,10 @@ enum AgentCRM {
     private static func redact(_ s: String) -> String {
         guard s.count > 2 else { return "***" }
         return String(s.prefix(1)) + String(repeating: "*", count: min(6, s.count - 1))
+    }
+
+    static func jsonStringPublic(_ obj: [String: Any]) -> String {
+        jsonString(obj)
     }
 
     private static func jsonString(_ obj: Any) -> String {

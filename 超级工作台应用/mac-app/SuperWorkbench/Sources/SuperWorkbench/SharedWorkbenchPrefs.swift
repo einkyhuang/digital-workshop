@@ -9,6 +9,7 @@ enum SharedWorkbenchPrefs {
         var autoScan: Bool = true
         var doubleLinkage: Bool = true
         var vectorLimit: Int = 3
+        var embeddingModel: String = "text-embedding-v4"
         var temperature: Double = 0.6
         var importedSkills: [SkillItem] = []
         var updatedAt: String = ""

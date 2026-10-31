@@ -8,7 +8,7 @@ enum AgentRisk: String {
         case "crm.send_email", "external.publish": return .L3
         case "task.create", "task.update", "task.set_status", "agent.undo_last", "crm.upsert_followup": return .L1
         case "list_employees", "delegate_to_employee", "crm_stats", "system_overview",
-             "crm.search_customers", "crm.open_customer", "context.get_snapshot",
+             "crm.search_customers", "semantic_search_customers", "crm.open_customer", "context.get_snapshot",
              "nav.open_section", "nav.switch_workbench", "schedule.open_day", "daily.open_report":
             return .L0
         default: return .L0
@@ -42,7 +42,7 @@ final class AgentExecutor {
         let t0 = Date()
         let summary = Self.summarize(params)
         let before = taskSnapshotJSON()
-        let result = perform(name: name, params: params)
+        let result = await perform(name: name, params: params)
         let ms = Int(Date().timeIntervalSince(t0) * 1000)
         let after = taskSnapshotJSON()
         let undoable = ["task.create", "task.update", "task.set_status", "task.delete", "crm.upsert_followup", "crm.create_quote"].contains(name) && result.0
@@ -55,7 +55,7 @@ final class AgentExecutor {
         return AgentStepEvent(name: name, argsSummary: summary, ok: result.0, detail: result.1, ms: ms)
     }
 
-    private func perform(name: String, params: [String: Any]) -> (Bool, String) {
+    private func perform(name: String, params: [String: Any]) async -> (Bool, String) {
         switch name {
         case "context.get_snapshot":
             return (true, snapshot(scope: (params["scope"] as? String) ?? "brief"))

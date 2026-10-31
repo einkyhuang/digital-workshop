@@ -290,6 +290,29 @@
       }
     },
     {
+      "name": "semantic_search_customers",
+      "risk": "L0",
+      "undoable": false,
+      "platforms": [
+        "mac"
+      ],
+      "description": "语义+关键词混合搜客户（本地向量索引）",
+      "params": {
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "topK": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    {
       "name": "crm.open_customer",
       "risk": "L0",
       "undoable": false,

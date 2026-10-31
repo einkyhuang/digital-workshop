@@ -75,8 +75,8 @@ actor AgentLLMClient {
         return (content, toolCalls)
     }
 
-    static func openAIToolsFromSchema() -> [[String: Any]] {
-        [
+    static func openAIToolsFromSchema(includeDelegation: Bool = true) -> [[String: Any]] {
+        let all: [[String: Any]] = [
             tool("list_employees", "列出工作台全部数字员工（id/姓名/简介），供总调度选型", [String: Any](), []),
             tool("delegate_to_employee", "把任务委派给指定员工；员工用其人设与模型作答并写入私有会话与工作摘要", ["botId": ["type": "string"], "task": ["type": "string"]], ["botId", "task"]),
             tool("context.get_snapshot", "只读快照", ["scope": ["type": "string", "enum": ["brief", "full"]]], []),
@@ -92,12 +92,18 @@ actor AgentLLMClient {
             tool("crm_stats", "客户库统计：总数/国家/阶段/星级/来源分布与近期样本（同源 leads-index）", ["topN": ["type": "integer"]], []),
             tool("system_overview", "工作台总览：客户/员工/任务/项目/deliverables 计数", [String: Any](), []),
             tool("crm.search_customers", "模糊搜索客户（company/country/product/notes）；返回 matchTotal；countOnly=true 只计数不翻页", ["query": ["type": "string"], "page": ["type": "integer"], "limit": ["type": "integer"], "countOnly": ["type": "boolean"]], []),
+            tool("semantic_search_customers", "语义+关键词混合搜客户（向量索引）；自然语言如「德国做LED筒灯的」；优先于翻页", ["query": ["type": "string"], "topK": ["type": "integer"]], ["query"]),
             tool("crm.open_customer", "打开客户", ["customerId": ["type": "string"]], ["customerId"]),
             tool("crm.upsert_followup", "追加跟进", ["customerId": ["type": "string"], "note": ["type": "string"]], ["customerId", "note"]),
             tool("crm.create_quote", "报价草稿(L2)", ["customerId": ["type": "string"], "title": ["type": "string"], "amount": ["type": "string"], "currency": ["type": "string"], "note": ["type": "string"]], ["customerId"]),
             tool("crm.send_email", "发信(L3拦截)", ["to": ["type": "string"], "subject": ["type": "string"], "body": ["type": "string"]], ["to", "subject"]),
             tool("external.publish", "发布(L3拦截)", ["channel": ["type": "string"], "summary": ["type": "string"]], ["channel", "summary"])
         ]
+        if includeDelegation { return all }
+        return all.filter { row in
+            guard let fn = row["function"] as? [String: Any], let name = fn["name"] as? String else { return true }
+            return name != "list_employees" && name != "delegate_to_employee"
+        }
     }
 
     private static func tool(_ name: String, _ desc: String, _ props: [String: Any], _ required: [String]) -> [String: Any] {

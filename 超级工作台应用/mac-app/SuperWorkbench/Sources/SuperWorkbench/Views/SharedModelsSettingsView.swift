@@ -3,6 +3,7 @@ import AppKit
 
 /// Full global settings window — ports MagicHub SystemSettings into native UI.
 struct SharedModelsSettingsView: View {
+    @ObservedObject private var vectorCtrl = AgentVectorIndexController.shared
     @EnvironmentObject var store: WorkspaceStore
     @Environment(\.dismiss) private var dismiss
     @StateObject private var vm = SharedModelsSettingsVM()
@@ -208,9 +209,43 @@ struct SharedModelsSettingsView: View {
                     Toggle("外部报告自动侦测", isOn: $vm.prefs.autoScan)
                     Toggle("跨组件双向数据同步", isOn: $vm.prefs.doubleLinkage)
                     HStack {
-                        Text("ChromaDB 向量召回上限")
+                        Text("向量召回上限（semantic top-K）")
                         Spacer()
                         Stepper(value: $vm.prefs.vectorLimit, in: 1...10) { Text("\(vm.prefs.vectorLimit) 条") }
+                    }
+                }
+                GroupBox("客户向量索引") {
+                    Text("本地索引路径：\(AgentVectorIndex.vectorsDir.path)")
+                        .font(.caption2).foregroundStyle(.secondary).textSelection(.enabled)
+                    Picker("向量模型", selection: $vm.prefs.embeddingModel) {
+                        ForEach(SharedModelsSettingsVM.embeddingModelChoices, id: \.self) { m in
+                            Text(m).tag(m)
+                        }
+                    }
+                    .onChange(of: vm.prefs.embeddingModel) { _, _ in
+                        vm.savePrefs()
+                    }
+                    Text("通义/DashScope 推荐 text-embedding-v4（失败自动回退 v3）。索引仅存本机 Application Support，不进仓库。")
+                        .font(.caption2).foregroundStyle(.secondary)
+                    HStack {
+                        Button(vectorCtrl.progress.isRunning ? "索引中…" : "重建索引") {
+                            Task { await vm.rebuildVectorIndex(forceAll: false) }
+                        }
+                        .disabled(vectorCtrl.progress.isRunning)
+                        Button("全量重建") {
+                            Task { await vm.rebuildVectorIndex(forceAll: true) }
+                        }
+                        .disabled(vectorCtrl.progress.isRunning)
+                        Spacer()
+                        Text(AgentVectorIndex.statusSummary()).font(.caption).foregroundStyle(.secondary)
+                    }
+                    if vectorCtrl.progress.isRunning || !vectorCtrl.progress.message.isEmpty {
+                        ProgressView(value: Double(vectorCtrl.progress.done), total: Double(max(1, vectorCtrl.progress.total))) {
+                            Text(vectorCtrl.progress.message).font(.caption)
+                        }
+                    }
+                    if let err = vectorCtrl.progress.lastError, !err.isEmpty {
+                        Text(err).font(.caption).foregroundStyle(.red)
                     }
                 }
                 GroupBox("创造力参数 (Temperature)") {
@@ -279,7 +314,8 @@ struct SharedModelsSettingsView: View {
                     Button("清理临时缓存") { vm.clearCaches() }
                 }
                 storageRow(title: "全局模型配置", path: SharedModelStore.modelsFile.path, note: "models.json · 含平台列表；密钥同步 Keychain")
-                storageRow(title: "工作台偏好", path: SharedWorkbenchPrefs.fileURL.path, note: "Skills / Temperature / Secret Mode")
+                storageRow(title: "工作台偏好", path: SharedWorkbenchPrefs.fileURL.path, note: "Skills / Temperature / Secret Mode / 向量模型")
+                storageRow(title: "客户向量索引", path: AgentVectorIndex.vectorsDir.path, note: "customers-index.json · 仅本机")
                 storageRow(title: "CRM 私有设置目录", path: store.repoRoot.appendingPathComponent("超级工作台应用/data/private/crm/settings").path, note: "gitignored · Magichub 镜像")
                 storageRow(title: "CRM 私有数据根", path: store.repoRoot.appendingPathComponent("超级工作台应用/data/private/crm").path, note: "leads / products / pdfs")
                 Text("原 MagicHub Electron 路径（SQLite / ChromaDB / Caches）仅在独立 MagicHub.app 存在；工作台内嵌模式改用以上目录。")
@@ -462,6 +498,30 @@ final class SharedModelsSettingsVM: ObservableObject {
             get: { self.selectedProvider?.baseURL ?? "" },
             set: { val in self.updateSelected { $0.baseURL = val } }
         )
+    }
+
+    static let embeddingModelChoices = [
+        "text-embedding-v4",
+        "text-embedding-v3",
+        "text-embedding-v2",
+        "text-embedding-3-small",
+        "text-embedding-3-large"
+    ]
+
+    let vectorCtrl = AgentVectorIndexController.shared
+
+    func rebuildVectorIndex(forceAll: Bool) async {
+        guard let repoRoot else {
+            alert("未绑定仓库根目录")
+            return
+        }
+        savePrefs()
+        await vectorCtrl.rebuild(repoRoot: repoRoot, forceAll: forceAll)
+        if let err = vectorCtrl.progress.lastError, !err.isEmpty {
+            alert("索引失败：\(err)")
+        } else if !vectorCtrl.progress.message.isEmpty {
+            alert(vectorCtrl.progress.message)
+        }
     }
 
     func bootstrap(repoRoot: URL) {

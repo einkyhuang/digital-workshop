@@ -9,6 +9,7 @@ enum AgentToolPresentation {
         case "crm_stats": return "客户统计"
         case "system_overview": return "系统总览"
         case "crm.search_customers": return "搜索客户"
+        case "semantic_search_customers": return "语义搜客户"
         case "crm.open_customer": return "打开客户"
         case "crm.add_followup": return "添加跟进"
         case "crm.draft_quote": return "报价草稿"
@@ -38,6 +39,7 @@ enum AgentToolPresentation {
         case "crm_stats": return "chart.bar"
         case "system_overview": return "square.grid.2x2"
         case "crm.search_customers": return "magnifyingglass"
+        case "semantic_search_customers": return "sparkle.magnifyingglass"
         case "crm.open_customer": return "person.crop.circle"
         case "crm.add_followup": return "text.bubble"
         case "crm.draft_quote": return "doc.text"
@@ -72,6 +74,11 @@ enum AgentToolPresentation {
             let c = intValue(json["customers"]) ?? intValue(json["customerTotal"]) ?? 0
             let b = intValue(json["bots"]) ?? intValue(json["botCount"]) ?? 0
             return "\(name) · 客户 \(c) · 员工 \(b)"
+        case "semantic_search_customers":
+            let q = stringValue(json["query"]) ?? extractArg(argsSummary, key: "query") ?? ""
+            let count = intValue(json["count"]) ?? 0
+            if q.isEmpty { return "\(name) · \(count) 条" }
+            return "\(name)「\(q)」· \(count) 条"
         case "crm.search_customers":
             let q = stringValue(json["query"]) ?? extractArg(argsSummary, key: "query") ?? ""
             let matchTotal = intValue(json["matchTotal"]) ?? intValue(json["total"]) ?? intValue(json["count"]) ?? 0
@@ -119,7 +126,7 @@ enum AgentToolPresentation {
 
     /// True when a CRM-style search returned zero hits (used to stop empty retry loops).
     static func isEmptySearchResult(tool: String, detail: String) -> Bool {
-        guard tool == "crm.search_customers" else { return false }
+        guard tool == "crm.search_customers" || tool == "semantic_search_customers" else { return false }
         let json = parseJSON(detail)
         if let m = intValue(json["matchTotal"]) { return m == 0 }
         if let c = intValue(json["count"]) { return c == 0 }
