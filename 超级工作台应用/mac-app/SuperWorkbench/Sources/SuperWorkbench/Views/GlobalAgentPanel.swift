@@ -834,8 +834,7 @@ final class GlobalAgentViewModel: ObservableObject {
         } else {
             messages.append(AgentChatMessage(
                 role: .assistant,
-                content: "⚠️ 【模型调用失败】provider=\(pid) · model=\(model)
-未找到 API Key。请在全局设置里为该平台填写密钥。",
+                content: "⚠️ 【模型调用失败】provider=\(pid) · model=\(model)\n未找到 API Key。请在全局设置里为该平台填写密钥。",
                 ok: false
             ))
             await runLocal(userText: text)
@@ -1232,8 +1231,7 @@ final class GlobalAgentViewModel: ObservableObject {
                     msg = e.localizedDescription ?? "模型调用失败"
                 } else {
                     let providerName = providerList.first(where: { $0.id == selectedProviderId })?.name ?? selectedProviderId
-                    msg = "【模型调用失败】provider=\(providerName) · model=\(model)
-\(error.localizedDescription)"
+                    msg = "【模型调用失败】provider=\(providerName) · model=\(model)\n\(error.localizedDescription)"
                 }
                 messages.append(AgentChatMessage(role: .assistant, content: "⚠️ " + msg, ok: false))
                 return
@@ -1251,8 +1249,7 @@ final class GlobalAgentViewModel: ObservableObject {
             let toolsOnly = turn.filter { $0.role == .tool }
             let fallback = AgentToolPresentation.fallbackAnswer(fromToolMessages: toolsOnly, userText: userText)
             let providerName = providerList.first(where: { $0.id == selectedProviderId })?.name ?? selectedProviderId
-            let note = "⚠️ 本轮模型未返回正文（provider=\(providerName) · model=\(model)）。
-" + fallback
+            let note = "⚠️ 本轮模型未返回正文（provider=\(providerName) · model=\(model)）。\n" + fallback
             messages.append(AgentChatMessage(role: .assistant, content: note, ok: false))
         } else {
             pruneEmptyAssistant(id: assistantId)

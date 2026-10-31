@@ -10,11 +10,9 @@ struct AgentLLMError: LocalizedError, Sendable {
         let prov = provider.isEmpty ? "—" : provider
         let mod = model.isEmpty ? "—" : model
         if status > 0 {
-            return "【模型调用失败】provider=\(prov) · model=\(mod) · HTTP \(status)
-\(message)"
+            return "【模型调用失败】provider=\(prov) · model=\(mod) · HTTP \(status)\n\(message)"
         }
-        return "【模型调用失败】provider=\(prov) · model=\(mod)
-\(message)"
+        return "【模型调用失败】provider=\(prov) · model=\(mod)\n\(message)"
     }
 }
 
