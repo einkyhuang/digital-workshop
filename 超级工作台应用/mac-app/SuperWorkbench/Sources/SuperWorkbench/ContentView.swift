@@ -77,6 +77,10 @@ struct ContentView: View {
         .sheet(isPresented: $showNewTask) {
             NewTaskSheet().environmentObject(store)
         }
+        .sheet(isPresented: $store.showGlobalModelSettings) {
+            SharedModelsSettingsView()
+                .environmentObject(store)
+        }
         .overlay {
             if store.isSyncing {
                 ProgressView("同步中…")

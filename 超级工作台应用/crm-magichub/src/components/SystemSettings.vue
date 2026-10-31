@@ -1379,9 +1379,26 @@ const deleteModel = () => {
 
 const saveProviderSettings = () => {
   try {
-    localStorage.setItem('magichub_ai_providers', JSON.stringify(localProviders.value));
+    const plain = JSON.parse(JSON.stringify(localProviders.value));
+    localStorage.setItem('magichub_ai_providers', JSON.stringify(plain));
+    try {
+      localStorage.setItem('sw.global.models', JSON.stringify({
+        version: 1,
+        activeProviderId: (plain.find(p => p.status) || plain[0] || {}).id || '',
+        providers: plain,
+        updatedAt: new Date().toISOString()
+      }));
+    } catch (_) {}
     if (window.electronAPI && window.electronAPI.saveSettings) {
-      window.electronAPI.saveSettings('magichub_ai_providers', JSON.parse(JSON.stringify(localProviders.value)));
+      window.electronAPI.saveSettings('magichub_ai_providers', plain);
+      try {
+        window.electronAPI.saveSettings('sw_global_models', {
+          version: 1,
+          activeProviderId: (plain.find(p => p.status) || plain[0] || {}).id || '',
+          providers: plain,
+          updatedAt: new Date().toISOString()
+        });
+      } catch (_) {}
     }
     emit('update:providers', [...localProviders.value]);
   } catch (e) {

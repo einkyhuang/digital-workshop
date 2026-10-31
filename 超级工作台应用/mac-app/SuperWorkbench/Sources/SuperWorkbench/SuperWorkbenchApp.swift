@@ -37,6 +37,15 @@ struct SuperWorkbenchApp: App {
         .defaultPosition(.center)
         .commands {
             CommandGroup(replacing: .newItem) {}
+            CommandGroup(replacing: .appSettings) {
+                Button("设置…") {
+                    store.showGlobalModelSettings = true
+                    if store.activeWorkbenchId == "trade" {
+                        store.setMagicHubTab("settings")
+                    }
+                }
+                .keyboardShortcut(",", modifiers: [.command])
+            }
             CommandMenu("工作台") {
                 Button("重新加载数据") { store.load() }
                     .keyboardShortcut("r", modifiers: [.command])
@@ -46,6 +55,12 @@ struct SuperWorkbenchApp: App {
                     store.showGlobalAgent.toggle()
                 }
                 .keyboardShortcut("k", modifiers: [.command])
+                Button("全局模型设置…") {
+                    store.showGlobalModelSettings = true
+                    if store.activeWorkbenchId == "trade" {
+                        store.setMagicHubTab("settings")
+                    }
+                }
             }
         }
     }

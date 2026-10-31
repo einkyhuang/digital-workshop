@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Menu, shell, ipcMain } = require('electron');
 const path = require('path');
+const globalModels = require('../../shared/global-models-store.cjs');
 
 let mainWindow = null;
 
@@ -151,6 +152,19 @@ ipcMain.handle('open-path', async (event, folderPath) => {
 // Secure Settings physical persistence for Electron (Across app updates)
 ipcMain.handle('save-settings', async (event, key, data) => {
   try {
+    if (globalModels.isModelsKey(key)) {
+      // Also mirror into Electron userData for backward compat
+      const mirrored = globalModels.saveForSettingsKey(key, data);
+      try {
+        const fsSync = require('fs');
+        const userDataPath = app.getPath('userData');
+        const settingsDir = path.join(userDataPath, 'settings');
+        if (!fsSync.existsSync(settingsDir)) fsSync.mkdirSync(settingsDir, { recursive: true });
+        const providers = Array.isArray(data) ? data : (data && data.providers) || [];
+        fsSync.writeFileSync(path.join(settingsDir, 'magichub_ai_providers.json'), JSON.stringify(providers, null, 2));
+      } catch (_) {}
+      return mirrored || { success: true };
+    }
     const fs = require('fs').promises;
     const fsSync = require('fs');
     const userDataPath = app.getPath('userData');
@@ -181,6 +195,21 @@ ipcMain.handle('save-settings', async (event, key, data) => {
 
 ipcMain.handle('load-settings', async (event, key) => {
   try {
+    if (globalModels.isModelsKey(key)) {
+      const fs = require('fs');
+      const userDataPath = app.getPath('userData');
+      const legacyPath = path.join(userDataPath, 'settings', 'magichub_ai_providers.json');
+      const altPath = path.join(userDataPath, 'settings', `${key}.json`);
+      const result = globalModels.loadForSettingsKey(key, () => {
+        for (const p of [legacyPath, altPath]) {
+          if (fs.existsSync(p)) {
+            try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch (_) {}
+          }
+        }
+        return null;
+      });
+      if (result) return result;
+    }
     const fs = require('fs');
     const userDataPath = app.getPath('userData');
     const filePath = path.join(userDataPath, 'settings', `${key}.json`);

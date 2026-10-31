@@ -58,6 +58,7 @@ const defaultProviders = [
   { id: 'siliconflow', name: '硅基流动', icon: '硅', iconColor: 'bg-indigo-600', status: true, baseUrl: 'https://api.siliconflow.cn/v1', apiKey: '', modelGroup: 'deepseek', model: 'deepseek-ai/DeepSeek-V3', previewUrl: 'https://api.siliconflow.cn/v1/chat/completions' },
   { id: 'gemini', name: 'Gemini', icon: 'G', iconColor: 'bg-blue-500', status: true, baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai', apiKey: '', modelGroup: 'google', model: 'gemini-1.5-pro', previewUrl: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions' },
   { id: 'alicoding', name: '阿里coding', icon: '阿', iconColor: 'bg-blue-800', status: true, baseUrl: 'https://api.alicoding.com/v1', apiKey: '', modelGroup: 'qwen', model: 'qwen-turbo', previewUrl: 'https://api.alicoding.com/v1/chat/completions' },
+  { id: 'qwen', name: '通义千问', icon: '千', iconColor: 'bg-violet-600', status: true, baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1', apiKey: '', modelGroup: 'qwen', model: 'qwen-max', previewUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', type: 'openai-compatible' },
   { id: 'volcengine', name: '火山引擎', icon: '火', iconColor: 'bg-blue-400', status: false, baseUrl: 'https://api.volcengine.com/v1', apiKey: '', modelGroup: 'doubao', model: 'doubao-pro', previewUrl: 'https://api.volcengine.com/v1/chat/completions' },
   { id: 'minimax', name: 'MiniMax', icon: 'M', iconColor: 'bg-red-500', status: false, baseUrl: 'https://api.minimaxi.com/v1', apiKey: '', modelGroup: 'abab', model: 'abab6.5-chat', previewUrl: 'https://api.minimaxi.com/v1/chat/completions' },
   { id: 'vpsairobot', name: 'vpsairobot', icon: 'V', iconColor: 'bg-green-500', status: false, baseUrl: 'https://api.vpsairobot.com/v1', apiKey: '', modelGroup: 'custom', model: 'vps-smart-v1', previewUrl: 'https://api.vpsairobot.com/v1/chat/completions' },
@@ -78,10 +79,27 @@ const loadSavedProviders = async () => {
   try {
     let parsed = null;
     if (window.electronAPI && window.electronAPI.loadSettings) {
-      const res = await window.electronAPI.loadSettings('magichub_ai_providers');
-      if (res && res.success && res.data) {
-        parsed = res.data;
+      try {
+        const doc = await window.electronAPI.loadSettings('sw_global_models');
+        if (doc && doc.success && doc.data && Array.isArray(doc.data.providers)) {
+          parsed = doc.data.providers;
+        }
+      } catch (_) {}
+      if (!parsed) {
+        const res = await window.electronAPI.loadSettings('magichub_ai_providers');
+        if (res && res.success && res.data) {
+          parsed = res.data;
+        }
       }
+    }
+    if (!parsed) {
+      try {
+        const g = localStorage.getItem('sw.global.models');
+        if (g) {
+          const d = JSON.parse(g);
+          if (d && Array.isArray(d.providers)) parsed = d.providers;
+        }
+      } catch (_) {}
     }
     if (!parsed) {
       const saved = localStorage.getItem('magichub_ai_providers');
@@ -163,8 +181,25 @@ const loadSavedProviders = async () => {
     }
     // Update local storage and Electron settings file so that system settings and AI call is synchronized
     localStorage.setItem('magichub_ai_providers', JSON.stringify(providers.value));
+    try {
+      localStorage.setItem('sw.global.models', JSON.stringify({
+        version: 1,
+        activeProviderId: (providers.value.find(p => p.status) || providers.value[0] || {}).id || '',
+        providers: providers.value,
+        updatedAt: new Date().toISOString()
+      }));
+    } catch (_) {}
     if (window.electronAPI && window.electronAPI.saveSettings) {
-      await window.electronAPI.saveSettings('magichub_ai_providers', JSON.parse(JSON.stringify(providers.value)));
+      const plain = JSON.parse(JSON.stringify(providers.value));
+      await window.electronAPI.saveSettings('magichub_ai_providers', plain);
+      try {
+        await window.electronAPI.saveSettings('sw_global_models', {
+          version: 1,
+          activeProviderId: (plain.find(p => p.status) || plain[0] || {}).id || '',
+          providers: plain,
+          updatedAt: new Date().toISOString()
+        });
+      } catch (_) {}
     }
   } catch (e) {
     console.error('Failed to load saved AI providers in App.vue:', e);
@@ -854,6 +889,14 @@ watch(activeTab, (v) => {
 })
 ;
 const settingsInitialTab = ref('api');
+const openGlobalModelSettings = () => {
+  activeTab.value = 'settings';
+  settingsInitialTab.value = 'api';
+};
+if (typeof window !== 'undefined') {
+  window.__SW_OPEN_SETTINGS__ = openGlobalModelSettings;
+}
+
 const jumpToScheduleDate = ref(null);
 
 const activeComponent = computed(() => {

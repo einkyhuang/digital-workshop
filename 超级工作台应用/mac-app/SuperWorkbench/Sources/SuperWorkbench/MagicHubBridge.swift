@@ -128,6 +128,27 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
     /// that SIGABRTs the whole app (prod crash 2026-10-30 02:26). Always validate/sanitize first.
     private func saveSettings(key: String, data: Any) -> (Bool, Any?, String?) {
         let safe = Self.jsonSafe(data)
+        // Global model/providers store (shared with Super Workbench Agent)
+        if key == SharedModelStore.settingsKey || key == SharedModelStore.globalDocKey {
+            if key == SharedModelStore.globalDocKey, let doc = SharedModelStore.Document.from(safe) {
+                let (ok, err) = SharedModelStore.saveDocument(doc, repoRoot: repoRoot)
+                return (ok, ["success": ok, "error": err as Any], err)
+            }
+            var providers: [[String: Any]] = []
+            if let arr = safe as? [[String: Any]] {
+                providers = arr
+            } else if let d = safe as? [String: Any] {
+                providers = (d["providers"] as? [[String: Any]]) ?? []
+            }
+            guard !providers.isEmpty || (safe as? [Any]) != nil else {
+                // Allow empty array clear
+                if let arr = safe as? [Any] {
+                    providers = arr.compactMap { $0 as? [String: Any] }
+                }
+            }
+            let (ok, err) = SharedModelStore.saveProviders(providers, repoRoot: repoRoot)
+            return (ok, ["success": ok, "error": err as Any], err)
+        }
         guard JSONSerialization.isValidJSONObject(safe) else {
             return (false, ["success": false, "error": "settings payload is not JSON-serializable"], "invalid JSON object for key \(key)")
         }
@@ -184,6 +205,16 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
     }
 
     private func loadSettings(key: String) -> (Bool, Any?, String?) {
+        if key == SharedModelStore.settingsKey || key == SharedModelStore.globalDocKey {
+            let doc = SharedModelStore.loadDocument(repoRoot: repoRoot)
+            let providers = SharedModelStore.loadProviders(repoRoot: repoRoot)
+            if key == SharedModelStore.globalDocKey {
+                var d = doc.asDictionary()
+                d["providers"] = providers
+                return (true, ["success": true, "data": d], nil)
+            }
+            return (true, ["success": true, "data": providers], nil)
+        }
         // First-run seed for leads from private CRM
         let file = settingsDir.appendingPathComponent("\(key).json")
         let fm = FileManager.default

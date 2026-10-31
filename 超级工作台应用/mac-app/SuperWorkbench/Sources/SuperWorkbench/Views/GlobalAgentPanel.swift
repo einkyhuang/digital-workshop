@@ -158,8 +158,33 @@ final class GlobalAgentViewModel: ObservableObject {
             return await self.askConfirm(name: name, summary: summary)
         }
         if messages.isEmpty {
-            messages.append(AgentChatMessage(role: .assistant, content: "全局 Agent P2：CRM 搜索/跟进/报价草稿(L2)/外发拦截(L3)。配置 Key 流式 tools；无 Key 本地指令（例：搜客户 菲律宾）。"))
+            messages.append(AgentChatMessage(role: .assistant, content: "全局 Agent P2：CRM 搜索/跟进/报价草稿(L2)/外发拦截(L3)。模型配置与外贸工作台共用（Application Support/超级工作台/models.json）。"))
         }
+        reloadGlobalProviders()
+    }
+
+    func reloadGlobalProviders() {
+        guard let store else { return }
+        let providers = SharedModelStore.loadProviders(repoRoot: store.repoRoot)
+        let doc = SharedModelStore.loadDocument(repoRoot: store.repoRoot)
+        var items: [ProviderItem] = []
+        for (i, p) in providers.enumerated() {
+            let base = (p["baseURL"] as? String) ?? (p["baseUrl"] as? String) ?? ""
+            let model = (p["model"] as? String) ?? (p["defaultModel"] as? String) ?? ""
+            let name = (p["name"] as? String) ?? "provider-\(i)"
+            let id = (p["id"] as? String) ?? "p\(i)"
+            if !base.isEmpty {
+                items.append(ProviderItem(id: id, name: name, baseURL: base, model: model.isEmpty ? self.model : model))
+            }
+        }
+        providerList = items
+        if !doc.activeProviderId.isEmpty, items.contains(where: { $0.id == doc.activeProviderId }) {
+            selectedProviderId = doc.activeProviderId
+        } else if selectedProviderId.isEmpty, let first = items.first {
+            selectedProviderId = first.id
+        }
+        applySelectedProvider()
+        status = items.isEmpty ? "无全局模型配置" : "已载入全局 \(items.count) 个网关"
     }
 
     @Published var confirmText: String = ""
@@ -184,38 +209,46 @@ final class GlobalAgentViewModel: ObservableObject {
         UserDefaults.standard.set(baseURL, forKey: "sw.agent.baseURL")
         UserDefaults.standard.set(model, forKey: "sw.agent.model")
         let k = keyDraft.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !k.isEmpty { AgentKeychain.saveKey(k); keyDraft = "" }
-        status = "已保存（Key 在 Keychain）"
+        guard let store else {
+            if !k.isEmpty { AgentKeychain.saveKey(k); keyDraft = "" }
+            status = "已保存本地（无 store）"
+            return
+        }
+        var providers = SharedModelStore.loadProviders(repoRoot: store.repoRoot)
+        let pid = selectedProviderId.isEmpty ? "deepseek" : selectedProviderId
+        if let idx = providers.firstIndex(where: { ($0["id"] as? String) == pid }) {
+            providers[idx]["baseUrl"] = baseURL
+            providers[idx]["model"] = model
+            if !k.isEmpty {
+                providers[idx]["apiKey"] = k
+                SharedModelStore.saveKey(providerId: pid, key: k)
+                AgentKeychain.saveKey(k) // legacy single-key mirror
+            }
+        } else {
+            var row: [String: Any] = [
+                "id": pid,
+                "name": "超级工作台 Agent",
+                "type": "openai-compatible",
+                "status": true,
+                "baseUrl": baseURL,
+                "model": model,
+                "modelGroup": "custom",
+                "apiKey": k,
+                "previewUrl": baseURL.trimmingCharacters(in: CharacterSet(charactersIn: "/")) + "/chat/completions"
+            ]
+            if !k.isEmpty { SharedModelStore.saveKey(providerId: pid, key: k); AgentKeychain.saveKey(k) }
+            providers.insert(row, at: 0)
+        }
+        let (ok, err) = SharedModelStore.saveProviders(providers, activeProviderId: pid, repoRoot: store.repoRoot)
+        keyDraft = ""
+        reloadGlobalProviders()
+        status = ok ? "已保存到全局模型配置（与外贸工作台共用）" : ("保存失败: " + (err ?? ""))
     }
 
     func importMagicHubProviders() {
-        guard let store else { status = "无 store"; return }
-        let url = store.repoRoot.appendingPathComponent("超级工作台应用/data/private/crm/settings/magichub_ai_providers.json")
-        guard let data = try? Data(contentsOf: url),
-              let obj = try? JSONSerialization.jsonObject(with: data) else {
-            status = "未找到 magichub_ai_providers.json"; return
-        }
-        var arr: [[String: Any]] = []
-        if let a = obj as? [[String: Any]] { arr = a }
-        else if let d = obj as? [String: Any] {
-            arr = (d["providers"] as? [[String: Any]]) ?? (d["data"] as? [[String: Any]]) ?? []
-        }
-        var items: [ProviderItem] = []
-        for (i, p) in arr.enumerated() {
-            let base = (p["baseURL"] as? String) ?? (p["baseUrl"] as? String) ?? (p["apiBase"] as? String) ?? ""
-            let model = (p["model"] as? String) ?? (p["defaultModel"] as? String) ?? ""
-            let name = (p["name"] as? String) ?? (p["label"] as? String) ?? "provider-\(i)"
-            let id = (p["id"] as? String) ?? "p\(i)"
-            if !base.isEmpty {
-                items.append(ProviderItem(id: id, name: name, baseURL: base, model: model.isEmpty ? self.model : model))
-            }
-        }
-        providerList = items
-        if let first = items.first {
-            selectedProviderId = first.id
-            applySelectedProvider()
-        }
-        status = items.isEmpty ? "列表为空" : "已导入 \(items.count) 个（未导入任何 API Key）"
+        // Now just reloads the shared global store ( Magichub writes into the same place ).
+        reloadGlobalProviders()
+        status = providerList.isEmpty ? "全局列表为空" : "已从全局配置载入 \(providerList.count) 个网关"
     }
 
     func applySelectedProvider() {
@@ -232,7 +265,11 @@ final class GlobalAgentViewModel: ObservableObject {
         isStreaming = true
         defer { isStreaming = false }
 
-        if let key = AgentKeychain.loadKey(), !key.isEmpty {
+        let pid = selectedProviderId.isEmpty ? "deepseek" : selectedProviderId
+        let key = SharedModelStore.loadKey(providerId: pid)
+            ?? AgentKeychain.loadKey()
+            ?? ""
+        if !key.isEmpty {
             await runLLM(userText: text, apiKey: key)
         } else {
             await runLocal(userText: text)
@@ -347,7 +384,7 @@ struct AgentSettingsSheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("全局 Agent · 模型").font(.title3.bold())
-            Text("OpenAI 兼容 · Key 存 Keychain（不进 git）").font(.caption).foregroundStyle(.secondary)
+            Text("与外贸工作台共用全局配置 · Key 在 Keychain / Application Support（不进 git）").font(.caption).foregroundStyle(.secondary)
             TextField("Base URL", text: $vm.baseURL)
             TextField("Model", text: $vm.model)
             SecureField("API Key（留空则保留原 Key）", text: $vm.keyDraft)
@@ -360,10 +397,10 @@ struct AgentSettingsSheet: View {
                     .keyboardShortcut(.defaultAction)
             }
             Divider().padding(.vertical, 4)
-            Button("从 MagicHub 导入 Provider 列表") { vm.importMagicHubProviders() }
+            Button("重新载入全局模型列表") { vm.importMagicHubProviders() }
                 .buttonStyle(.bordered)
             if !vm.providerList.isEmpty {
-                Text("已载入 \(vm.providerList.count) 个网关（Key 仍用上方 Keychain，不读 MagicHub 密钥文件进聊天）")
+                Text("已载入 \(vm.providerList.count) 个全局网关（与外贸工作台同一份 models.json）")
                     .font(.caption).foregroundStyle(.secondary)
                 Picker("选用", selection: $vm.selectedProviderId) {
                     ForEach(vm.providerList, id: \.id) { p in

@@ -18,6 +18,9 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const globalModels = require('../shared/global-models-store.cjs');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.SW_LAN_PORT || 18787);
@@ -275,7 +278,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Magichub settings API → private/crm/settings
+  // Magichub settings API → global models store for AI providers; else private/crm/settings
   if (url.pathname.startsWith("/api/mh/settings/")) {
     const key = decodeURIComponent(url.pathname.slice("/api/mh/settings/".length));
     if (!/^[a-zA-Z0-9._-]+$/.test(key)) {
@@ -286,15 +289,32 @@ const server = http.createServer(async (req, res) => {
     }
     const settingsDir = path.join(PRIVATE_ROOT, "crm/settings");
     fs.mkdirSync(settingsDir, { recursive: true });
-    const fp = path.join(settingsDir, `magichub_${key}.json`);
+    // Prefer correct key.json (and legacy magichub_${key}.json)
+    const fp = path.join(settingsDir, `${key}.json`);
+    const fpLegacy = path.join(settingsDir, `magichub_${key}.json`);
     if (req.method === "GET") {
-      if (!fs.existsSync(fp)) {
+      if (globalModels.isModelsKey(key)) {
+        const result = globalModels.loadForSettingsKey(key, () => {
+          for (const p of [fp, fpLegacy]) {
+            if (fs.existsSync(p)) {
+              try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch (_) {}
+            }
+          }
+          return null;
+        });
+        send(res, 200, JSON.stringify(result || { success: true, data: null }), {
+          "Content-Type": "application/json",
+        });
+        return;
+      }
+      const readFp = fs.existsSync(fp) ? fp : (fs.existsSync(fpLegacy) ? fpLegacy : null);
+      if (!readFp) {
         send(res, 200, JSON.stringify({ success: true, data: null }), {
           "Content-Type": "application/json",
         });
         return;
       }
-      const data = JSON.parse(fs.readFileSync(fp, "utf8"));
+      const data = JSON.parse(fs.readFileSync(readFp, "utf8"));
       send(res, 200, JSON.stringify({ success: true, data }), {
         "Content-Type": "application/json",
       });
@@ -312,7 +332,20 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       const data = parsed && Object.prototype.hasOwnProperty.call(parsed, "data") ? parsed.data : parsed;
-      // atomic write
+      if (globalModels.isModelsKey(key)) {
+        const result = globalModels.saveForSettingsKey(key, data);
+        // Mirror into private settings for backup
+        try {
+          const providers = Array.isArray(data) ? data : (data && data.providers) || [];
+          const tmp = fp + ".tmp";
+          fs.writeFileSync(tmp, JSON.stringify(providers, null, 2));
+          fs.renameSync(tmp, fp);
+        } catch (_) {}
+        send(res, 200, JSON.stringify(result || { success: true }), {
+          "Content-Type": "application/json",
+        });
+        return;
+      }
       const tmp = fp + ".tmp";
       fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
       fs.renameSync(tmp, fp);

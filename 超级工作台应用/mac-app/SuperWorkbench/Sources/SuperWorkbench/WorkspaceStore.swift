@@ -17,6 +17,7 @@ final class WorkspaceStore: ObservableObject {
     @Published var loadError: String?
     @Published var commandText: String = ""
     @Published var showGlobalAgent: Bool = false
+    @Published var showGlobalModelSettings: Bool = false
     @Published var showingBotDetail: Bool = false
     @Published var emailDaily: [OverviewMetrics.EmailDaily] = []
     @Published var targetsFile: OverviewMetrics.TargetsFile? = nil

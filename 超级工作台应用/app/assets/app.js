@@ -1681,3 +1681,79 @@ function renderKanban() {
     }
   });
 })();
+
+
+/* ---- Global model settings (shared with MagicHub) ---- */
+(function wireGlobalSettings() {
+  function $(id) { return document.getElementById(id); }
+  async function openSettings() {
+    const modal = $("swSettingsModal");
+    const body = $("swSettingsBody");
+    if (!modal || !body) return;
+    modal.hidden = false;
+    body.textContent = "加载中…";
+    try {
+      if (!window.SWSharedModels) throw new Error("shared-models.js 未加载");
+      const doc = await window.SWSharedModels.loadDocument();
+      const providers = doc.providers || [];
+      body.innerHTML = "";
+      providers.forEach((p, idx) => {
+        const row = document.createElement("div");
+        row.className = "sw-settings-row";
+        row.dataset.idx = String(idx);
+        row.innerHTML =
+          '<label><input type="checkbox" data-f="status"' + (p.status ? " checked" : "") + "/> " +
+          (p.name || p.id) + " <span class=\"muted\">(" + (p.id || "") + ")</span></label>" +
+          '<label>Base URL</label><input data-f="baseUrl" value="' + String(p.baseUrl || p.baseURL || "").replace(/"/g, "&quot;") + '"/>' +
+          '<label>Model</label><input data-f="model" value="' + String(p.model || "").replace(/"/g, "&quot;") + '"/>' +
+          '<label>API Key（留空保留）</label><input data-f="apiKey" type="password" placeholder="' +
+          (p.apiKey ? "•••• 已保存" : "未设置") + '" autocomplete="off"/>';
+        body.appendChild(row);
+      });
+      body._providers = providers;
+    } catch (e) {
+      body.textContent = "加载失败: " + e;
+    }
+  }
+  async function saveSettings() {
+    const body = $("swSettingsBody");
+    if (!body || !body._providers) return;
+    const rows = [...body.querySelectorAll(".sw-settings-row")];
+    const providers = body._providers.map((p, i) => {
+      const row = rows[i];
+      if (!row) return p;
+      const next = { ...p };
+      const st = row.querySelector('[data-f="status"]');
+      const base = row.querySelector('[data-f="baseUrl"]');
+      const model = row.querySelector('[data-f="model"]');
+      const key = row.querySelector('[data-f="apiKey"]');
+      if (st) next.status = !!st.checked;
+      if (base) next.baseUrl = base.value.trim();
+      if (model) next.model = model.value.trim();
+      if (key && key.value.trim()) next.apiKey = key.value.trim();
+      next.previewUrl = String(next.baseUrl || "").replace(/\/+$/, "") + "/chat/completions";
+      next.type = next.type || "openai-compatible";
+      return next;
+    });
+    await window.SWSharedModels.saveProviders(providers);
+    alert("已保存全局模型配置（与外贸工作台共用）");
+    $("swSettingsModal").hidden = true;
+  }
+  function closeSettings() {
+    const modal = $("swSettingsModal");
+    if (modal) modal.hidden = true;
+  }
+  function boot() {
+    const btn = $("btnGlobalSettings");
+    if (btn) btn.addEventListener("click", openSettings);
+    const close = $("swSettingsClose");
+    if (close) close.addEventListener("click", closeSettings);
+    const save = $("swSettingsSave");
+    if (save) save.addEventListener("click", saveSettings);
+    const modal = $("swSettingsModal");
+    if (modal) modal.addEventListener("click", (e) => { if (e.target === modal) closeSettings(); });
+    window.SWOpenGlobalSettings = openSettings;
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
+})();

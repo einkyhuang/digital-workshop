@@ -69,6 +69,33 @@ struct SidebarView: View {
             Spacer(minLength: 0)
 
             VStack(alignment: .leading, spacing: 8) {
+                Button {
+                    openGlobalSettings()
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "gearshape")
+                            .font(.system(size: SWTheme.Typography.navIcon, weight: .regular))
+                            .frame(width: 20, alignment: .center)
+                        Text("设置")
+                            .font(.system(size: SWTheme.Typography.nav, weight: .semibold))
+                        Spacer(minLength: 0)
+                        Text("⌘,")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(.secondary)
+                    }
+                    .foregroundStyle(SWTheme.text)
+                    .padding(.horizontal, 12)
+                    .frame(maxWidth: .infinity, minHeight: SWTheme.Typography.navRowMin, alignment: .leading)
+                    .contentShape(Rectangle())
+                    .background(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(Color.white.opacity(0.72))
+                    )
+                    .padding(.horizontal, 8)
+                }
+                .buttonStyle(.plain)
+                .help("全局模型设置（与外贸工作台共用）")
+
                 HStack(spacing: 8) {
                     Circle().fill(Color.green).frame(width: 8, height: 8)
                     VStack(alignment: .leading, spacing: 2) {
@@ -231,5 +258,12 @@ struct SidebarView: View {
             .padding(.horizontal, 8)
         }
         .buttonStyle(.plain)
+    }
+
+    private func openGlobalSettings() {
+        store.showGlobalModelSettings = true
+        if store.activeWorkbenchId == "trade" {
+            store.setMagicHubTab("settings")
+        }
     }
 }

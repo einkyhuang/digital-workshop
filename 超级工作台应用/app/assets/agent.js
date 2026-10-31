@@ -93,10 +93,39 @@
   }
 
   function providersFromLocal() {
+    try {
+      const g = JSON.parse(localStorage.getItem("sw.global.models") || "null");
+      if (g && Array.isArray(g.providers) && g.providers.length) {
+        return g.providers.map((p) => ({
+          id: p.id, name: p.name, baseURL: p.baseUrl || p.baseURL, model: p.model, hasKey: !!(p.apiKey && String(p.apiKey).trim())
+        }));
+      }
+    } catch (_) {}
     try { return JSON.parse(localStorage.getItem("sw.agent.providers") || "[]"); } catch (_) { return []; }
   }
   function saveProviders(list) {
     localStorage.setItem("sw.agent.providers", JSON.stringify(list || []));
+    if (window.SWSharedModels && Array.isArray(list)) {
+      window.SWSharedModels.loadProviders().then((cur) => {
+        const byId = Object.fromEntries((cur || []).map((p) => [p.id, p]));
+        list.forEach((p) => {
+          const id = p.id || "default";
+          const prev = byId[id] || { id, name: p.name || id, type: "openai-compatible", status: true, apiKey: "", modelGroup: "custom", availableModels: [] };
+          byId[id] = {
+            ...prev,
+            baseUrl: p.baseURL || p.baseUrl || prev.baseUrl || "",
+            model: p.model || prev.model || "deepseek-chat",
+            previewUrl: String(p.baseURL || p.baseUrl || prev.baseUrl || "").replace(/\/+$/, "") + "/chat/completions"
+          };
+        });
+        const key = (localStorage.getItem("sw.agent.apiKey") || "").trim();
+        if (key) {
+          const first = list[0] && list[0].id;
+          if (first && byId[first] && !byId[first].apiKey) byId[first].apiKey = key;
+        }
+        return window.SWSharedModels.saveProviders(Object.values(byId));
+      }).catch(() => {});
+    }
   }
 
   function mount(api) {
@@ -134,6 +163,10 @@
       if (e.key === "Escape" && !panel.hidden) close();
     });
     document.getElementById("swAgentSettings").onclick = () => {
+      if (typeof window.SWOpenGlobalSettings === "function") {
+        window.SWOpenGlobalSettings();
+        return;
+      }
       const cur = providersFromLocal();
       const base = prompt("Provider Base URL", (cur[0] && cur[0].baseURL) || "https://api.deepseek.com");
       if (base == null) return;
@@ -143,25 +176,7 @@
       const list = [{ id: "default", baseURL: base, model, hasKey: !!(key && key.trim()) }];
       if (key && key.trim()) localStorage.setItem("sw.agent.apiKey", key.trim());
       saveProviders(list);
-      // optional import Magichub-like list from pasted JSON
-      const paste = prompt("可选：粘贴 MagicHub providers JSON 数组以导入（可留空）", "");
-      if (paste && paste.trim()) {
-        try {
-          const arr = JSON.parse(paste);
-          if (Array.isArray(arr)) {
-            const mapped = arr.map((p, i) => ({
-              id: p.id || ("p" + i),
-              baseURL: p.baseURL || p.baseUrl || p.apiBase || "",
-              model: p.model || p.defaultModel || "",
-              hasKey: false,
-              name: p.name || p.label || ("provider-" + i)
-            })).filter(p => p.baseURL);
-            if (mapped.length) { saveProviders(mapped); alert("已导入 " + mapped.length + " 个 Provider（Key 请在 Web 单独填，勿提交 git）"); }
-          }
-        } catch (e) { alert("JSON 无效: " + e); }
-      } else {
-        alert("已保存 Provider（Web 明文警告）");
-      }
+      alert("已保存 Provider（建议用侧栏「设置」编辑全局配置）");
     };
     async function send() {
       const input = document.getElementById("swAgentInput");
