@@ -487,7 +487,7 @@ enum AgentVectorIndex {
                 preferredModel: pref
             )
             guard let qv = result.vectors.first else { return (false, "query 嵌入为空") }
-            let hits = topK(query: qv, records: records, k: topK)
+            let hits = AgentVectorIndex.topK(query: qv, records: records, k: topK)
             let payload: [String: Any] = [
                 "query": q,
                 "mode": "vector",
@@ -565,7 +565,7 @@ enum AgentVectorIndex {
                     preferredModel: pref
                 )
                 if let qv = result.vectors.first {
-                    vectorHits = topK(query: qv, records: records, k: limit)
+                    vectorHits = AgentVectorIndex.topK(query: qv, records: records, k: limit)
                 }
             } catch {
                 vectorNote = "向量检索失败：\(error.localizedDescription)"
