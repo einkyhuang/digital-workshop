@@ -117,7 +117,7 @@
           byId[id] = {
             ...prev,
             baseUrl: p.baseURL || p.baseUrl || prev.baseUrl || "",
-            model: p.model || prev.model || "deepseek-chat",
+            model: p.model || prev.model || "qwen3.8-max",
             previewUrl: String(p.baseURL || p.baseUrl || prev.baseUrl || "").replace(/\/+$/, "") + "/chat/completions"
           };
         });
@@ -387,7 +387,7 @@
       const cur = providersFromLocal();
       const base = prompt("Provider Base URL", (cur[0] && cur[0].baseURL) || "https://api.deepseek.com");
       if (base == null) return;
-      const model = prompt("Model id", (cur[0] && cur[0].model) || selectedModel || "deepseek-chat");
+      const model = prompt("Model id", (cur[0] && cur[0].model) || selectedModel || "qwen3.8-max");
       if (model == null) return;
       const key = prompt("API Key（明文存 localStorage，勿用生产密钥）", "");
       const list = [{ id: "default", baseURL: base, model, hasKey: !!(key && key.trim()) }];

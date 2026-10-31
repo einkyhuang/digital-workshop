@@ -1,11 +1,38 @@
 import Foundation
 
+struct AgentLLMError: LocalizedError, Sendable {
+    var status: Int
+    var message: String
+    var provider: String
+    var model: String
+
+    var errorDescription: String? {
+        let prov = provider.isEmpty ? "—" : provider
+        let mod = model.isEmpty ? "—" : model
+        if status > 0 {
+            return "【模型调用失败】provider=\(prov) · model=\(mod) · HTTP \(status)
+\(message)"
+        }
+        return "【模型调用失败】provider=\(prov) · model=\(mod)
+\(message)"
+    }
+}
+
+enum AgentLLMDefaults {
+    static let preferredDefaultModel = "qwen3.8-max"
+    static let preferredDefaultProviderId = "qwen"
+    static let preferredDefaultBaseURL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+}
+
 /// OpenAI-compatible chat/completions with optional SSE stream + tools.
 actor AgentLLMClient {
     struct Config: Equatable {
         var baseURL: String
         var model: String
         var apiKey: String
+        /// Display-only provider id/name for error rows (never a secret).
+        var providerId: String = ""
+        var providerName: String = ""
     }
 
     func streamChat(
@@ -14,10 +41,18 @@ actor AgentLLMClient {
         tools: [[String: Any]],
         onDelta: @escaping @Sendable (String) -> Void
     ) async throws -> (content: String, toolCalls: [[String: Any]]) {
-        var base = config.baseURL.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-        if base.hasSuffix("/v1") == false { base += "/v1" }
+        var base = config.baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        if base.isEmpty {
+            throw makeError(config, status: 0, message: "Base URL 为空")
+        }
+        // Keep .../compatible-mode/v1 and .../v1 as-is; otherwise append /v1.
+        let lower = base.lowercased()
+        if !lower.hasSuffix("/v1") && !lower.contains("/compatible-mode/v1") {
+            base += "/v1"
+        }
         guard let url = URL(string: base + "/chat/completions") else {
-            throw NSError(domain: "AgentLLM", code: 1, userInfo: [NSLocalizedDescriptionKey: "bad baseURL"])
+            throw makeError(config, status: 0, message: "无效 Base URL：\(base)")
         }
         var body: [String: Any] = [
             "model": config.model,
@@ -25,45 +60,92 @@ actor AgentLLMClient {
             "stream": true,
             "temperature": 0.2
         ]
-        if !tools.isEmpty { body["tools"] = tools; body["tool_choice"] = "auto" }
-        var req = URLRequest(url: url)
+        if !tools.isEmpty {
+            body["tools"] = tools
+            body["tool_choice"] = "auto"
+        }
+        var req = URLRequest(url: url, timeoutInterval: 90)
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.setValue("Bearer \(config.apiKey)", forHTTPHeaderField: "Authorization")
         req.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (bytes, resp) = try await URLSession.shared.bytes(for: req)
-        if let http = resp as? HTTPURLResponse, http.statusCode >= 400 {
-            throw NSError(domain: "AgentLLM", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: "HTTP \(http.statusCode)"])
+        let http = resp as? HTTPURLResponse
+        let status = http?.statusCode ?? 0
+
+        if status >= 400 {
+            var errBody = ""
+            for try await line in bytes.lines {
+                errBody += line
+                if errBody.count > 2000 { break }
+            }
+            throw makeError(config, status: status, message: extractErrorMessage(errBody, fallback: "HTTP \(status)"))
         }
 
         var content = ""
         var toolAcc: [Int: (id: String, name: String, args: String)] = [:]
+        var rawBuffer = ""
+        var sawSSE = false
+
         for try await line in bytes.lines {
-            guard line.hasPrefix("data:") else { continue }
-            let payload = line.dropFirst(5).trimmingCharacters(in: .whitespaces)
-            if payload == "[DONE]" { break }
-            guard let data = payload.data(using: .utf8),
-                  let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let choices = obj["choices"] as? [[String: Any]],
-                  let delta = choices.first?["delta"] as? [String: Any] else { continue }
-            if let c = delta["content"] as? String, !c.isEmpty {
-                content += c
-                onDelta(c)
-            }
-            if let tcs = delta["tool_calls"] as? [[String: Any]] {
-                for tc in tcs {
-                    let idx = tc["index"] as? Int ?? 0
-                    var cur = toolAcc[idx] ?? (id: "", name: "", args: "")
-                    if let id = tc["id"] as? String { cur.id = id }
-                    if let fn = tc["function"] as? [String: Any] {
-                        if let n = fn["name"] as? String { cur.name += n }
-                        if let a = fn["arguments"] as? String { cur.args += a }
-                    }
-                    toolAcc[idx] = cur
+            if line.hasPrefix("data:") {
+                sawSSE = true
+                let payload = line.dropFirst(5).trimmingCharacters(in: .whitespaces)
+                if payload == "[DONE]" { break }
+                guard let data = payload.data(using: .utf8),
+                      let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { continue }
+                if let err = obj["error"] as? [String: Any] {
+                    let msg = (err["message"] as? String) ?? String(describing: err)
+                    throw makeError(config, status: status == 0 ? 200 : status, message: redactSecrets(msg))
                 }
+                guard let choices = obj["choices"] as? [[String: Any]],
+                      let delta = choices.first?["delta"] as? [String: Any] else { continue }
+                if let c = delta["content"] as? String, !c.isEmpty {
+                    content += c
+                    onDelta(c)
+                }
+                // Some gateways put full message in stream final chunk
+                if let msg = choices.first?["message"] as? [String: Any],
+                   let c = msg["content"] as? String, !c.isEmpty, content.isEmpty {
+                    content = c
+                    onDelta(c)
+                }
+                if let tcs = delta["tool_calls"] as? [[String: Any]] {
+                    accumulateTools(tcs, into: &toolAcc)
+                }
+            } else if !line.isEmpty {
+                rawBuffer += line
+                if rawBuffer.count > 500_000 { break }
             }
         }
+
+        // Non-SSE JSON body (gateway ignored stream:true)
+        if !sawSSE, !rawBuffer.isEmpty {
+            if let data = rawBuffer.data(using: .utf8),
+               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                if let err = obj["error"] as? [String: Any] {
+                    let msg = (err["message"] as? String) ?? String(describing: err)
+                    throw makeError(config, status: status == 0 ? 200 : status, message: redactSecrets(msg))
+                }
+                if let choices = obj["choices"] as? [[String: Any]], let first = choices.first {
+                    if let msg = first["message"] as? [String: Any] {
+                        if let c = msg["content"] as? String { content = c }
+                        if let tcs = msg["tool_calls"] as? [[String: Any]] {
+                            accumulateTools(tcs, into: &toolAcc)
+                        }
+                    }
+                    if let c = first["text"] as? String, content.isEmpty { content = c }
+                }
+            } else {
+                throw makeError(
+                    config,
+                    status: status,
+                    message: "响应不是 SSE/JSON：\(redactSecrets(String(rawBuffer.prefix(280))))"
+                )
+            }
+        }
+
         let toolCalls: [[String: Any]] = toolAcc.keys.sorted().compactMap { idx in
             guard let t = toolAcc[idx], !t.name.isEmpty else { return nil }
             return [
@@ -72,8 +154,68 @@ actor AgentLLMClient {
                 "function": ["name": t.name, "arguments": t.args]
             ]
         }
+
+        if content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && toolCalls.isEmpty {
+            throw makeError(
+                config,
+                status: status == 0 ? 200 : status,
+                message: sawSSE
+                    ? "流式响应结束但未返回文本或工具调用（模型可能不支持 tools，或网关未正确流式输出）。"
+                    : "空响应。请检查模型 id 是否有效、是否支持 chat/completions。"
+            )
+        }
         return (content, toolCalls)
     }
+
+    private func accumulateTools(_ tcs: [[String: Any]], into toolAcc: inout [Int: (id: String, name: String, args: String)]) {
+        for tc in tcs {
+            let idx = tc["index"] as? Int ?? (tc["index"] as? NSNumber)?.intValue ?? 0
+            var cur = toolAcc[idx] ?? (id: "", name: "", args: "")
+            if let id = tc["id"] as? String { cur.id = id }
+            if let fn = tc["function"] as? [String: Any] {
+                if let n = fn["name"] as? String { cur.name += n }
+                if let a = fn["arguments"] as? String { cur.args += a }
+            }
+            toolAcc[idx] = cur
+        }
+    }
+
+    private func makeError(_ config: Config, status: Int, message: String) -> AgentLLMError {
+        AgentLLMError(
+            status: status,
+            message: redactSecrets(message),
+            provider: config.providerName.isEmpty ? config.providerId : config.providerName,
+            model: config.model
+        )
+    }
+
+    private func extractErrorMessage(_ raw: String, fallback: String) -> String {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return fallback }
+        if let data = trimmed.data(using: .utf8),
+           let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            if let err = obj["error"] as? [String: Any] {
+                if let m = err["message"] as? String { return redactSecrets(m) }
+                if let m = err["code"] as? String { return redactSecrets(m) }
+            }
+            if let m = obj["message"] as? String { return redactSecrets(m) }
+        }
+        return redactSecrets(String(trimmed.prefix(400)))
+    }
+
+    private func redactSecrets(_ s: String) -> String {
+        var out = s
+        // Never echo bearer tokens / long key-looking strings
+        if let regex = try? NSRegularExpression(pattern: #"(sk-[A-Za-z0-9_\-]{8,}|Bearer\s+[A-Za-z0-9_\-\.]{8,})"#, options: [.caseInsensitive]) {
+            let range = NSRange(out.startIndex..<out.endIndex, in: out)
+            out = regex.stringByReplacingMatches(in: out, options: [], range: range, withTemplate: "[REDACTED]")
+        }
+        return out
+    }
+
+    static let preferredDefaultModel = AgentLLMDefaults.preferredDefaultModel
+    static let preferredDefaultProviderId = AgentLLMDefaults.preferredDefaultProviderId
+    static let preferredDefaultBaseURL = AgentLLMDefaults.preferredDefaultBaseURL
 
     static func openAIToolsFromSchema(includeDelegation: Bool = true) -> [[String: Any]] {
         let all: [[String: Any]] = [

@@ -85,14 +85,28 @@ struct AgentUserBubble: View {
 struct AgentAssistantMarkdown: View {
     let content: String
     var isActive: Bool = false
+    var isError: Bool = false
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
             GlassOrbView(size: 22, isActive: isActive)
                 .padding(.top, 2)
-            AgentMarkdown.text(content)
-                .font(.system(size: SWTheme.Typography.body))
-                .textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            Group {
+                if isError {
+                    Text(content)
+                        .font(.system(size: SWTheme.Typography.body))
+                        .foregroundStyle(Color.red.opacity(0.9))
+                        .textSelection(.enabled)
+                } else {
+                    AgentMarkdown.text(content)
+                        .font(.system(size: SWTheme.Typography.body))
+                        .textSelection(.enabled)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, isError ? 10 : 0)
+            .padding(.vertical, isError ? 8 : 0)
+            .background(isError ? Color.red.opacity(0.08) : Color.clear)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             Spacer(minLength: 16)
         }
         .padding(.vertical, 2)
@@ -134,7 +148,10 @@ struct AgentTranscriptView: View {
         case .user(let msg):
             AgentUserBubble(content: msg.content)
         case .assistant(let msg):
-            AgentAssistantMarkdown(content: msg.content)
+            AgentAssistantMarkdown(
+                content: msg.content,
+                isError: msg.ok == false || msg.content.hasPrefix("⚠️")
+            )
         case .toolGroup(let tools):
             ToolCallGroupView(tools: tools)
         }

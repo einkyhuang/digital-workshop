@@ -457,7 +457,7 @@ final class SharedModelsSettingsVM: ObservableObject {
     @Published var newProviderName = ""
     @Published var newProviderBase = ""
     @Published var newProviderKey = ""
-    @Published var newProviderModel = "deepseek-chat"
+    @Published var newProviderModel = "qwen3.8-max"
     @Published var newModelName = ""
     @Published var prefs = SharedWorkbenchPrefs.Prefs()
     @Published var selectedSkillIds: Set<String> = []
@@ -722,7 +722,7 @@ final class SharedModelsSettingsVM: ObservableObject {
         raw.append(dict)
         _ = SharedModelStore.saveProviders(raw, activeProviderId: id, repoRoot: repoRoot)
         showAddProvider = false
-        newProviderName = ""; newProviderBase = ""; newProviderKey = ""; newProviderModel = "deepseek-chat"
+        newProviderName = ""; newProviderBase = ""; newProviderKey = ""; newProviderModel = "qwen3.8-max"
         reloadProviders()
         selectedId = id
         alert("已添加自定义平台")

@@ -380,8 +380,8 @@ final class GlobalAgentViewModel: ObservableObject {
     @Published var draft: String = ""
     @Published var isStreaming = false
     @Published var showSettings = false
-    @Published var baseURL: String = UserDefaults.standard.string(forKey: "sw.agent.baseURL") ?? "https://api.deepseek.com"
-    @Published var model: String = UserDefaults.standard.string(forKey: "sw.agent.model") ?? "deepseek-chat"
+    @Published var baseURL: String = UserDefaults.standard.string(forKey: "sw.agent.baseURL") ?? AgentLLMClient.preferredDefaultBaseURL
+    @Published var model: String = UserDefaults.standard.string(forKey: "sw.agent.model") ?? AgentLLMClient.preferredDefaultModel
     @Published var keyDraft: String = ""
     @Published var status: String = ""
     @Published var providerList: [ProviderItem] = []
@@ -458,12 +458,12 @@ final class GlobalAgentViewModel: ObservableObject {
         case .global:
             return AgentChatMessage(
                 role: .assistant,
-                content: "我是 **全局助手**。可直接查客户统计、语义搜客户、任务与导航；不委派员工。问数量先看快照 / `crm_stats`；找客户优先 `semantic_search_customers`。"
+                content: "我是全局助手。可以直接问客户数量、找客户、任务和导航；需要派员工时请切换到「大可可」。"
             )
         case .chief:
             return AgentChatMessage(
                 role: .assistant,
-                content: "我是 **大可可（总调度）**。需要时会 `list_employees` / `delegate_to_employee` 派给数字员工并汇总。会话写入 chief 私有目录。浏览器/发信请走 Grok Bot App。"
+                content: "我是大可可，告诉我要做什么，我来安排合适的员工并汇总结果。"
             )
         }
     }
@@ -560,8 +560,106 @@ final class GlobalAgentViewModel: ObservableObject {
             selectedProviderId = first.id
         }
         applySelectedProvider()
+        let hint = ensureValidModelSelection(showHint: false)
         persistSelection()
-        status = enabledItems.isEmpty ? "无已启用全局模型" : "已载入 \(enabledItems.count) 个启用网关"
+        if let hint, !hint.isEmpty {
+            status = hint
+        } else {
+            status = enabledItems.isEmpty ? "无已启用全局模型" : "已载入 \(enabledItems.count) 个启用网关"
+        }
+    }
+
+
+    /// Prefer Qwen qwen3.8-max. Fall back when selection is missing/disabled/no key/skyclaw stale.
+    @discardableResult
+    func ensureValidModelSelection(showHint: Bool) -> String? {
+        let preferredModel = AgentLLMClient.preferredDefaultModel
+        let preferredProvider = AgentLLMClient.preferredDefaultProviderId
+        let preferredBase = AgentLLMClient.preferredDefaultBaseURL
+
+        func hasKey(_ id: String) -> Bool {
+            let k = SharedModelStore.loadKey(providerId: id) ?? ""
+            return !k.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        func modelMatches(_ candidate: String, in available: [String], providerDefault: String) -> Bool {
+            let c = candidate.trimmingCharacters(in: .whitespacesAndNewlines)
+            if c.isEmpty { return false }
+            if !available.isEmpty {
+                if available.contains(c) { return true }
+                if available.contains(where: { $0 == c || $0.hasSuffix("/" + c) || c.hasSuffix("/" + $0) }) {
+                    return true
+                }
+                return false
+            }
+            if !providerDefault.isEmpty && (providerDefault == c || providerDefault.hasSuffix("/" + c)) {
+                return true
+            }
+            let lower = c.lowercased()
+            if lower.contains("skyclaw") { return false }
+            return true
+        }
+
+        let enabled = providerList.filter(\.enabled)
+        let current = enabled.first(where: { $0.id == selectedProviderId })
+        let currentOk: Bool = {
+            guard let current else { return false }
+            guard hasKey(current.id) else { return false }
+            return modelMatches(model, in: current.availableModels, providerDefault: current.model)
+        }()
+        if currentOk { return nil }
+
+        let oldModel = model
+        if let qwen = enabled.first(where: { $0.id == preferredProvider && hasKey($0.id) }) {
+            selectedProviderId = qwen.id
+            baseURL = qwen.baseURL.isEmpty ? preferredBase : qwen.baseURL
+            if modelMatches(preferredModel, in: qwen.availableModels, providerDefault: qwen.model) {
+                model = preferredModel
+            } else if let hit = qwen.availableModels.first(where: {
+                let l = $0.lowercased()
+                return l == preferredModel || l.contains("qwen3.8-max") || l.contains("qwen3-max") || l.contains("qwen-plus")
+            }) {
+                model = hit
+            } else if !qwen.model.isEmpty {
+                model = qwen.model
+            } else {
+                model = preferredModel
+            }
+        } else if let anyQwenish = enabled.first(where: { p in
+            hasKey(p.id) && (
+                p.id == "qwen" || p.id == "bailian" || p.id == "alicoding"
+                || p.model.lowercased().contains("qwen")
+                || p.availableModels.contains(where: { $0.lowercased().contains("qwen") })
+            )
+        }) {
+            selectedProviderId = anyQwenish.id
+            baseURL = anyQwenish.baseURL
+            if let hit = anyQwenish.availableModels.first(where: {
+                let l = $0.lowercased()
+                return l.contains("qwen3.8-max") || l.contains("qwen3-max") || l.contains("qwen-plus") || l.contains("qwen-max")
+            }) {
+                model = hit
+            } else if !anyQwenish.model.isEmpty {
+                model = anyQwenish.model
+            } else {
+                model = preferredModel
+            }
+        } else if let first = enabled.first(where: { hasKey($0.id) && !$0.model.lowercased().contains("skyclaw") }) {
+            selectedProviderId = first.id
+            baseURL = first.baseURL
+            model = first.availableModels.first ?? (first.model.isEmpty ? preferredModel : first.model)
+        } else {
+            selectedProviderId = preferredProvider
+            baseURL = preferredBase
+            model = preferredModel
+        }
+
+        persistSelection()
+        let shownOld = oldModel.isEmpty ? "空" : oldModel
+        let hint = "已将无效模型「" + shownOld + "」切换为 " + model + "（" + selectedProviderId + "）。请确认该平台已配置 API Key。"
+        if showHint {
+            messages.append(AgentChatMessage(role: .assistant, content: "⚠️ " + hint, ok: false))
+        }
+        return hint
     }
 
     func askConfirm(name: String, summary: String) async -> Bool {
@@ -726,13 +824,20 @@ final class GlobalAgentViewModel: ObservableObject {
             snapshotCurrentSession()
         }
 
-        let pid = selectedProviderId.isEmpty ? "deepseek" : selectedProviderId
+        _ = ensureValidModelSelection(showHint: true)
+        let pid = selectedProviderId.isEmpty ? AgentLLMClient.preferredDefaultProviderId : selectedProviderId
         let key = SharedModelStore.loadKey(providerId: pid)
             ?? AgentKeychain.loadKey()
             ?? ""
         if !key.isEmpty {
             await runLLM(userText: text, apiKey: key)
         } else {
+            messages.append(AgentChatMessage(
+                role: .assistant,
+                content: "⚠️ 【模型调用失败】provider=\(pid) · model=\(model)
+未找到 API Key。请在全局设置里为该平台填写密钥。",
+                ok: false
+            ))
             await runLocal(userText: text)
         }
         attachmentPaths = []
@@ -850,7 +955,14 @@ final class GlobalAgentViewModel: ObservableObject {
             ["role": "user", "content": userText]
         ]
         let toolsSchema = AgentLLMClient.openAIToolsFromSchema(includeDelegation: panelMode == .chief)
-        let cfg = AgentLLMClient.Config(baseURL: baseURL, model: model, apiKey: apiKey)
+        let providerName = providerList.first(where: { $0.id == selectedProviderId })?.name ?? selectedProviderId
+        let cfg = AgentLLMClient.Config(
+            baseURL: baseURL,
+            model: model,
+            apiKey: apiKey,
+            providerId: selectedProviderId,
+            providerName: providerName
+        )
         let maxLoops = 6
         var loops = 0
         var emptySearchStreak = 0
@@ -1115,20 +1227,33 @@ final class GlobalAgentViewModel: ObservableObject {
                 messages.append(AgentChatMessage(id: assistantId, role: .assistant, content: ""))
             } catch {
                 pruneEmptyAssistant(id: assistantId)
-                messages.append(AgentChatMessage(role: .assistant, content: "调用失败：\(error.localizedDescription)"))
+                let msg: String
+                if let e = error as? AgentLLMError {
+                    msg = e.localizedDescription ?? "模型调用失败"
+                } else {
+                    let providerName = providerList.first(where: { $0.id == selectedProviderId })?.name ?? selectedProviderId
+                    msg = "【模型调用失败】provider=\(providerName) · model=\(model)
+\(error.localizedDescription)"
+                }
+                messages.append(AgentChatMessage(role: .assistant, content: "⚠️ " + msg, ok: false))
                 return
             }
         }
 
-        let hasAssistantText = messages.contains {
+        // Only count assistant text AFTER the latest user turn (welcome must not count).
+        let fromUser = messages.lastIndex(where: { $0.role == .user }) ?? 0
+        let turn = Array(messages.suffix(from: fromUser))
+        let hasAssistantText = turn.contains {
             $0.role == .assistant && !$0.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         }
         if !hasAssistantText {
             pruneEmptyAssistant(id: assistantId)
-            let fromUser = messages.lastIndex(where: { $0.role == .user }) ?? 0
-            let toolsOnly = Array(messages.suffix(from: fromUser).filter { $0.role == .tool })
+            let toolsOnly = turn.filter { $0.role == .tool }
             let fallback = AgentToolPresentation.fallbackAnswer(fromToolMessages: toolsOnly, userText: userText)
-            messages.append(AgentChatMessage(role: .assistant, content: fallback))
+            let providerName = providerList.first(where: { $0.id == selectedProviderId })?.name ?? selectedProviderId
+            let note = "⚠️ 本轮模型未返回正文（provider=\(providerName) · model=\(model)）。
+" + fallback
+            messages.append(AgentChatMessage(role: .assistant, content: note, ok: false))
         } else {
             pruneEmptyAssistant(id: assistantId)
         }

@@ -24,12 +24,12 @@
 
   function defaultProviders() {
     return [
-      preset("apifree", "APIFree", "A", "bg-purple-600", true, "https://api.apifree.ai/agent/v1", "skywork-ai", "skywork-ai/skyclaw-v1"),
+      preset("apifree", "APIFree", "A", "bg-purple-600", false, "https://api.apifree.ai/agent/v1", "skywork-ai", "skywork-ai/skyclaw-v1"),
       preset("cloudflare", "Cloudflare", "C", "bg-orange-500", true, "https://api.cloudflare.com/client/v4", "workers-ai", "meta-llama/llama-3-8b-instruct"),
       preset("siliconflow", "硅基流动", "硅", "bg-indigo-600", true, "https://api.siliconflow.cn/v1", "deepseek", "deepseek-ai/DeepSeek-V3"),
       preset("gemini", "Gemini", "G", "bg-blue-500", true, "https://generativelanguage.googleapis.com/v1beta/openai", "google", "gemini-1.5-pro"),
       preset("alicoding", "阿里coding", "阿", "bg-blue-800", true, "https://api.alicoding.com/v1", "qwen", "qwen-turbo"),
-      preset("qwen", "通义千问", "千", "bg-violet-600", true, "https://dashscope.aliyuncs.com/compatible-mode/v1", "qwen", "qwen-max"),
+      preset("qwen", "通义千问", "千", "bg-violet-600", true, "https://dashscope.aliyuncs.com/compatible-mode/v1", "qwen", "qwen3.8-max"),
       preset("bailian", "阿里云百炼", "百", "bg-blue-600", false, "https://dashscope.aliyuncs.com/compatible-mode/v1", "qwen", "qwen-max"),
       preset("volcengine", "火山引擎", "火", "bg-blue-400", false, "https://ark.cn-beijing.volces.com/api/v3", "doubao", "doubao-pro"),
       preset("minimax", "MiniMax", "M", "bg-red-500", false, "https://api.minimaxi.com/v1", "abab", "abab6.5-chat"),

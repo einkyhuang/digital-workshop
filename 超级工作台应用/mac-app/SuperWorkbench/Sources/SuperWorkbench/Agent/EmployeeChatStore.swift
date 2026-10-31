@@ -234,22 +234,31 @@ enum EmployeeChatStore {
             return (id, base, model)
         }
         if !prefs.providerId.isEmpty, let hit = pick(prefs.providerId) {
-            return hit
+            return sanitizeResolved(hit)
         }
         // Prefer Qwen when it is the active global default or enabled.
         let active = doc.activeProviderId
         if !active.isEmpty, let hit = pick(active) {
-            return hit
+            return sanitizeResolved(hit)
         }
-        if let qwen = pick("qwen") { return qwen }
-        if let alicoding = pick("alicoding") { return alicoding }
+        if let qwen = pick("qwen") { return sanitizeResolved(qwen) }
+        if let alicoding = pick("alicoding") { return sanitizeResolved(alicoding) }
         for p in providers where enabled(p) {
             let id = (p["id"] as? String) ?? ""
-            if let hit = pick(id) { return hit }
+            if let hit = pick(id) { return sanitizeResolved(hit) }
         }
-        let legacyModel = UserDefaults.standard.string(forKey: "sw.agent.model") ?? "qwen-max"
-        let legacyBase = UserDefaults.standard.string(forKey: "sw.agent.baseURL") ?? "https://dashscope.aliyuncs.com/compatible-mode/v1"
-        return ("qwen", legacyBase, legacyModel)
+        let legacyModel = UserDefaults.standard.string(forKey: "sw.agent.model") ?? AgentLLMClient.preferredDefaultModel
+        let legacyBase = UserDefaults.standard.string(forKey: "sw.agent.baseURL") ?? AgentLLMClient.preferredDefaultBaseURL
+        return sanitizeResolved(("qwen", legacyBase, legacyModel))
+    }
+
+    private static func sanitizeResolved(_ r: (providerId: String, baseURL: String, model: String)) -> (providerId: String, baseURL: String, model: String) {
+        let m = r.model.trimmingCharacters(in: .whitespacesAndNewlines)
+        let lower = m.lowercased()
+        if m.isEmpty || lower.contains("skyclaw") || lower == "skywork-ai/skyclaw-v1" {
+            return (AgentLLMClient.preferredDefaultProviderId, AgentLLMClient.preferredDefaultBaseURL, AgentLLMClient.preferredDefaultModel)
+        }
+        return r
     }
 
     private static func sanitize(_ botId: String) -> String {
