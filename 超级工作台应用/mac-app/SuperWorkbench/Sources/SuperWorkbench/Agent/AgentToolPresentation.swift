@@ -116,7 +116,7 @@ enum AgentToolPresentation {
             lines.append("如需我继续处理，请补充具体目标。")
         }
         if !userText.isEmpty {
-            lines.insert(0, "针对「\(userText.prefix(40))」：")
+            lines.insert("针对「\(userText.prefix(40))」：", at: 0)
         }
         return lines.joined(separator: "\n")
     }
