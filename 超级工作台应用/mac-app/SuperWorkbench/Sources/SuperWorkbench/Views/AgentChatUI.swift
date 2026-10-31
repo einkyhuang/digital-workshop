@@ -84,13 +84,16 @@ struct AgentUserBubble: View {
 
 struct AgentAssistantMarkdown: View {
     let content: String
+    var isActive: Bool = false
     var body: some View {
-        HStack(alignment: .top) {
+        HStack(alignment: .top, spacing: 10) {
+            GlassOrbView(size: 22, isActive: isActive)
+                .padding(.top, 2)
             AgentMarkdown.text(content)
                 .font(.system(size: SWTheme.Typography.body))
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Spacer(minLength: 24)
+            Spacer(minLength: 16)
         }
         .padding(.vertical, 2)
     }
@@ -98,9 +101,8 @@ struct AgentAssistantMarkdown: View {
 
 struct AgentTypingIndicator: View {
     var body: some View {
-        HStack(spacing: 6) {
-            ProgressView()
-                .controlSize(.small)
+        HStack(spacing: 8) {
+            GlassOrbView(size: 22, isActive: true)
             Text("正在思考…")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)

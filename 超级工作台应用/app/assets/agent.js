@@ -216,9 +216,9 @@
     const root = document.createElement("div");
     root.id = "swAgentRoot";
     root.innerHTML = `
-      <button type="button" id="swAgentFab" title="全局 Agent">✦</button>
+      <button type="button" id="swAgentFab" class="sw-glass-orb-fab" title="全局 Agent" aria-label="全局 Agent"><span class="sw-glass-orb" aria-hidden="true"><span class="sw-glass-orb-core"></span><span class="sw-glass-orb-rim"></span><span class="sw-glass-orb-streak"></span><span class="sw-glass-orb-spec"></span></span></button>
       <div id="swAgentPanel" hidden>
-        <div class="sw-agent-head"><strong>全局 Agent</strong><span class="muted">模型 · Skills</span>
+        <div class="sw-agent-head"><span class="sw-glass-orb sw-glass-orb-sm" aria-hidden="true"><span class="sw-glass-orb-core"></span><span class="sw-glass-orb-rim"></span><span class="sw-glass-orb-streak"></span><span class="sw-glass-orb-spec"></span></span><strong>全局 Agent</strong><span class="muted">模型 · Skills</span>
           <button type="button" id="swAgentSettings">设置</button>
           <button type="button" id="swAgentClose">×</button></div>
         <div id="swAgentLog" class="sw-agent-log"></div>
@@ -269,7 +269,12 @@
     function line(role, text) {
       const d = document.createElement("div");
       d.className = "sw-agent-msg sw-agent-" + role;
-      d.textContent = text;
+      if (role === "assistant") {
+        d.innerHTML = '<span class="sw-glass-orb sw-glass-orb-sm" aria-hidden="true"><span class="sw-glass-orb-core"></span><span class="sw-glass-orb-rim"></span><span class="sw-glass-orb-streak"></span><span class="sw-glass-orb-spec"></span></span><span class="sw-agent-assistant-text"></span>';
+        d.querySelector(".sw-agent-assistant-text").textContent = text;
+      } else {
+        d.textContent = text;
+      }
       log.appendChild(d); log.scrollTop = log.scrollHeight;
     }
     line("assistant", "Web 子集：导航/快照/本地任务。可选择模型与 Skills（Skills 正文在 Web 仅注入元数据摘要）。");
@@ -369,8 +374,8 @@
       });
     }
 
-    function open() { panel.hidden = false; input.focus(); buildModelMenu(); buildSkillMenu(); renderSkillTags(); updateSendState(); }
-    function close() { panel.hidden = true; hideMenus(); }
+    function open() { panel.hidden = false; input.focus(); buildModelMenu(); buildSkillMenu(); renderSkillTags(); updateSendState();  document.body.classList.add("sw-agent-active"); }
+    function close() { panel.hidden = true; hideMenus();  document.body.classList.remove("sw-agent-active"); }
     document.getElementById("swAgentFab").onclick = () => { panel.hidden ? open() : close(); };
     document.getElementById("swAgentClose").onclick = close;
     document.addEventListener("keydown", (e) => {

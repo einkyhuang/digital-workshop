@@ -56,8 +56,8 @@ struct GlobalAgentPanel: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Image(systemName: "sparkles")
+            HStack(spacing: 10) {
+                GlassOrbView(size: 26, isActive: vm.isStreaming)
                 Text(vm.panelMode == .chief ? "大可可 · 总调度" : "全局对话").font(.headline)
                 Text(vm.panelMode == .chief ? "委派员工并汇总" : "系统工具 · 客户统计/语义检索")
                     .font(.caption).foregroundStyle(.secondary)

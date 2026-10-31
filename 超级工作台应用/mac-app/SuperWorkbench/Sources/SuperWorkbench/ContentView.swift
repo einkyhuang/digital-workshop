@@ -47,17 +47,11 @@ struct ContentView: View {
                 Button {
                     store.showGlobalAgent = true
                 } label: {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 48, height: 48)
-                        .background(Color.black)
-                        .clipShape(Circle())
-                        .shadow(color: .black.opacity(0.25), radius: 8, y: 4)
+                    GlassOrbView(size: 52, isActive: false)
                 }
                 .buttonStyle(.plain)
-                .padding(.trailing, 22)
-                .padding(.bottom, 22)
+                .padding(.trailing, 18)
+                .padding(.bottom, 18)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                 .help("全局 Agent（⌘K）")
             }
