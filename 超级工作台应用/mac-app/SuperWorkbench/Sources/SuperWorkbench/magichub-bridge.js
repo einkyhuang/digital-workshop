@@ -32,7 +32,8 @@
     loadSettings: (key) => invoke('load-settings', [key]),
     readFile: (path) => invoke('read-file', [path]),
     writeFile: (path, content) => invoke('write-file', [path, content]),
-    selectLocalZipAndUpdate: () => invoke('select-local-zip-and-update', [])
+    selectLocalZipAndUpdate: () => invoke('select-local-zip-and-update', []),
+    openGlobalSettings: () => invoke('open-global-settings', [])
   };
   document.documentElement.setAttribute('data-sw-host', 'mac');
   // Always embed when hosted by SuperWorkbench Mac WKWebView

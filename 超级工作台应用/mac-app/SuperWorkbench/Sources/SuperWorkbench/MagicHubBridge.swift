@@ -115,6 +115,11 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
                 )
             }
             return (true, ["ok": true], nil)
+        case "open-global-settings":
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .swOpenGlobalSettings, object: nil)
+            }
+            return (true, ["ok": true, "opened": true], nil)
         default:
             return (false, nil, "unknown method \(method)")
         }

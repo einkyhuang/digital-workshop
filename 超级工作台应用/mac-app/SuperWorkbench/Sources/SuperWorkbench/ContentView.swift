@@ -81,6 +81,9 @@ struct ContentView: View {
             SharedModelsSettingsView()
                 .environmentObject(store)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .swOpenGlobalSettings)) { _ in
+            store.showGlobalModelSettings = true
+        }
         .overlay {
             if store.isSyncing {
                 ProgressView("同步中…")

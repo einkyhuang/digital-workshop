@@ -1,4 +1,24 @@
 <template>
+  <!-- Mac SuperWorkbench embed: settings live in native global window -->
+  <div v-if="isMacHost" class="max-w-xl mx-auto mt-16 apple-glass rounded-[28px] border border-white/50 p-10 space-y-5 text-center select-none">
+    <div class="text-4xl">⚙️</div>
+    <h2 class="text-lg font-bold font-serif-sc text-zen-ink">全局设置已迁移</h2>
+    <p class="text-xs text-zen-gray leading-relaxed">
+      AI 模型平台、密钥、模型拉取、Skills / 存储 / 说明书等，已统一到「超级工作台」原生全局设置
+      （侧栏 KY 卡片齿轮或 ⌘,）。与外贸工作台共用同一份配置，避免两边各写一份。
+    </p>
+    <button
+      type="button"
+      @click="openNativeGlobalSettings"
+      class="px-6 py-3 rounded-2xl bg-zen-ink text-white text-sm font-bold shadow-md hover:bg-zen-ink/90 transition-all"
+    >
+      打开全局设置
+    </button>
+    <p class="text-[10px] text-zen-gray">若按钮无反应，请确认当前运行在超级工作台 Mac 内嵌窗口中。</p>
+  </div>
+
+  <div v-else class="space-y-6">
+
   <div class="space-y-6 font-sans text-zen-ink relative z-10 select-text">
     <!-- Header -->
     <div class="pb-4 border-b border-white/20 select-none flex justify-between items-center">
@@ -945,6 +965,8 @@
       </template>
     </ZenModal>
   </div>
+
+  </div>
 </template>
 
 <script setup>
@@ -986,6 +1008,30 @@ const emit = defineEmits([
 ]);
 
 const activeTab = ref('api');
+
+const isMacHost = computed(() => {
+  try {
+    if (typeof document !== 'undefined' && document.documentElement.getAttribute('data-sw-host') === 'mac') return true;
+    if (window.__SW_EMBED__ && window.electronAPI && window.electronAPI.__swBridge) return true;
+    return !!(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.swMagicHub);
+  } catch (_) {
+    return false;
+  }
+});
+
+const openNativeGlobalSettings = async () => {
+  try {
+    if (window.electronAPI && typeof window.electronAPI.openGlobalSettings === 'function') {
+      await window.electronAPI.openGlobalSettings();
+      return;
+    }
+  } catch (e) {
+    alert('打开全局设置失败：' + e);
+    return;
+  }
+  alert('当前环境无法调起原生全局设置。浏览器模式下请继续使用本页完整设置。');
+};
+
 
 onMounted(() => {
   if (props.initialTab) {

@@ -64,5 +64,6 @@
     readFile: async () => ({ success: false, error: "浏览器无本地读文件" }),
     writeFile: async () => ({ success: false, error: "浏览器无本地写文件" }),
     selectLocalZipAndUpdate: async () => ({ success: false, error: "请用 Mac 应用更新" }),
+    openGlobalSettings: async () => ({ success: false, error: "浏览器请使用本页设置" }),
   };
 })();
