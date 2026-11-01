@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-11-01",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-01T10:00:00+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "Formore Lighting：今日选题 LED Linear Light，简报已完成，待墨墨成稿、画眉配图；日检无新的严重问题，3 篇已发布文章均 200。",
+  "articles": [
+    {
+      "id": "led-linear-light-guide",
+      "title": "LED Linear Light: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-linear-light-guide",
+      "status": "brief",
+      "primaryKeyword": "led linear light",
+      "secondaryKeywords": [
+        "led linear light manufacturer",
+        "linear led lighting",
+        "suspended linear light",
+        "recessed linear light",
+        "linkable linear light"
+      ],
+      "image": "",
+      "publishedAt": "",
+      "notes": "简报已出（briefs/2026-11-01-led-linear-light.md），已交给墨墨写稿、画眉配图，等待稿件；16 条内链目标均 200；尚未上线"
+    }
+  ],
+  "keywords": [
+    { "term": "led linear light", "intent": "informational", "priority": "high" },
+    { "term": "led linear light manufacturer", "intent": "commercial", "priority": "medium" },
+    { "term": "suspended linear light", "intent": "commercial", "priority": "medium" }
+  ],
+  "images": [
+    { "url": "", "alt": "Modern open-plan office ceiling featuring long suspended black LED linear lights in continuous runs.", "ofArticleId": "led-linear-light-guide" },
+    { "url": "", "alt": "Exploded view of an aluminum linear light extrusion showing the LED board, opal diffuser, and end cap.", "ofArticleId": "led-linear-light-guide" },
+    { "url": "", "alt": "Retail corridor ceiling showing recessed linear slot lights and surface-mounted linkable battens.", "ofArticleId": "led-linear-light-guide" }
+  ],
+  "checks": [
+    { "id": "seo-daily", "name": "npm run seo:daily", "status": "warn", "detail": "运行成功，但缺少 PSI_API_KEY，性能分数跳过" },
+    { "id": "core-pages", "name": "核心页面状态码", "status": "pass", "detail": "首页、robots、sitemap、llms.txt、insights、products、contact、oem-odm、sourcing、solutions、OQC、factory-first 均 200" },
+    { "id": "published-articles", "name": "已发布文章复核", "status": "pass", "detail": "UGR、Solar、Magnetic 三篇均 200；canonical 正确；index,follow；Article、FAQPage、BreadcrumbList 齐全" },
+    { "id": "sitemap", "name": "Sitemap 覆盖", "status": "pass", "detail": "142 个 URL，含 3 篇已发布文章" },
+    { "id": "brief-links", "name": "简报内链核验", "status": "pass", "detail": "16 条内链目标和 /contact、/products 均 200" }
+  ],
+  "issues": [
+    { "severity": "medium", "title": "PSI_API_KEY 未配置", "detail": "日检拿不到性能和 Core Web Vitals 分数" },
+    { "severity": "low", "title": "日检任务映射过期", "detail": "daily-seo-check.mjs 仍按四月排期" },
+    { "severity": "low", "title": "Organization sameAs 为空", "detail": "等有真实社媒或目录主页 URL 再补" }
+  ],
+  "tomorrow": "收到墨墨稿件和画眉配图后审稿，校验通过即发布 led-linear-light-guide；排下一个选题（3000K vs 4000K 与现有色温文去重后再定，或 OEM vs ODM）。"
+}
