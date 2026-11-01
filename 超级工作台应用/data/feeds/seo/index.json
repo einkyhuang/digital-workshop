@@ -2,12 +2,12 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-01T01:18:03+00:00",
+  "updatedAt": "2026-11-01T01:40:06+00:00",
   "dates": [
     {
       "date": "2026-11-01",
       "file": "2026-11-01.json",
-      "summary": "Formore Lighting：今日选题 LED Linear Light，简报已完成，待墨墨成稿、画眉配图；日检无新的严重问题，3 篇已发布文章均 200。",
+      "summary": "Formore Lighting：今日文章 LED Linear Light 已审稿发布；16 内链与 9 标准外链已核验；布局 TOC/FAQ/chips/CTA 正常；sitemap 与 schema 齐全。",
       "articleCount": 1,
       "issueCount": 3
     },
