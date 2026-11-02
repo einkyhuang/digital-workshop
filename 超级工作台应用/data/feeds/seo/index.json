@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-01T01:40:06+00:00",
+  "updatedAt": "2026-11-02T01:13:01+00:00",
   "dates": [
+    {
+      "date": "2026-11-02",
+      "file": "2026-11-02.json",
+      "summary": "Formore Lighting：今日选题 OEM vs ODM（OEM-ODM 簇支撑文），简报已交墨墨、配图需求已交画眉，等稿后审稿发布；日检无新的严重问题。",
+      "articleCount": 1,
+      "issueCount": 3
+    },
     {
       "date": "2026-11-01",
       "file": "2026-11-01.json",
