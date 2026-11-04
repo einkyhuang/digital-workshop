@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-02T01:13:01+00:00",
+  "updatedAt": "2026-11-04T01:03:38+00:00",
   "dates": [
+    {
+      "date": "2026-11-04",
+      "file": "2026-11-04.json",
+      "summary": "Formore Lighting：11-02 的 OEM vs ODM 简报无人认领、11-03 例程失败，今日继续主推该文并更新简报；简报已写，等待墨墨稿件与画眉配图；日检无新的严重问题。",
+      "articleCount": 1,
+      "issueCount": 5
+    },
     {
       "date": "2026-11-02",
       "file": "2026-11-02.json",

@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-11-02",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-02T09:30:00+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "Formore Lighting：今日选题 OEM vs ODM（OEM-ODM 簇支撑文），简报已交墨墨、配图需求已交画眉，等稿后审稿发布；日检无新的严重问题。",
+  "articles": [
+    {
+      "id": "oem-vs-odm-lighting-guide",
+      "title": "OEM vs ODM Lighting: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/oem-vs-odm-lighting-guide",
+      "status": "draft",
+      "primaryKeyword": "oem vs odm lighting",
+      "secondaryKeywords": [
+        "oem led lighting manufacturer",
+        "odm lighting manufacturer",
+        "lighting oem odm",
+        "led downlight oem",
+        "private label led lighting"
+      ],
+      "notes": "简报 briefs/2026-11-02-oem-vs-odm-lighting.md；待墨墨成稿与画眉配图，尚未发布，线上链接为计划地址"
+    }
+  ],
+  "keywords": [
+    {
+      "term": "oem vs odm lighting",
+      "intent": "informational",
+      "priority": "high"
+    },
+    {
+      "term": "oem led lighting manufacturer",
+      "intent": "commercial",
+      "priority": "medium"
+    },
+    {
+      "term": "odm lighting manufacturer",
+      "intent": "commercial",
+      "priority": "medium"
+    }
+  ],
+  "images": [],
+  "checks": [
+    {
+      "id": "seo-daily",
+      "name": "npm run seo:daily",
+      "status": "warn",
+      "detail": "运行成功，但缺少 PSI_API_KEY，性能分数跳过"
+    },
+    {
+      "id": "core-pages",
+      "name": "核心页面状态码",
+      "status": "pass",
+      "detail": "首页、robots、sitemap、llms.txt、insights、products、contact、oem-odm、sourcing、solutions、IQC/IPQC/OQC、factory-first 均 200"
+    },
+    {
+      "id": "published-articles",
+      "name": "已发布文章复核",
+      "status": "pass",
+      "detail": "UGR、Solar、Magnetic、LED Linear 四篇均 200；LED Linear 的 title、canonical、index,follow 正确，Article、FAQPage、BreadcrumbList 齐全"
+    },
+    {
+      "id": "sitemap",
+      "name": "Sitemap 覆盖",
+      "status": "pass",
+      "detail": "子 sitemap 合计 143 个 URL，含 led-linear-light-guide"
+    },
+    {
+      "id": "brief-links",
+      "name": "简报内链核验",
+      "status": "pass",
+      "detail": "今日简报 19 条内链目标均 200"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "medium",
+      "title": "PSI_API_KEY 未配置",
+      "detail": "日检拿不到性能和 Core Web Vitals 分数"
+    },
+    {
+      "severity": "low",
+      "title": "日检任务映射过期",
+      "detail": "daily-seo-check.mjs 仍按四月排期"
+    },
+    {
+      "severity": "low",
+      "title": "Organization sameAs 为空",
+      "detail": "等有真实社媒或目录主页 URL 再补"
+    }
+  ],
+  "tomorrow": "收墨墨稿件和画眉配图后审稿，校验通过即发布 oem-vs-odm-lighting-guide；下一选题考虑 3000K vs 4000K（先与色温文去重）。"
+}
