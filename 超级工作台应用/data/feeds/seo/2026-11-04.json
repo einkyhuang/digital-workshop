@@ -3,16 +3,16 @@
   "feedId": "seo",
   "date": "2026-11-04",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-04T09:30:00+08:00",
+  "updatedAt": "2026-11-04T09:11:31+08:00",
   "botId": "seo",
   "botName": "搜搜-SEO专家",
-  "summary": "Formore Lighting：11-02 的 OEM vs ODM 简报无人认领、11-03 例程失败，今日继续主推该文并更新简报；简报已写，等待墨墨稿件与画眉配图；日检无新的严重问题。",
+  "summary": "Formore Lighting：今日文章 OEM vs ODM Lighting 已审稿发布；19 内链与标准外链已核验；黄金样品图 alt 已按可见边框修正；布局 TOC/FAQ/chips/CTA 正常。",
   "articles": [
     {
       "id": "oem-vs-odm-lighting-guide",
       "title": "OEM vs ODM Lighting: A B2B Buyer's Guide",
       "url": "https://www.formorelightings.com/insights/oem-vs-odm-lighting-guide",
-      "status": "draft",
+      "status": "published",
       "primaryKeyword": "oem vs odm lighting",
       "secondaryKeywords": [
         "oem led lighting manufacturer",
@@ -21,15 +21,45 @@
         "led downlight oem",
         "private label led lighting"
       ],
-      "notes": "简报 briefs/2026-11-04-oem-vs-odm-lighting.md 已写，等待墨墨成稿；尚未发布，线上链接为计划地址（当前 404）"
+      "notes": "已发布；摘录缩短；CTA 对齐；黄金样品 alt 去掉 trimless；site images 34ab9c1 + publish 0416517",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/engineer-reviewing-luminaire-cad-drawings-aluminum-samples.webp",
+      "publishedAt": "2026-11-04T09:11:31+08:00"
     }
   ],
   "keywords": [
-    { "term": "oem vs odm lighting", "intent": "informational", "priority": "high" },
-    { "term": "oem led lighting manufacturer", "intent": "commercial", "priority": "medium" },
-    { "term": "odm lighting manufacturer", "intent": "commercial", "priority": "medium" }
+    {
+      "term": "oem vs odm lighting",
+      "intent": "informational",
+      "priority": "high"
+    },
+    {
+      "term": "oem led lighting manufacturer",
+      "intent": "commercial",
+      "priority": "medium"
+    },
+    {
+      "term": "odm lighting manufacturer",
+      "intent": "commercial",
+      "priority": "medium"
+    }
   ],
-  "images": [],
+  "images": [
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/engineer-reviewing-luminaire-cad-drawings-aluminum-samples.webp",
+      "alt": "Lighting engineer reviewing luminaire CAD drawings and physical aluminum extrusion samples on a factory desk.",
+      "ofArticleId": "oem-vs-odm-lighting-guide"
+    },
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/golden-sample-comparison-trimless-downlights-linear-lights.webp",
+      "alt": "Top-down view of a golden-sample comparison table showing recessed downlights with visible trim rings and linear light samples for inspection.",
+      "ofArticleId": "oem-vs-odm-lighting-guide"
+    },
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/factory-qc-test-station-integrating-sphere-aging-racks.webp",
+      "alt": "Factory QC test station featuring an integrating sphere and aging racks testing commercial LED track spotlights and suspended lights.",
+      "ofArticleId": "oem-vs-odm-lighting-guide"
+    }
+  ],
   "checks": [
     {
       "id": "seo-daily",
@@ -47,19 +77,19 @@
       "id": "published-articles",
       "name": "已发布文章复核",
       "status": "pass",
-      "detail": "UGR、Solar、Magnetic、LED Linear 四篇均 200；title、canonical、index,follow 正确，Article、FAQPage、BreadcrumbList 齐全；最新发布仍为 11-01 的 LED Linear"
+      "detail": "含 OEM vs ODM；200；canonical；Article/FAQPage/BreadcrumbList；TOC/FAQ details/chips/CTA"
     },
     {
       "id": "sitemap",
       "name": "Sitemap 覆盖",
       "status": "pass",
-      "detail": "sitemap-index 下子 sitemap 合计 143 个 URL，与 11-02 持平"
+      "detail": "sitemap-insights 含 oem-vs-odm-lighting-guide"
     },
     {
       "id": "brief-links",
       "name": "简报内链核验",
       "status": "pass",
-      "detail": "今日简报 19 条内链目标均 200"
+      "detail": "19 条内链均 200；IEC/UL 标准外链 200；IES LM-80/TM-21 curl 403（非 404）"
     }
   ],
   "issues": [
@@ -89,5 +119,5 @@
       "detail": "等有真实社媒或目录主页 URL 再补"
     }
   ],
-  "tomorrow": "收墨墨稿件和画眉配图后审稿，校验通过即发布 oem-vs-odm-lighting-guide；若仍无稿件则排查链路；之后按排期做 how to source led lights from china 相关内容（先与已发布同名文去重）。"
+  "tomorrow": "下一选题继续推进；R2 桶可写时补传历史文章配图。"
 }
