@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-04T01:11:31+00:00",
+  "updatedAt": "2026-11-05T01:11:04+00:00",
   "dates": [
+    {
+      "date": "2026-11-05",
+      "file": "2026-11-05.json",
+      "summary": "Formore Lighting：昨日 OEM vs ODM 已上线；今日选题 commercial led lighting（简报已发墨墨、配图需求已发画眉），等待稿件与配图，暂未发布；日检全部 200。",
+      "articleCount": 1,
+      "issueCount": 4
+    },
     {
       "date": "2026-11-04",
       "file": "2026-11-04.json",

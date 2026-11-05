@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-11-05",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-05T09:40:00+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "Formore Lighting：昨日 OEM vs ODM 已上线；今日选题 commercial led lighting（简报已发墨墨、配图需求已发画眉），等待稿件与配图，暂未发布；日检全部 200。",
+  "articles": [
+    {
+      "id": "commercial-led-lighting-guide",
+      "title": "Commercial LED Lighting: A B2B Buyer's Guide",
+      "url": "",
+      "status": "brief",
+      "primaryKeyword": "commercial led lighting",
+      "secondaryKeywords": [
+        "commercial led lighting fixtures",
+        "commercial led lighting for offices",
+        "commercial led lighting for retail",
+        "led lighting for commercial buildings",
+        "commercial led lighting manufacturer"
+      ],
+      "notes": "简报已写（24 内链均 200），待墨墨稿件与画眉配图；草稿位置待定"
+    }
+  ],
+  "keywords": [
+    {
+      "term": "commercial led lighting",
+      "intent": "informational",
+      "priority": "high"
+    },
+    {
+      "term": "commercial led lighting manufacturer",
+      "intent": "commercial",
+      "priority": "medium"
+    }
+  ],
+  "images": [],
+  "checks": [
+    {
+      "id": "seo-daily",
+      "name": "npm run seo:daily",
+      "status": "warn",
+      "detail": "运行成功，但缺少 PSI_API_KEY，性能分数跳过"
+    },
+    {
+      "id": "core-pages",
+      "name": "核心页面状态码",
+      "status": "pass",
+      "detail": "首页、robots、sitemap、llms.txt、insights、products、contact、oem-odm、sourcing、solutions 均 200"
+    },
+    {
+      "id": "published-articles",
+      "name": "已发布文章复核",
+      "status": "pass",
+      "detail": "5 篇均 200；oem-vs-odm canonical 与 Article/FAQPage/BreadcrumbList 正常"
+    },
+    {
+      "id": "sitemap",
+      "name": "Sitemap 覆盖",
+      "status": "pass",
+      "detail": "sitemap-insights 20 URL，含 oem-vs-odm-lighting-guide"
+    },
+    {
+      "id": "brief-links",
+      "name": "简报内链核验",
+      "status": "pass",
+      "detail": "今日简报 24 条内链均 200"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "low",
+      "title": "PSI_API_KEY 未配置",
+      "detail": "日检拿不到性能和 Core Web Vitals 分数"
+    },
+    {
+      "severity": "low",
+      "title": "UGR 文章 og:image 不贴题",
+      "detail": "使用了通用的旧图，社交分享预览不精准"
+    },
+    {
+      "severity": "low",
+      "title": "日检任务映射过期",
+      "detail": "daily-seo-check.mjs 仍按四月排期"
+    },
+    {
+      "severity": "low",
+      "title": "Organization sameAs 为空",
+      "detail": "等有真实主页 URL 再补"
+    }
+  ],
+  "tomorrow": "收到墨墨稿件与画眉配图后审稿、校验并发布 commercial-led-lighting-guide；若仍未交付则排查；随后选下一个关键词。"
+}
