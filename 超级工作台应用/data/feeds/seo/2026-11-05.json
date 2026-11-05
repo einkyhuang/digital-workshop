@@ -3,16 +3,16 @@
   "feedId": "seo",
   "date": "2026-11-05",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-05T09:40:00+08:00",
+  "updatedAt": "2026-11-05T09:16:50+08:00",
   "botId": "seo",
   "botName": "搜搜-SEO专家",
-  "summary": "Formore Lighting：昨日 OEM vs ODM 已上线；今日选题 commercial led lighting（简报已发墨墨、配图需求已发画眉），等待稿件与配图，暂未发布；日检全部 200。",
+  "summary": "Formore Lighting：今日文章 Commercial LED Lighting 已审稿发布；24 内链与标准外链均 200；布局 TOC/FAQ/chips/CTA 正常；sitemap 与 schema 齐全。",
   "articles": [
     {
       "id": "commercial-led-lighting-guide",
       "title": "Commercial LED Lighting: A B2B Buyer's Guide",
-      "url": "",
-      "status": "brief",
+      "url": "https://www.formorelightings.com/insights/commercial-led-lighting-guide",
+      "status": "published",
       "primaryKeyword": "commercial led lighting",
       "secondaryKeywords": [
         "commercial led lighting fixtures",
@@ -21,7 +21,9 @@
         "led lighting for commercial buildings",
         "commercial led lighting manufacturer"
       ],
-      "notes": "简报已写（24 内链均 200），待墨墨稿件与画眉配图；草稿位置待定"
+      "notes": "已发布；摘录缩短；CTA 对齐；site images f6c879f + publish 7bbe6cc",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/modern-open-plan-office-linear-suspended-led-lights.webp",
+      "publishedAt": "2026-11-05T09:16:50+08:00"
     }
   ],
   "keywords": [
@@ -36,7 +38,23 @@
       "priority": "medium"
     }
   ],
-  "images": [],
+  "images": [
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/modern-open-plan-office-linear-suspended-led-lights.webp",
+      "alt": "Modern open-plan office space illuminated by sleek, linear suspended LED lights over workstations.",
+      "ofArticleId": "commercial-led-lighting-guide"
+    },
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/retail-store-interior-led-track-spotlights-highlighting-merchandise.webp",
+      "alt": "Retail store interior featuring commercial LED track spotlights highlighting displayed merchandise on shelves.",
+      "ofArticleId": "commercial-led-lighting-guide"
+    },
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/warehouse-facility-illuminated-by-ufo-high-bay-led-lights.webp",
+      "alt": "Large warehouse facility with high ceilings illuminated by powerful UFO high bay LED lights.",
+      "ofArticleId": "commercial-led-lighting-guide"
+    }
+  ],
   "checks": [
     {
       "id": "seo-daily",
@@ -54,19 +72,19 @@
       "id": "published-articles",
       "name": "已发布文章复核",
       "status": "pass",
-      "detail": "5 篇均 200；oem-vs-odm canonical 与 Article/FAQPage/BreadcrumbList 正常"
+      "detail": "含 Commercial LED；200；canonical；Article/FAQPage/BreadcrumbList；TOC/FAQ details/chips/CTA"
     },
     {
       "id": "sitemap",
       "name": "Sitemap 覆盖",
       "status": "pass",
-      "detail": "sitemap-insights 20 URL，含 oem-vs-odm-lighting-guide"
+      "detail": "sitemap-insights 含 commercial-led-lighting-guide"
     },
     {
       "id": "brief-links",
       "name": "简报内链核验",
       "status": "pass",
-      "detail": "今日简报 24 条内链均 200"
+      "detail": "24 条内链均 200；IEC/UL/DLC/ENERGY STAR 外链 200"
     }
   ],
   "issues": [
@@ -91,5 +109,5 @@
       "detail": "等有真实主页 URL 再补"
     }
   ],
-  "tomorrow": "收到墨墨稿件与画眉配图后审稿、校验并发布 commercial-led-lighting-guide；若仍未交付则排查；随后选下一个关键词。"
+  "tomorrow": "下一选题继续推进；R2 桶可写时补传历史文章配图。"
 }
