@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-05T01:16:50+00:00",
+  "updatedAt": "2026-11-06T01:15:07+00:00",
   "dates": [
+    {
+      "date": "2026-11-06",
+      "file": "2026-11-06.json",
+      "summary": "Formore Lighting：今日完成 3000K vs 4000K 简报（slug 3000k-vs-4000k-led，24 内链均 200）；commercial-led-lighting-guide 仍 live；日检无新严重问题；等待墨墨+画眉交付，今日不发布。",
+      "articleCount": 2,
+      "issueCount": 4
+    },
     {
       "date": "2026-11-05",
       "file": "2026-11-05.json",

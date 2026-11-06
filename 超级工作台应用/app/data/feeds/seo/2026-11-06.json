@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-11-06",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-06T09:14:30+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "Formore Lighting：今日完成 3000K vs 4000K 简报（slug 3000k-vs-4000k-led，24 内链均 200）；commercial-led-lighting-guide 仍 live；日检无新严重问题；等待墨墨+画眉交付，今日不发布。",
+  "articles": [
+    {
+      "id": "3000k-vs-4000k-led",
+      "title": "3000K vs 4000K LED: Which to Choose",
+      "url": "https://www.formorelightings.com/insights/3000k-vs-4000k-led",
+      "status": "draft",
+      "primaryKeyword": "3000k vs 4000k",
+      "secondaryKeywords": [
+        "3000k vs 4000k led",
+        "3000k led lighting",
+        "4000k office lighting",
+        "warm white vs cool white led",
+        "led color temperature 3000 vs 4000"
+      ],
+      "notes": "简报已写（briefs/2026-11-06-3000k-vs-4000k.md）；status draft/pending 墨墨成稿+画眉配图；须内链 color-temperature-guide",
+      "image": "",
+      "publishedAt": ""
+    },
+    {
+      "id": "commercial-led-lighting-guide",
+      "title": "Commercial LED Lighting: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/commercial-led-lighting-guide",
+      "status": "published",
+      "primaryKeyword": "commercial led lighting",
+      "secondaryKeywords": [
+        "commercial led lighting fixtures",
+        "commercial led lighting for offices",
+        "commercial led lighting for retail",
+        "led lighting for commercial buildings",
+        "commercial led lighting manufacturer"
+      ],
+      "notes": "昨日已发布；今日抽检仍 200",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/modern-open-plan-office-linear-suspended-led-lights.webp",
+      "publishedAt": "2026-11-05T09:16:50+08:00"
+    }
+  ],
+  "keywords": [
+    {
+      "term": "3000k vs 4000k",
+      "intent": "informational",
+      "priority": "high"
+    },
+    {
+      "term": "3000k vs 4000k led",
+      "intent": "informational",
+      "priority": "high"
+    },
+    {
+      "term": "4000k office lighting",
+      "intent": "commercial",
+      "priority": "medium"
+    },
+    {
+      "term": "warm white vs cool white led",
+      "intent": "informational",
+      "priority": "medium"
+    }
+  ],
+  "images": [],
+  "checks": [
+    {
+      "id": "seo-daily",
+      "name": "npm run seo:daily",
+      "status": "warn",
+      "detail": "运行成功，但缺少 PSI_API_KEY，性能分数跳过；四月任务映射过期（老问题）"
+    },
+    {
+      "id": "core-pages",
+      "name": "核心页面状态码",
+      "status": "pass",
+      "detail": "首页、robots、sitemap、llms.txt、insights、products、contact、oem-odm、solutions 均 200"
+    },
+    {
+      "id": "published-articles",
+      "name": "已发布文章复核",
+      "status": "pass",
+      "detail": "commercial-led-lighting-guide 与 color-temperature-guide 均 200"
+    },
+    {
+      "id": "brief-links",
+      "name": "简报内链核验",
+      "status": "pass",
+      "detail": "今日简报 24 条内链均 curl 200"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "low",
+      "title": "PSI_API_KEY 未配置",
+      "detail": "日检拿不到性能和 Core Web Vitals 分数"
+    },
+    {
+      "severity": "low",
+      "title": "UGR 文章 og:image 不贴题",
+      "detail": "使用了通用的旧图，社交分享预览不精准"
+    },
+    {
+      "severity": "low",
+      "title": "日检任务映射过期",
+      "detail": "daily-seo-check.mjs 仍按四月排期"
+    },
+    {
+      "severity": "low",
+      "title": "Organization sameAs 为空",
+      "detail": "等有真实主页 URL 再补"
+    }
+  ],
+  "tomorrow": "墨墨+画眉交付后审稿并按 2026-10-30 授权自动发布 3000k-vs-4000k-led；无新严重 SEO 问题。"
+}
