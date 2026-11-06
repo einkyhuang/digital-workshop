@@ -3,16 +3,16 @@
   "feedId": "seo",
   "date": "2026-11-06",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-06T09:14:30+08:00",
+  "updatedAt": "2026-11-06T09:22:35+08:00",
   "botId": "seo",
   "botName": "搜搜-SEO专家",
-  "summary": "Formore Lighting：今日完成 3000K vs 4000K 简报（slug 3000k-vs-4000k-led，24 内链均 200）；commercial-led-lighting-guide 仍 live；日检无新严重问题；等待墨墨+画眉交付，今日不发布。",
+  "summary": "Formore Lighting：今日文章 3000K vs 4000K LED 已审稿发布；24 内链与外链均 200；布局 TOC/FAQ/chips/CTA 正常；sitemap 与 schema 齐全。",
   "articles": [
     {
       "id": "3000k-vs-4000k-led",
       "title": "3000K vs 4000K LED: Which to Choose",
       "url": "https://www.formorelightings.com/insights/3000k-vs-4000k-led",
-      "status": "draft",
+      "status": "published",
       "primaryKeyword": "3000k vs 4000k",
       "secondaryKeywords": [
         "3000k vs 4000k led",
@@ -21,9 +21,9 @@
         "warm white vs cool white led",
         "led color temperature 3000 vs 4000"
       ],
-      "notes": "简报已写（briefs/2026-11-06-3000k-vs-4000k.md）；status draft/pending 墨墨成稿+画眉配图；须内链 color-temperature-guide",
-      "image": "",
-      "publishedAt": ""
+      "notes": "已发布；摘录缩短；CTA 对齐；site images 3504155 + publish 6629d26",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/3000k-vs-4000k-commercial-lobby-office-comparison.webp",
+      "publishedAt": "2026-11-06T09:22:35+08:00"
     },
     {
       "id": "commercial-led-lighting-guide",
@@ -65,7 +65,23 @@
       "priority": "medium"
     }
   ],
-  "images": [],
+  "images": [
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/3000k-vs-4000k-commercial-lobby-office-comparison.webp",
+      "alt": "Side-by-side commercial interior comparing warm 3000K lobby lighting with cooler 4000K open-office linear LEDs.",
+      "ofArticleId": "3000k-vs-4000k-led"
+    },
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/3000k-warm-white-retail-hospitality-led-interior.webp",
+      "alt": "Retail hospitality interior illuminated by warm 3000K LED downlights and track accents.",
+      "ofArticleId": "3000k-vs-4000k-led"
+    },
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/4000k-neutral-white-office-linear-led-task-lighting.webp",
+      "alt": "Modern open office illuminated by neutral 4000K LED linear and panel task lighting.",
+      "ofArticleId": "3000k-vs-4000k-led"
+    }
+  ],
   "checks": [
     {
       "id": "seo-daily",
@@ -83,13 +99,19 @@
       "id": "published-articles",
       "name": "已发布文章复核",
       "status": "pass",
-      "detail": "commercial-led-lighting-guide 与 color-temperature-guide 均 200"
+      "detail": "含 3000K vs 4000K；200；canonical；Article/FAQPage/BreadcrumbList；TOC/FAQ details/chips/CTA"
     },
     {
       "id": "brief-links",
       "name": "简报内链核验",
       "status": "pass",
-      "detail": "今日简报 24 条内链均 curl 200"
+      "detail": "24 条内链均 200；CIE 与 ENERGY STAR 外链 200"
+    },
+    {
+      "id": "sitemap",
+      "name": "Sitemap 覆盖",
+      "status": "pass",
+      "detail": "sitemap-insights 含 3000k-vs-4000k-led"
     }
   ],
   "issues": [
@@ -114,5 +136,5 @@
       "detail": "等有真实主页 URL 再补"
     }
   ],
-  "tomorrow": "墨墨+画眉交付后审稿并按 2026-10-30 授权自动发布 3000k-vs-4000k-led；无新严重 SEO 问题。"
+  "tomorrow": "下一选题继续推进；R2 桶可写时补传历史文章配图。"
 }
