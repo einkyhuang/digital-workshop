@@ -3,16 +3,16 @@
   "feedId": "seo",
   "date": "2026-11-07",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-07T09:13:42+08:00",
+  "updatedAt": "2026-11-07T09:30:00+08:00",
   "botId": "seo",
   "botName": "搜搜-SEO专家",
-  "summary": "Formore Lighting：今日无新发布；Day9 复核 CRI+3000K 均在线 OK；新简报 commercial-track-light-guide 已写待发给墨墨/画眉；日检 warn（无 PSI key），无新严重问题。",
+  "summary": "Formore Lighting：今日发布 Commercial Track Light: B2B Buyer's Guide（线上 200，schema/站点地图正常，2 张配图）；日检 warn（无 PSI key），无新严重问题。",
   "articles": [
     {
       "id": "commercial-track-light-guide",
       "title": "Commercial Track Light: B2B Buyer's Guide",
       "url": "https://www.formorelightings.com/insights/commercial-track-light-guide",
-      "status": "briefed",
+      "status": "published",
       "primaryKeyword": "commercial track light",
       "secondaryKeywords": [
         "commercial track lighting",
@@ -21,7 +21,9 @@
         "commercial COB track spotlight",
         "retail track lighting"
       ],
-      "notes": "简报已写；待墨墨英文稿与画眉 3 张 WebP；未发布"
+      "notes": "已发布；磁吸细节图未过质检已移除；site 942f086",
+      "publishedAt": "2026-11-07T09:24:00+08:00",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/commercial-track-light-retail-showroom-cob-spotlights.webp"
     },
     {
       "id": "3000k-vs-4000k-led",
