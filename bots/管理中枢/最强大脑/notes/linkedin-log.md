@@ -9,3 +9,4 @@
 | 2026-11-04 | OEM vs ODM Lighting: A B2B Buyer's Guide | https://www.formorelightings.com/insights/oem-vs-odm-lighting-guide | https://www.linkedin.com/feed/update/urn:li:activity:7523943517019230208/ | 个人号发帖，Anyone 可见，有链接预览卡；11-04 例程失败漏发，11-05 补发；发布前核对全文含链接与5个话题标签 |
 | 2026-11-05 | Commercial LED Lighting: A B2B Buyer's Guide | https://www.formorelightings.com/insights/commercial-led-lighting-guide | https://www.linkedin.com/feed/update/urn:li:activity:7523943633834819584/ | 个人号发帖，Anyone 可见，有链接预览卡；发布前核对全文含链接与5个话题标签 |
 | 2026-11-06 | 3000K vs 4000K LED: Which to Choose | https://www.formorelightings.com/insights/3000k-vs-4000k-led | https://www.linkedin.com/feed/update/urn:li:activity:7524306437909504000/ | 个人号发帖，Anyone 可见，有链接预览卡；发布前核对全文含链接与5个话题标签 |
+| 2026-11-07 | Commercial Track Light: B2B Buyer's Guide | https://www.formorelightings.com/insights/commercial-track-light-guide | https://lnkd.in/p/gCnZfXjm | 个人号发帖，Anyone 可见，有链接预览卡；发布前核对全文含链接与5个话题标签 |
