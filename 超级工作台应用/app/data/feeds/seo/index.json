@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-06T01:22:35+00:00",
+  "updatedAt": "2026-11-07T01:13:42+00:00",
   "dates": [
+    {
+      "date": "2026-11-07",
+      "file": "2026-11-07.json",
+      "summary": "Formore Lighting：今日无新发布；Day9 复核 CRI+3000K 均在线 OK；新简报 commercial-track-light-guide 已写待发给墨墨/画眉；日检 warn（无 PSI key），无新严重问题。",
+      "articleCount": 3,
+      "issueCount": 5
+    },
     {
       "date": "2026-11-06",
       "file": "2026-11-06.json",

@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-11-07",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-07T09:13:42+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "Formore Lighting：今日无新发布；Day9 复核 CRI+3000K 均在线 OK；新简报 commercial-track-light-guide 已写待发给墨墨/画眉；日检 warn（无 PSI key），无新严重问题。",
+  "articles": [
+    {
+      "id": "commercial-track-light-guide",
+      "title": "Commercial Track Light: B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/commercial-track-light-guide",
+      "status": "briefed",
+      "primaryKeyword": "commercial track light",
+      "secondaryKeywords": [
+        "commercial track lighting",
+        "LED track light commercial",
+        "track light system supplier",
+        "commercial COB track spotlight",
+        "retail track lighting"
+      ],
+      "notes": "简报已写；待墨墨英文稿与画眉 3 张 WebP；未发布"
+    },
+    {
+      "id": "3000k-vs-4000k-led",
+      "title": "3000K vs 4000K LED: Which to Choose",
+      "url": "https://www.formorelightings.com/insights/3000k-vs-4000k-led",
+      "status": "published",
+      "primaryKeyword": "3000k vs 4000k",
+      "secondaryKeywords": [
+        "3000k vs 4000k led",
+        "3000k led lighting",
+        "4000k office lighting",
+        "warm white vs cool white led"
+      ],
+      "notes": "昨日已发布；今日 Day9 抽检仍 200 + Article/FAQPage/BreadcrumbList",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/3000k-vs-4000k-commercial-lobby-office-comparison.webp",
+      "publishedAt": "2026-11-06T09:22:35+08:00"
+    },
+    {
+      "id": "what-is-cri-in-lighting",
+      "title": "What Is CRI in Lighting? A Practical Guide for Buyers and Designers",
+      "url": "https://www.formorelightings.com/insights/what-is-cri-in-lighting",
+      "status": "published",
+      "primaryKeyword": "what is cri in lighting",
+      "secondaryKeywords": [
+        "cri 90 led",
+        "color rendering index"
+      ],
+      "notes": "Day9 复核：在线 200；Article+Breadcrumb；FAQ 内容在页，JSON-LD FAQPage 未见（低优先级旧问题）",
+      "publishedAt": "2026-11-04"
+    }
+  ],
+  "keywords": [
+    {
+      "term": "commercial track light",
+      "intent": "commercial",
+      "priority": "high"
+    },
+    {
+      "term": "commercial track lighting",
+      "intent": "commercial",
+      "priority": "high"
+    },
+    {
+      "term": "LED track light commercial",
+      "intent": "commercial",
+      "priority": "medium"
+    },
+    {
+      "term": "track light system supplier",
+      "intent": "commercial",
+      "priority": "medium"
+    },
+    {
+      "term": "retail track lighting",
+      "intent": "commercial",
+      "priority": "medium"
+    }
+  ],
+  "images": [],
+  "checks": [
+    {
+      "id": "seo-daily",
+      "name": "npm run seo:daily",
+      "status": "warn",
+      "detail": "运行成功并写出 reports/seo/2026-11-07.md；缺 PSI_API_KEY 性能跳过；四月任务映射过期（老问题）"
+    },
+    {
+      "id": "core-pages",
+      "name": "核心页面状态码",
+      "status": "pass",
+      "detail": "首页、robots、sitemap、llms.txt、insights、products、contact、oem-odm、solutions、sourcing 均 200"
+    },
+    {
+      "id": "day9-review",
+      "name": "Day9 CRI+3000K 复核",
+      "status": "pass",
+      "detail": "what-is-cri-in-lighting 与 3000k-vs-4000k-led 均在线 200；3000K schema 齐全；CRI 缺 FAQPage JSON-LD（低）"
+    },
+    {
+      "id": "brief-links",
+      "name": "简报内链核验",
+      "status": "pass",
+      "detail": "commercial-track-light 简报 24 条内链均 curl 200"
+    },
+    {
+      "id": "sitemap",
+      "name": "Sitemap 覆盖",
+      "status": "pass",
+      "detail": "含 what-is-cri-in-lighting、3000k-vs-4000k-led、commercial-led-lighting-guide"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "low",
+      "title": "PSI_API_KEY 未配置",
+      "detail": "日检拿不到性能和 Core Web Vitals 分数"
+    },
+    {
+      "severity": "low",
+      "title": "日检任务映射过期",
+      "detail": "daily-seo-check.mjs 仍按四月排期"
+    },
+    {
+      "severity": "low",
+      "title": "Organization sameAs 为空",
+      "detail": "等有真实主页 URL 再补"
+    },
+    {
+      "severity": "low",
+      "title": "UGR 文章 og:image 不贴题",
+      "detail": "使用了通用的旧图，社交分享预览不精准"
+    },
+    {
+      "severity": "low",
+      "title": "CRI 文章缺 FAQPage JSON-LD",
+      "detail": "页面有 FAQ 文案，结构化数据未见 FAQPage；非新 P0"
+    }
+  ],
+  "tomorrow": "墨墨+画眉交付后审稿并校验发布 commercial-track-light-guide；若稿件未到则继续推进下一高价值未覆盖关键词。"
+}
