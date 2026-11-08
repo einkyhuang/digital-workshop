@@ -140,5 +140,13 @@
       "detail": "页面有 FAQ 文案，结构化数据未见 FAQPage；非新 P0"
     }
   ],
-  "tomorrow": "墨墨+画眉交付后审稿并校验发布 led-lighting-manufacturer-guide；下一高价值未覆盖 P1 候选为 architectural led lighting（US vol 260，KD 19；可带 architectural lighting supplier）或 led flood light manufacturer（US vol 260，KD 29）。"
+  "tomorrow": "墨墨+画眉交付后审稿并校验发布 led-lighting-manufacturer-guide；下一高价值未覆盖 P1 候选为 architectural led lighting（US vol 260，KD 19；可带 architectural lighting supplier）或 led flood light manufacturer（US vol 260，KD 29）。",
+  "items": [
+    {
+      "type": "publish",
+      "title": "LED Lighting Manufacturer: B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-lighting-manufacturer-guide",
+      "status": "live"
+    }
+  ]
 }

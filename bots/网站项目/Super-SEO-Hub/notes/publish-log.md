@@ -10,3 +10,4 @@
 | 2026-11-05 | Commercial LED Lighting: A B2B Buyer's Guide | https://www.formorelightings.com/insights/commercial-led-lighting-guide | 已发布；校验通过；摘录缩短至 160；CTA 对齐增强器；24 内链与标准外链均 200；配图 Vercel 同源；site commits f6c879f→7bbe6cc |
 | 2026-11-06 | 3000K vs 4000K LED: Which to Choose | https://www.formorelightings.com/insights/3000k-vs-4000k-led | 已发布；校验通过；摘录缩短至 144；CTA 对齐增强器；24 内链与 CIE/ENERGY STAR 外链均 200；配图 Vercel 同源；site commits 3504155→6629d26 |
 | 2026-11-07 | Commercial Track Light: B2B Buyer's Guide | https://www.formorelightings.com/insights/commercial-track-light-guide | 已发布；校验通过；经 PR #1 合并（942f086）；磁吸细节图未过质检已移除，仅用头图+精品店过道图；CTA 对齐增强器；摘录 145 |
+| 2026-11-08 | led-lighting-manufacturer-guide | https://www.formorelightings.com/insights/led-lighting-manufacturer-guide | 826bc73 (PR #2) |
