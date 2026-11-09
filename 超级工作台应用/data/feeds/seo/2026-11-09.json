@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-11-09",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-09T09:20:00+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "Formore Lighting：今日无发布；新简报 Architectural LED Lighting: B2B Buyer's Guide（待墨墨成稿、画眉 3 张配图）；日检 warn（无 PSI key），无新严重问题。昨日 led-lighting-manufacturer-guide 抽检 200，schema 齐全。",
+  "articles": [
+    {
+      "id": "architectural-led-lighting-guide",
+      "title": "Architectural LED Lighting: B2B Buyer's Guide",
+      "status": "brief created",
+      "primaryKeyword": "architectural led lighting",
+      "secondaryKeywords": [
+        "architectural lighting supplier",
+        "beam angle lighting",
+        "led lighting manufacturer china"
+      ],
+      "notes": "简报已写：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-09-architectural-led-lighting.md；计划地址 /insights/architectural-led-lighting-guide（今日 404，尚未上线）；待墨墨英文稿与画眉 3 张 WebP"
+    },
+    {
+      "id": "led-lighting-manufacturer-guide",
+      "title": "LED Lighting Manufacturer: B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-lighting-manufacturer-guide",
+      "status": "published",
+      "primaryKeyword": "led lighting manufacturer",
+      "secondaryKeywords": [
+        "led lighting manufacturer china",
+        "oem led lighting manufacturer",
+        "odm lighting manufacturer"
+      ],
+      "notes": "昨日经 PR #2 上线（826bc73）；今日抽检 200，canonical 正确，Article + FAQPage + BreadcrumbList"
+    }
+  ],
+  "keywords": [
+    {
+      "term": "architectural led lighting",
+      "intent": "commercial",
+      "priority": "high"
+    },
+    {
+      "term": "architectural lighting supplier",
+      "intent": "commercial",
+      "priority": "high"
+    },
+    {
+      "term": "beam angle lighting",
+      "intent": "informational",
+      "priority": "medium"
+    },
+    {
+      "term": "human centric lighting",
+      "intent": "informational",
+      "priority": "medium"
+    }
+  ],
+  "images": [
+    {
+      "alt": "Modern commercial building facade at dusk lit by linear LED wall washers and up-down sconces grazing stone cladding, with no people or text visible.",
+      "ofArticleId": "architectural-led-lighting-guide",
+      "notes": "requested hero: architectural-led-lighting-facade-dusk.webp (1600x900); not delivered yet"
+    },
+    {
+      "alt": "Linear LED wall washer at the base of a textured concrete wall producing even vertical light at night, with no text or logos.",
+      "ofArticleId": "architectural-led-lighting-guide",
+      "notes": "requested inline 1: architectural-led-wall-washer-textured-facade.webp (1200x800); not delivered yet"
+    },
+    {
+      "alt": "Landscaped plaza at night with in-ground LED uplights lighting trees and minimalist bollards along a path, with no people or text visible.",
+      "ofArticleId": "architectural-led-lighting-guide",
+      "notes": "requested inline 2: architectural-landscape-in-ground-uplights-bollards.webp (1200x800); not delivered yet"
+    }
+  ],
+  "checks": [
+    {
+      "id": "seo-daily",
+      "name": "npm run seo:daily",
+      "status": "warn",
+      "detail": "运行成功并写出 reports/seo/2026-11-09.md；缺 PSI_API_KEY 性能跳过；四月任务映射过期（老问题）"
+    },
+    {
+      "id": "core-pages",
+      "name": "核心页面状态码",
+      "status": "pass",
+      "detail": "首页、robots、sitemap、sitemap-index、llms.txt、insights、products、contact、oem-odm、solutions、sourcing 均 200"
+    },
+    {
+      "id": "yesterday-article",
+      "name": "昨日 led-lighting-manufacturer-guide 抽检",
+      "status": "pass",
+      "detail": "200；canonical 正确；title 为 LED Lighting Manufacturer: B2B Buyer's Guide | Formore；Article + FAQPage + BreadcrumbList"
+    },
+    {
+      "id": "brief-links",
+      "name": "简报内链核验",
+      "status": "pass",
+      "detail": "architectural-led-lighting 简报 32 条内链均 curl 200；目标 slug 尚未上线（404，符合预期）"
+    },
+    {
+      "id": "sitemap",
+      "name": "Sitemap 覆盖",
+      "status": "pass",
+      "detail": "sitemap-insights.xml 24 篇；已含 led-lighting-manufacturer-guide"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "low",
+      "title": "PSI_API_KEY 未配置",
+      "detail": "日检拿不到性能和 Core Web Vitals 分数"
+    },
+    {
+      "severity": "low",
+      "title": "日检任务映射过期",
+      "detail": "daily-seo-check.mjs 仍按四月排期"
+    },
+    {
+      "severity": "low",
+      "title": "Organization sameAs 为空",
+      "detail": "等有真实主页 URL 再补"
+    },
+    {
+      "severity": "low",
+      "title": "UGR 文章 og:image 不贴题",
+      "detail": "使用了通用的旧图，社交分享预览不精准"
+    },
+    {
+      "severity": "low",
+      "title": "CRI 文章缺 FAQPage JSON-LD",
+      "detail": "页面有 FAQ 文案，结构化数据未见 FAQPage；非新 P0"
+    }
+  ],
+  "tomorrow": "墨墨+画眉交付后审稿并校验发布 architectural-led-lighting-guide；下一候选 led flood light manufacturer（US vol 260，KD 29）或 human centric lighting（US vol 210，KD 4）。",
+  "items": []
+}

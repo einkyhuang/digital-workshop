@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-08T01:23:28+00:00",
+  "updatedAt": "2026-11-09T01:12:50+00:00",
   "dates": [
+    {
+      "date": "2026-11-09",
+      "file": "2026-11-09.json",
+      "summary": "Formore Lighting：今日无发布；新简报 Architectural LED Lighting: B2B Buyer's Guide（待墨墨成稿、画眉 3 张配图）；日检 warn（无 PSI key），无新严重问题。昨日 led-lighting-manufacturer-guide 抽检 200，schema 齐全。",
+      "articleCount": 2,
+      "issueCount": 5
+    },
     {
       "date": "2026-11-08",
       "file": "2026-11-08.json",
