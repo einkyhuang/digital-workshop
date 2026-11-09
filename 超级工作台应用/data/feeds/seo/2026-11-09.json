@@ -3,22 +3,25 @@
   "feedId": "seo",
   "date": "2026-11-09",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-09T09:20:00+08:00",
+  "updatedAt": "2026-11-09T09:35:46+08:00",
   "botId": "seo",
   "botName": "搜搜-SEO专家",
-  "summary": "Formore Lighting：今日无发布；新简报 Architectural LED Lighting: B2B Buyer's Guide（待墨墨成稿、画眉 3 张配图）；日检 warn（无 PSI key），无新严重问题。昨日 led-lighting-manufacturer-guide 抽检 200，schema 齐全。",
+  "summary": "Formore Lighting：今日发布 Architectural LED Lighting: B2B Buyer's Guide（线上 200，canonical 与 prerender 正常，Article + FAQPage(5) + BreadcrumbList，列表与 sitemap 已收录，3 张配图 200）；日检 warn（无 PSI key），无新严重问题。昨日 led-lighting-manufacturer-guide 抽检 200，schema 齐全。",
   "articles": [
     {
       "id": "architectural-led-lighting-guide",
       "title": "Architectural LED Lighting: B2B Buyer's Guide",
-      "status": "brief created",
+      "url": "https://www.formorelightings.com/insights/architectural-led-lighting-guide",
+      "status": "published",
       "primaryKeyword": "architectural led lighting",
       "secondaryKeywords": [
         "architectural lighting supplier",
         "beam angle lighting",
         "led lighting manufacturer china"
       ],
-      "notes": "简报已写：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-09-architectural-led-lighting.md；计划地址 /insights/architectural-led-lighting-guide（今日 404，尚未上线）；待墨墨英文稿与画眉 3 张 WebP"
+      "notes": "简报已写：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-09-architectural-led-lighting.md；计划地址 /insights/architectural-led-lighting-guide（今日 404，尚未上线）；待墨墨英文稿与画眉 3 张 WebP。线上已核验：文章 HTTP 200，canonical 正确，prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap 已收录；3 张配图 HTTP 200；site PR #3 squash 177c33df05a1c94467c5f043a54138d504d425f2",
+      "publishedAt": "2026-11-09T09:35:46+08:00",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/architectural-led-lighting-facade-dusk.webp"
     },
     {
       "id": "led-lighting-manufacturer-guide",
@@ -58,19 +61,22 @@
   ],
   "images": [
     {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/architectural-led-lighting-facade-dusk.webp",
       "alt": "Modern commercial building facade at dusk lit by linear LED wall washers and up-down sconces grazing stone cladding, with no people or text visible.",
       "ofArticleId": "architectural-led-lighting-guide",
-      "notes": "requested hero: architectural-led-lighting-facade-dusk.webp (1600x900); not delivered yet"
+      "notes": "requested hero: architectural-led-lighting-facade-dusk.webp (1600x900); live HTTP 200 image/webp"
     },
     {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/architectural-led-wall-washer-textured-facade.webp",
       "alt": "Linear LED wall washer at the base of a textured concrete wall producing even vertical light at night, with no text or logos.",
       "ofArticleId": "architectural-led-lighting-guide",
-      "notes": "requested inline 1: architectural-led-wall-washer-textured-facade.webp (1200x800); not delivered yet"
+      "notes": "requested inline 1: architectural-led-wall-washer-textured-facade.webp (1200x800); live HTTP 200 image/webp"
     },
     {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/architectural-landscape-in-ground-uplights-bollards.webp",
       "alt": "Landscaped plaza at night with in-ground LED uplights lighting trees and minimalist bollards along a path, with no people or text visible.",
       "ofArticleId": "architectural-led-lighting-guide",
-      "notes": "requested inline 2: architectural-landscape-in-ground-uplights-bollards.webp (1200x800); not delivered yet"
+      "notes": "requested inline 2: architectural-landscape-in-ground-uplights-bollards.webp (1200x800); live HTTP 200 image/webp"
     }
   ],
   "checks": [
@@ -133,5 +139,12 @@
     }
   ],
   "tomorrow": "墨墨+画眉交付后审稿并校验发布 architectural-led-lighting-guide；下一候选 led flood light manufacturer（US vol 260，KD 29）或 human centric lighting（US vol 210，KD 4）。",
-  "items": []
+  "items": [
+    {
+      "type": "publish",
+      "title": "Architectural LED Lighting: B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/architectural-led-lighting-guide",
+      "status": "live"
+    }
+  ]
 }
