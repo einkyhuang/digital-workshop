@@ -3,7 +3,7 @@
   "feedId": "seo",
   "date": "2026-11-09",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-09T09:35:46+08:00",
+  "updatedAt": "2026-11-09T09:43:00+08:00",
   "botId": "seo",
   "botName": "搜搜-SEO专家",
   "summary": "Formore Lighting：今日发布 Architectural LED Lighting: B2B Buyer's Guide（线上 200，canonical 与 prerender 正常，Article + FAQPage(5) + BreadcrumbList，列表与 sitemap 已收录，3 张配图 200）；日检 warn（无 PSI key），无新严重问题。昨日 led-lighting-manufacturer-guide 抽检 200，schema 齐全。",
@@ -19,7 +19,7 @@
         "beam angle lighting",
         "led lighting manufacturer china"
       ],
-      "notes": "简报已写：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-09-architectural-led-lighting.md；计划地址 /insights/architectural-led-lighting-guide（今日 404，尚未上线）；待墨墨英文稿与画眉 3 张 WebP。线上已核验：文章 HTTP 200，canonical 正确，prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap 已收录；3 张配图 HTTP 200；site PR #3 squash 177c33df05a1c94467c5f043a54138d504d425f2",
+      "notes": "简报路径：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-09-architectural-led-lighting.md。发布前上午记录（非当前状态）：计划地址 /insights/architectural-led-lighting-guide 当时 404、尚未上线，稿与 3 张配图当时未交付。当前已上线：文章 HTTP 200，canonical 正确，prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap 已收录；3 张配图 HTTP 200；site PR #3 squash 177c33df05a1c94467c5f043a54138d504d425f2",
       "publishedAt": "2026-11-09T09:35:46+08:00",
       "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/architectural-led-lighting-facade-dusk.webp"
     },
@@ -102,13 +102,13 @@
       "id": "brief-links",
       "name": "简报内链核验",
       "status": "pass",
-      "detail": "architectural-led-lighting 简报 32 条内链均 curl 200；目标 slug 尚未上线（404，符合预期）"
+      "detail": "发布前上午日检（文章上线前，非当前线上状态）：architectural-led-lighting 简报 32 条内链均 curl 200；当时目标 slug 尚未上线（404，符合当时预期）"
     },
     {
       "id": "sitemap",
       "name": "Sitemap 覆盖",
       "status": "pass",
-      "detail": "sitemap-insights.xml 24 篇；已含 led-lighting-manufacturer-guide"
+      "detail": "发布前上午日检（文章上线前，非当前篇数）：sitemap-insights.xml 当时 24 篇，已含 led-lighting-manufacturer-guide。当前线上 sitemap 已收录 architectural-led-lighting-guide"
     }
   ],
   "issues": [
@@ -138,7 +138,7 @@
       "detail": "页面有 FAQ 文案，结构化数据未见 FAQPage；非新 P0"
     }
   ],
-  "tomorrow": "墨墨+画眉交付后审稿并校验发布 architectural-led-lighting-guide；下一候选 led flood light manufacturer（US vol 260，KD 29）或 human centric lighting（US vol 210，KD 4）。",
+  "tomorrow": "下一候选：led flood light manufacturer（US vol 260，KD 29）或 human centric lighting（US vol 210，KD 4）。",
   "items": [
     {
       "type": "publish",
