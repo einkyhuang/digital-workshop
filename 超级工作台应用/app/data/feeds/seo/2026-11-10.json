@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-11-10",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-10T09:27:33+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "Formore Lighting：今日发布 LED Flood Light Manufacturer: B2B Buyer's Guide（线上 200，canonical 与 prerender 正常，Article + FAQPage(5) + BreadcrumbList，列表与 sitemap 已收录，3 张配图 200）；日检 warn（无 PSI key），无新严重问题。昨日 architectural-led-lighting-guide 抽检 200，schema 齐全。",
+  "articles": [
+    {
+      "id": "led-flood-light-manufacturer-guide",
+      "title": "LED Flood Light Manufacturer: B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-flood-light-manufacturer-guide",
+      "status": "published",
+      "primaryKeyword": "led flood light manufacturer",
+      "secondaryKeywords": [
+        "led lighting manufacturer china",
+        "oem led lighting manufacturer",
+        "beam angle lighting"
+      ],
+      "notes": "简报路径：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-10-led-flood-light-manufacturer.md。发布前上午记录（非当前状态）：计划地址当时尚未上线、稿与配图审稿中。当前已上线：文章 HTTP 200，canonical 正确，prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap 已收录；3 张配图 HTTP 200；site PR #4 squash 236e3d950ae3f95efd0209f41fe63b727c1c11f9",
+      "publishedAt": "2026-11-10T09:27:33+08:00",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/led-flood-lights-sports-field-night.webp"
+    },
+    {
+      "id": "architectural-led-lighting-guide",
+      "title": "Architectural LED Lighting: B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/architectural-led-lighting-guide",
+      "status": "published",
+      "primaryKeyword": "architectural led lighting",
+      "secondaryKeywords": [
+        "architectural lighting supplier"
+      ],
+      "notes": "昨日经 PR #3 上线（177c33d）；今日抽检 200，canonical 正确，Article + FAQPage + BreadcrumbList"
+    }
+  ],
+  "keywords": [
+    {
+      "term": "led flood light manufacturer",
+      "intent": "commercial",
+      "priority": "high"
+    },
+    {
+      "term": "led lighting manufacturer china",
+      "intent": "commercial",
+      "priority": "high"
+    },
+    {
+      "term": "oem led lighting manufacturer",
+      "intent": "commercial",
+      "priority": "high"
+    },
+    {
+      "term": "beam angle lighting",
+      "intent": "informational",
+      "priority": "medium"
+    }
+  ],
+  "images": [
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/led-flood-lights-sports-field-night.webp",
+      "alt": "Sports field at night lit by pole-mounted modular LED flood lights casting even light across the ground, with no people or text visible.",
+      "ofArticleId": "led-flood-light-manufacturer-guide",
+      "notes": "requested hero: led-flood-lights-sports-field-night.webp (1600x900); live HTTP 200 image/webp"
+    },
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/industrial-slim-led-flood-light-warehouse-wall.webp",
+      "alt": "Slim-profile LED flood light mounted on a warehouse exterior wall at dusk, showing its bracket and heatsink, with no text or logos.",
+      "ofArticleId": "led-flood-light-manufacturer-guide",
+      "notes": "requested inline 1: industrial-slim-led-flood-light-warehouse-wall.webp (1200x800); live HTTP 200 image/webp"
+    },
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/led-flood-light-factory-aging-test.webp",
+      "alt": "Factory QC bench with LED flood lights running an aging test on a rack, technician hands only adjusting a fixture, with no faces or text visible.",
+      "ofArticleId": "led-flood-light-manufacturer-guide",
+      "notes": "requested inline 2: led-flood-light-factory-aging-test.webp (1200x800); live HTTP 200 image/webp"
+    }
+  ],
+  "checks": [
+    {
+      "id": "seo-daily",
+      "name": "npm run seo:daily",
+      "status": "warn",
+      "detail": "运行成功并写出 reports/seo/2026-11-10.md；缺 PSI_API_KEY 性能跳过；四月任务映射过期（老问题）"
+    },
+    {
+      "id": "core-pages",
+      "name": "核心页面状态码",
+      "status": "pass",
+      "detail": "首页、robots、sitemap、sitemap-index、llms.txt、insights、products、contact、oem-odm、solutions、sourcing 均 200"
+    },
+    {
+      "id": "yesterday-article",
+      "name": "昨日 architectural-led-lighting-guide 抽检",
+      "status": "pass",
+      "detail": "200；canonical 正确；Article + FAQPage + BreadcrumbList"
+    },
+    {
+      "id": "brief-links",
+      "name": "简报内链核验",
+      "status": "pass",
+      "detail": "发布前上午日检（文章上线前，非当前线上状态）：led-flood-light-manufacturer 简报 29 条内链均 curl 200；当时目标 slug 尚未上线。当前文章已上线并校验通过。"
+    },
+    {
+      "id": "sitemap",
+      "name": "Sitemap 覆盖",
+      "status": "pass",
+      "detail": "发布前上午日检（文章上线前，非当前篇数）：sitemap-insights.xml 当时已含 architectural-led-lighting-guide。当前线上 sitemap 已收录 led-flood-light-manufacturer-guide。"
+    },
+    {
+      "id": "live-validation",
+      "name": "今日 led-flood-light-manufacturer-guide 上线校验",
+      "status": "pass",
+      "detail": "文章与 3 张配图 HTTP 200；canonical 正确；prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap 已收录"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "low",
+      "title": "PSI_API_KEY 未配置",
+      "detail": "日检拿不到性能和 Core Web Vitals 分数"
+    },
+    {
+      "severity": "low",
+      "title": "日检任务映射过期",
+      "detail": "daily-seo-check.mjs 仍按四月排期"
+    },
+    {
+      "severity": "low",
+      "title": "Organization sameAs 为空",
+      "detail": "等有真实主页 URL 再补"
+    },
+    {
+      "severity": "low",
+      "title": "UGR 文章 og:image 不贴题",
+      "detail": "使用了通用的旧图，社交分享预览不精准"
+    },
+    {
+      "severity": "low",
+      "title": "CRI 文章缺 FAQPage JSON-LD",
+      "detail": "页面有 FAQ 文案，结构化数据未见 FAQPage；非新 P0"
+    }
+  ],
+  "tomorrow": "下一候选：human centric lighting（US vol 210，KD 4）或 office lighting design（US vol 140，KD 6）。",
+  "items": [
+    {
+      "type": "publish",
+      "title": "LED Flood Light Manufacturer: B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-flood-light-manufacturer-guide",
+      "status": "live"
+    }
+  ]
+}

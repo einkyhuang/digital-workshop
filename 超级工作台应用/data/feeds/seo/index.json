@@ -2,12 +2,12 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-10T01:11:19+00:00",
+  "updatedAt": "2026-11-10T01:27:34+00:00",
   "dates": [
     {
       "date": "2026-11-10",
       "file": "2026-11-10.json",
-      "summary": "Formore Lighting：今日新简报 LED Flood Light Manufacturer: B2B Buyer's Guide（主词 led flood light manufacturer，US 260），已发墨墨写稿、画眉出图，待交稿审核后发布；日检 warn（无 PSI key），无新严重问题。昨日 architectural-led-lighting-guide 抽检 200，schema 齐全，sitemap 已收录（25 篇）。",
+      "summary": "Formore Lighting：今日发布 LED Flood Light Manufacturer: B2B Buyer's Guide（线上 200，canonical 与 prerender 正常，Article + FAQPage(5) + BreadcrumbList，列表与 sitemap 已收录，3 张配图 200）；日检 warn（无 PSI key），无新严重问题。昨日 architectural-led-lighting-guide 抽检 200，schema 齐全。",
       "articleCount": 2,
       "issueCount": 5
     },
