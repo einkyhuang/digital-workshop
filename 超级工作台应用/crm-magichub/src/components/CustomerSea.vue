@@ -113,34 +113,16 @@
       <div class="flex items-center gap-2 text-xs flex-shrink-0">
         <span class="text-slate-400 font-bold mr-1 text-[11px] uppercase tracking-wider whitespace-nowrap">分类:</span>
         <button
-          @click="selectedCategory = 'all'"
+          v-for="tab in categoryTabs"
+          :key="tab.id"
+          @click="selectedCategory = tab.id"
           class="whitespace-nowrap px-3.5 py-1.5 rounded-xl border font-medium text-xs transition-all duration-300 outline-none flex items-center gap-1.5 shadow-sm active:scale-[0.97]"
-          :class="selectedCategory === 'all'
+          :class="selectedCategory === tab.id
             ? 'bg-white border-slate-200/80 text-slate-800 font-bold'
             : 'bg-slate-50/50 border-transparent text-slate-500 hover:bg-white hover:text-slate-800 hover:border-slate-200/30'"
         >
-           <span>全部</span>
-          <span class="px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded-md text-[9px] font-bold">{{ categoryCounts.all }}</span>
-        </button>
-        <button
-          @click="selectedCategory = 'parts'"
-          class="whitespace-nowrap px-3.5 py-1.5 rounded-xl border font-medium text-xs transition-all duration-300 outline-none flex items-center gap-1.5 shadow-sm active:scale-[0.97]"
-          :class="selectedCategory === 'parts'
-            ? 'bg-white border-slate-200/80 text-slate-800 font-bold'
-            : 'bg-slate-50/50 border-transparent text-slate-500 hover:bg-white hover:text-slate-800 hover:border-slate-200/30'"
-        >
-           <span>汽配</span>
-          <span class="px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded-md text-[9px] font-bold">{{ categoryCounts.parts }}</span>
-        </button>
-        <button
-          @click="selectedCategory = 'lights'"
-          class="whitespace-nowrap px-3.5 py-1.5 rounded-xl border font-medium text-xs transition-all duration-300 outline-none flex items-center gap-1.5 shadow-sm active:scale-[0.97]"
-          :class="selectedCategory === 'lights'
-            ? 'bg-white border-slate-200/80 text-slate-800 font-bold'
-            : 'bg-slate-50/50 border-transparent text-slate-500 hover:bg-white hover:text-slate-800 hover:border-slate-200/30'"
-        >
-           <span>照明</span>
-          <span class="px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded-md text-[9px] font-bold">{{ categoryCounts.lights }}</span>
+           <span>{{ tab.label }}</span>
+          <span class="px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded-md text-[9px] font-bold">{{ categoryCounts[tab.id] || 0 }}</span>
         </button>
         <button
           @click="addNewCategory"
@@ -324,6 +306,43 @@
 
     <!-- 4. Main viewport: List View (深度还原截图表格列表) or Card View -->
     <div v-if="viewMode === 'list'" class="space-y-4">
+      <div class="apple-glass rounded-2xl overflow-hidden border border-indigo-200/60" v-if="archivePinnedLeads.length">
+        <div class="w-full px-6 py-4 flex items-center justify-between text-xs font-semibold text-zen-ink bg-indigo-50/40 border-b border-white/20 select-none">
+          <span class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+            本地客户档案 {{ archivePinnedLeads.length }}
+          </span>
+          <span class="text-[10px] text-zen-gray font-normal">来自客户档案文件夹，打开后读取 Markdown</span>
+        </div>
+        <div class="divide-y divide-white/20">
+          <div
+            v-for="lead in archivePinnedLeads.slice(0, archivePinLimit)"
+            :key="'archive-' + lead.id"
+            @click="triggerDetailModal(lead)"
+            class="px-6 py-4 hover:bg-white/40 transition-colors flex items-center justify-between gap-4 cursor-pointer"
+          >
+            <div class="min-w-0 flex-1">
+              <h4 class="text-xs font-bold text-zen-ink truncate">{{ lead.name }}</h4>
+              <p class="text-[10px] text-zen-gray truncate mt-1">
+                {{ categoryLabel(effectiveCategory(lead), lead.archiveCategoryLabel) }} · {{ lead.country }} · {{ lead.contact }}
+              </p>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span v-if="lead.archiveFiles?.analysis" class="px-2 py-0.5 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">深度分析</span>
+              <span v-if="lead.archiveFiles?.plan" class="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">30天规划</span>
+              <button
+                @click.stop="triggerDetailModal(lead)"
+                class="px-3.5 py-1 bg-indigo-50 border border-indigo-200/50 hover:bg-indigo-100 text-indigo-600 rounded-xl text-[10px] font-bold"
+              >详情</button>
+            </div>
+          </div>
+        </div>
+        <div v-if="archivePinnedLeads.length > archivePinLimit" class="px-6 py-3 flex justify-center">
+          <button @click="archivePinLimit += 20" class="px-4 py-1.5 bg-white/70 text-indigo-600 rounded-xl text-[10px] font-bold border border-indigo-100">
+            展开更多档案 (还有 {{ archivePinnedLeads.length - archivePinLimit }} 个)
+          </button>
+        </div>
+      </div>
       <!-- 4.1 已成交组 (Section 1: 已成交 3) -->
       <div class="apple-glass rounded-2xl overflow-hidden border border-white/50" v-if="shouldShowGroup('deal')">
         <button
@@ -893,11 +912,13 @@
               <select v-model="editForm.category"
                 class="w-full bg-white/40 border border-white/60 rounded-lg px-2 py-1 text-sm outline-none focus:bg-white focus:border-zen-green transition-all">
                 <option value="parts">汽车配件</option>
-                <option value="lights">LED照明</option>
+                <option value="lights">照明</option>
+                <option value="apparel">服装</option>
+                <option value="fabric">布料</option>
               </select>
             </div>
             <p v-else class="text-sm font-semibold text-zen-ink">
-              {{ selectedLeadForModal.category === 'parts' ? '汽车配件' : 'LED照明' }}
+              {{ categoryLabel(effectiveCategory(selectedLeadForModal), selectedLeadForModal.archiveCategoryLabel) }}
             </p>
           </div>
 
@@ -1156,8 +1177,24 @@
 
               <!-- Normal Workspace Report View -->
               <template v-else>
+                <div v-if="liveArchive.loading" class="text-[10px] text-zen-gray px-2">正在读取本地 Markdown…</div>
+                <div
+                  v-for="doc in liveArchive.docs"
+                  :key="doc.id"
+                  class="apple-glass rounded-xl overflow-hidden border border-white/50"
+                >
+                  <div class="px-4 py-2.5 flex items-center justify-between text-[10px] font-bold text-indigo-700 bg-white/30">
+                    <span>{{ doc.title }}</span>
+                    <span class="font-mono text-zen-gray font-normal">{{ doc.filename }} · Markdown</span>
+                  </div>
+                  <div class="p-4 bg-white/40">
+                    <p v-if="doc.error" class="text-[10px] text-red-600">{{ doc.error }}</p>
+                    <div v-if="doc.html" class="mh-md max-h-[480px] overflow-y-auto" v-html="doc.html"></div>
+                    <p v-else-if="!doc.error" class="text-[10px] text-zen-gray">这份 Markdown 是空的。</p>
+                  </div>
+                </div>
                 <!-- Deep analysis panel toolbar -->
-                <div class="flex justify-between items-center bg-white/30 border border-white/50 px-4 py-2.5 rounded-2xl select-none" v-if="selectedLeadForModal.deepReport">
+                <div class="flex justify-between items-center bg-white/30 border border-white/50 px-4 py-2.5 rounded-2xl select-none" v-if="selectedLeadForModal.deepReport && !hasLiveAnalysis">
                   <div class="flex items-center gap-1.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-zen-green"></span>
               <span class="text-[9px] text-zen-gray font-bold">大模型深度报告 (已存本地底仓)</span>
@@ -1174,7 +1211,7 @@
                 </div>
 
     <!-- Collapsible Section D: SPI Deep Analysis Report (大模型深度报告 - SPI风格) [NEW] -->
-                <div class="apple-glass rounded-xl overflow-hidden border border-white/50 animate-fadeIn" v-if="selectedLeadForModal.deepReport">
+                <div class="apple-glass rounded-xl overflow-hidden border border-white/50 animate-fadeIn" v-if="selectedLeadForModal.deepReport && !hasLiveAnalysis">
                   <button
                     @click="showDeepReportCollapse = !showDeepReportCollapse"
                     class="w-full px-4 py-2.5 flex items-center justify-between text-[10px] font-bold text-zen-ink bg-white/30 hover:bg-white/50 transition-colors outline-none select-none"
@@ -1944,7 +1981,7 @@
                 <div>
                   <span class="block text-[9px] uppercase tracking-wider text-zen-gray font-bold">行业分类 (Category)</span>
                   <span class="text-xs font-semibold text-zen-ink block mt-0.5">
-              {{ selectedLeadForPreview.category === 'parts' ? '汽车配件' : '工业照明' }}
+              {{ categoryLabel(effectiveCategory(selectedLeadForPreview), selectedLeadForPreview.archiveCategoryLabel) }}
                   </span>
                 </div>
               </div>
@@ -2104,7 +2141,9 @@
               class="w-full bg-white/40 border border-white/60 rounded-xl px-3 py-2 text-xs outline-none focus:bg-white focus:border-zen-green transition-all"
             >
               <option value="parts">汽车零部件 (汽配)</option>
-              <option value="lights">工业外贸照明 (LED)</option>
+              <option value="lights">照明</option>
+              <option value="apparel">服装</option>
+              <option value="fabric">布料</option>
             </select>
           </div>
         </div>
@@ -2423,6 +2462,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import ZenModal from './ZenModal.vue';
+import { buildLiveDocs, categoryLabel, effectiveCategory } from '../lib/localArchives.js';
 
 const reportTab = ref('dashboard');
 
@@ -2620,21 +2660,44 @@ const dealLimit = ref(20);
 const potentialLimit = ref(20);
 const lostLimit = ref(20);
 const cardLimit = ref(30);
+const archivePinLimit = ref(40);
+const liveArchive = ref({ key: '', loading: false, docs: [] });
+const hasLiveAnalysis = computed(() => liveArchive.value.docs.some((doc) => doc.id === 'analysis' && doc.html));
 
+const categoryTabs = computed(() => {
+  const base = [
+    { id: 'all', label: '全部' },
+    { id: 'parts', label: '汽配' },
+    { id: 'lights', label: '照明' },
+    { id: 'apparel', label: '服装' },
+    { id: 'fabric', label: '布料' },
+  ];
+  const known = new Set(base.map((tab) => tab.id));
+  const extras = [];
+  for (const lead of leads.value) {
+    const id = effectiveCategory(lead);
+    if (!id || known.has(id)) continue;
+    known.add(id);
+    extras.push({ id, label: lead.archiveCategoryLabel || categoryLabel(id) });
+  }
+  return [...base, ...extras];
+});
 
 // Category counts badge
 const categoryCounts = computed(() => {
-  const all = leads.value.length;
-  const parts = leads.value.filter(l => l.category === 'parts').length;
-  const lights = leads.value.filter(l => l.category === 'lights').length;
-  return { all, parts, lights };
+  const counts = { all: leads.value.length };
+  for (const tab of categoryTabs.value) {
+    if (tab.id === 'all') continue;
+    counts[tab.id] = leads.value.filter((lead) => effectiveCategory(lead) === tab.id).length;
+  }
+  return counts;
 });
 
 // Base filtered list (search + category + status)
 const filteredLeads = computed(() => {
   let list = leads.value;
   if (selectedCategory.value !== 'all') {
-    list = list.filter(l => l.category === selectedCategory.value);
+    list = list.filter(l => effectiveCategory(l) === selectedCategory.value);
   }
   if (selectedStatus.value !== 'all') {
     list = list.filter(l => l.stage === selectedStatus.value);
@@ -2651,10 +2714,11 @@ const filteredLeads = computed(() => {
   return list;
 });
 
-// Group filtered leads by stage
-const dealLeads = computed(() => filteredLeads.value.filter(l => l.stage === 'deal'));
-const potentialLeads = computed(() => filteredLeads.value.filter(l => l.stage === 'potential'));
-const lostLeads = computed(() => filteredLeads.value.filter(l => l.stage === 'lost'));
+// Group filtered leads by stage. Archive cards stay in the pinned block above.
+const dealLeads = computed(() => filteredLeads.value.filter(l => l.stage === 'deal' && !l.archiveBacked));
+const potentialLeads = computed(() => filteredLeads.value.filter(l => l.stage === 'potential' && !l.archiveBacked));
+const lostLeads = computed(() => filteredLeads.value.filter(l => l.stage === 'lost' && !l.archiveBacked));
+const archivePinnedLeads = computed(() => filteredLeads.value.filter(l => l.archiveBacked));
 
 // Whether to show each group section
 const shouldShowGroup = (stage) => {
@@ -3999,10 +4063,35 @@ const matchedProduct = computed(() => {
 
 const emailDraftText = ref('');
 
+const loadLiveArchive = async (lead) => {
+  const files = lead?.archiveFiles;
+  if (!files || !Object.keys(files).length) {
+    liveArchive.value = { key: '', loading: false, docs: [] };
+    return;
+  }
+  const key = String(lead.archiveKey || lead.id);
+  liveArchive.value = { key, loading: true, docs: [] };
+  const readText = async (filePath) => {
+    if (!window.electronAPI?.readFile) throw new Error('当前环境不能读取本地文件');
+    const res = await window.electronAPI.readFile(filePath);
+    if (!res?.success) throw new Error(res?.error || '读取失败');
+    return res.content || '';
+  };
+  try {
+    const docs = await buildLiveDocs(files, readText);
+    if (liveArchive.value.key !== key) return;
+    liveArchive.value = { key, loading: false, docs };
+  } catch (err) {
+    if (liveArchive.value.key !== key) return;
+    liveArchive.value = { key, loading: false, docs: [{ id: 'analysis', title: '深度分析', filename: '', html: '', error: err?.message || String(err) }] };
+  }
+};
+
 const triggerDetailModal = (lead) => {
   selectedLeadForModal.value = lead;
   isEditingProfile.value = false;
   activeWorkspaceTab.value = 'analysis';
+  loadLiveArchive(lead);
 
   // AI custom business campaign draft pregeneration
   emailDraftText.value = `Subject: Tailored Technical Blueprint regarding ${matchedProduct.value.name} - ${lead.name}\n\nDear Mr./Ms. ${lead.contact},\n\nWe trust you are doing well.\n\nFollowing up on our agricultural parts parameters review, we are pleased to suggest our FLAGSHIP ${matchedProduct.value.name} (Model: ${matchedProduct.value.model}).\n\nBased on your tags: our local vector RAG matches confirm that the ${matchedProduct.value.material} outer frame easily satisfies your extreme outdoor requirement (rated for: ${matchedProduct.value.temp}).\n\nOur initial trial MOQ is flexible, and we can prioritize dispatch under our custom shipping rates.\n\nWarm regards,\nSofia | Zen Auto Parts Sales Department`;

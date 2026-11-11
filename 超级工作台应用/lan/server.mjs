@@ -19,6 +19,8 @@ import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
 import { createRequire } from 'module';
+import { persistableLeads, persistableKnowledge } from '../crm-magichub/src/lib/localArchives.js';
+import { scanCustomerArchives, scanKnowledgeFiles, isAllowedLocalText } from '../crm-magichub/src/lib/localArchivesScan.js';
 const require = createRequire(import.meta.url);
 const globalModels = require('../shared/global-models-store.cjs');
 
@@ -278,6 +280,31 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (url.pathname === "/api/mh/customer-archives" && req.method === "GET") {
+    const archives = scanCustomerArchives(path.join(PRIVATE_ROOT, "客户档案"));
+    send(res, 200, JSON.stringify({ success: true, archives }), { "Content-Type": "application/json" });
+    return;
+  }
+  if (url.pathname === "/api/mh/knowledge-files" && req.method === "GET") {
+    const items = scanKnowledgeFiles(path.join(PRIVATE_ROOT, "知识库"));
+    send(res, 200, JSON.stringify({ success: true, items }), { "Content-Type": "application/json" });
+    return;
+  }
+  if (url.pathname === "/api/mh/local-text" && req.method === "GET") {
+    const filePath = url.searchParams.get("path") || "";
+    if (!isAllowedLocalText(REPO, filePath) || !fs.existsSync(filePath)) {
+      send(res, 404, JSON.stringify({ success: false, error: "文件不存在" }), { "Content-Type": "application/json" });
+      return;
+    }
+    try {
+      const content = fs.readFileSync(filePath, "utf8");
+      send(res, 200, JSON.stringify({ success: true, content }), { "Content-Type": "application/json" });
+    } catch (err) {
+      send(res, 500, JSON.stringify({ success: false, error: String(err.message || err) }), { "Content-Type": "application/json" });
+    }
+    return;
+  }
+
   // Magichub settings API → global models store for AI providers; else private/crm/settings
   if (url.pathname.startsWith("/api/mh/settings/")) {
     const key = decodeURIComponent(url.pathname.slice("/api/mh/settings/".length));
@@ -331,7 +358,9 @@ const server = http.createServer(async (req, res) => {
         });
         return;
       }
-      const data = parsed && Object.prototype.hasOwnProperty.call(parsed, "data") ? parsed.data : parsed;
+      let data = parsed && Object.prototype.hasOwnProperty.call(parsed, "data") ? parsed.data : parsed;
+      if (key === "magichub_leads") data = persistableLeads(data);
+      if (key === "magichub_knowledge_base") data = persistableKnowledge(data);
       if (globalModels.isModelsKey(key)) {
         const result = globalModels.saveForSettingsKey(key, data);
         // Mirror into private settings for backup

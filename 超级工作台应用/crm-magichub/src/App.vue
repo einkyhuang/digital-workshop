@@ -18,6 +18,7 @@ import ScheduleManager from './components/ScheduleManager.vue'; // [NEW] Schedul
 import SmartMarketing from './components/SmartMarketing.vue'; // [NEW] Smart Email Marketing Component
 import AgentRoom from './components/AgentRoom.vue'; // [NEW] Multi-Agent Group Chat
 import ForwelikeHub from './components/ForwelikeHub.vue';
+import { mergeLeadsWithArchives, persistableLeads } from './lib/localArchives.js';
 
 
 // --- Global IDE and System Skills Registry (标准技能导入注册底盘) ---
@@ -404,6 +405,34 @@ const leads = ref([
   },
 ]);
 
+const leadsHydrated = ref(false);
+
+const fetchCustomerArchives = async () => {
+  if (!window.electronAPI?.listCustomerArchives) return [];
+  try {
+    const res = await window.electronAPI.listCustomerArchives();
+    if (res?.success && Array.isArray(res.archives)) return res.archives;
+    throw new Error(res?.error || 'archive scan failed');
+  } catch (e) {
+    console.warn('[MagicHub] customer archive scan failed', e);
+    return null;
+  }
+};
+
+let leadRefreshSeq = 0;
+const applyLeadLibrary = async (library, { keepOnScanError = false } = {}) => {
+  const seq = ++leadRefreshSeq;
+  const archives = await fetchCustomerArchives();
+  if (seq !== leadRefreshSeq) return;
+  if (archives === null) {
+    if (keepOnScanError) return;
+  }
+  const base = Array.isArray(library) ? library : [];
+  const found = archives || [];
+  if (!base.length && !found.length) return;
+  leads.value = mergeLeadsWithArchives(base, found);
+};
+
 const loadSavedLeads = async () => {
   try {
     let savedLeads = null;
@@ -418,10 +447,15 @@ const loadSavedLeads = async () => {
       if (local) savedLeads = JSON.parse(local);
     }
     if (Array.isArray(savedLeads) && savedLeads.length) {
-      leads.value = savedLeads;
+      await applyLeadLibrary(savedLeads);
+    } else {
+      const archives = await fetchCustomerArchives();
+      if (archives.length) leads.value = mergeLeadsWithArchives(leads.value, archives);
     }
   } catch (e) {
     console.error('Failed to load saved leads:', e);
+  } finally {
+    leadsHydrated.value = true;
   }
 };
 
@@ -450,12 +484,12 @@ const loadSavedCompanyInfo = async () => {
 let leadsSaveTimer = null;
 const saveLeadsDataNow = async () => {
   try {
+    const plain = persistableLeads(JSON.parse(JSON.stringify(leads.value)));
     if (window.electronAPI?.saveSettings) {
-      const plain = JSON.parse(JSON.stringify(leads.value));
       await window.electronAPI.saveSettings('magichub_leads', plain);
       console.log('[MagicHub] Leads database persisted successfully.');
     } else {
-      const serialized = JSON.stringify(leads.value);
+      const serialized = JSON.stringify(plain);
       if (serialized.length < 4_000_000) {
         localStorage.setItem('magichub_leads', serialized);
       }
@@ -890,6 +924,10 @@ window.addEventListener('message', (ev) => {
 })
 watch(activeTab, (v) => {
   if (isEmbedded.value) swNotifyHostTab(v)
+  if (v === 'customers' && leadsHydrated.value) {
+    const library = persistableLeads(JSON.parse(JSON.stringify(leads.value)));
+    applyLeadLibrary(library, { keepOnScanError: true });
+  }
 })
 
 const openGlobalModelSettings = async () => {

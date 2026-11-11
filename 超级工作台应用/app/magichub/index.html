@@ -54,7 +54,27 @@
       try { var raw = localStorage.getItem(storeKey(key)); return { success: true, data: raw ? JSON.parse(raw) : null }; }
       catch (e) { return { success: false, error: String(e) }; }
     },
-    readFile: async function () { return { success: false, error: 'web' }; },
+    readFile: async function (filePath) {
+      try {
+        var r = await fetch('/api/mh/local-text?path=' + encodeURIComponent(filePath || ''), { credentials: 'same-origin', cache: 'no-store' });
+        if (r.ok) return await r.json();
+      } catch (_) {}
+      return { success: false, error: 'web' };
+    },
+    listCustomerArchives: async function () {
+      try {
+        var r = await fetch('/api/mh/customer-archives', { credentials: 'same-origin', cache: 'no-store' });
+        if (r.ok) return await r.json();
+      } catch (_) {}
+      return { success: true, archives: [] };
+    },
+    listKnowledgeFiles: async function () {
+      try {
+        var r = await fetch('/api/mh/knowledge-files', { credentials: 'same-origin', cache: 'no-store' });
+        if (r.ok) return await r.json();
+      } catch (_) {}
+      return { success: true, items: [] };
+    },
     writeFile: async function () { return { success: false, error: 'web' }; },
     selectLocalZipAndUpdate: async function () { return { success: false, error: 'web' }; },
     openGlobalSettings: async function () { return { success: false, error: 'web' }; }
@@ -84,8 +104,8 @@
         background-color: #F9FBFA;
       }
     </style>
-    <script type="module" crossorigin src="./assets/index-DRA-ijZQ.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-sKoUZH3d.css">
+    <script type="module" crossorigin src="./assets/index-Dh48Qnei.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-C1gleqOo.css">
   </head>
   <body class="font-sans antialiased text-zen-ink bg-zen-bg overflow-x-hidden selection:bg-zen-tea/20">
     <div id="app"></div>

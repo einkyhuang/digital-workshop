@@ -93,6 +93,10 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
         case "read-file":
             guard let path = args.first as? String else { return (false, nil, "missing path") }
             return readFile(path)
+        case "list-customer-archives":
+            return (true, ["success": true, "archives": LocalArchiveIndex.listCustomers(repoRoot: repoRoot)], nil)
+        case "list-knowledge-files":
+            return (true, ["success": true, "items": LocalArchiveIndex.listKnowledge(repoRoot: repoRoot)], nil)
         case "write-file":
             guard args.count >= 2, let path = args[0] as? String, let content = args[1] as? String else {
                 return (false, nil, "bad args")
@@ -148,14 +152,18 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
             let (ok, err) = SharedModelStore.saveProviders(providers, repoRoot: repoRoot)
             return (ok, ["success": ok, "error": err as Any], err)
         }
-        guard JSONSerialization.isValidJSONObject(safe) else {
+        let payload = persistedSettings(key: key, data: safe)
+        guard JSONSerialization.isValidJSONObject(payload) else {
             return (false, ["success": false, "error": "settings payload is not JSON-serializable"], "invalid JSON object for key \(key)")
+        }
+        if let refusal = refuseDestructiveLeadSave(key: key, input: safe, output: payload) {
+            return refusal
         }
         do {
             try ensureSettingsDir()
             let file = settingsDir.appendingPathComponent("\(key).json")
             let tmp = settingsDir.appendingPathComponent("\(key).json.tmp")
-            let json = try JSONSerialization.data(withJSONObject: safe, options: [.prettyPrinted, .sortedKeys])
+            let json = try JSONSerialization.data(withJSONObject: payload, options: [.prettyPrinted, .sortedKeys])
             try json.write(to: tmp, options: .atomic)
             if FileManager.default.fileExists(atPath: file.path) {
                 _ = try? FileManager.default.removeItem(at: file)
@@ -168,6 +176,23 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
         } catch {
             return (false, ["success": false, "error": error.localizedDescription], error.localizedDescription)
         }
+    }
+
+    /// Archive cards are an overlay. Never let a live save replace the lead library with them.
+    private func persistedSettings(key: String, data: Any) -> Any {
+        if key == "magichub_leads" { return LocalArchiveIndex.persistableLeads(data) }
+        if key == "magichub_knowledge_base" { return LocalArchiveIndex.persistableKnowledge(data) }
+        return data
+    }
+
+    private func refuseDestructiveLeadSave(key: String, input: Any, output: Any) -> (Bool, Any?, String?)? {
+        guard key == "magichub_leads",
+              let incoming = input as? [Any], incoming.count > 100,
+              let outgoing = output as? [Any] else { return nil }
+        if outgoing.count * 2 < incoming.count {
+            return (false, ["success": false, "error": "refusing to shrink magichub_leads"], "refusing to shrink magichub_leads")
+        }
+        return nil
     }
 
     /// Convert WKScriptMessage / JS values into JSONSerialization-safe trees.

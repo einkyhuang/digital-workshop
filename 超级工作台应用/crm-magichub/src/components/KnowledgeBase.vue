@@ -10,6 +10,7 @@
           </h2>
           <p class="text-[11px] text-zen-gray mt-1 font-serif-sc">
             对本地产品、行业及营销资产执行语义切片并编译向量，秒速同步 Notion 和 GitHub 云端库，为 AI 智能决策和自动化营销提供即时背景支撑。
+            本地 Markdown 放在「知识库/{分类}/{标题}.md」，打开本页即读入，按原文渲染。
           </p>
         </div>
       </div>
@@ -64,7 +65,7 @@
       <!-- Tab headers -->
       <div class="flex flex-wrap gap-1.5 p-1 bg-black/[0.04] rounded-2xl border border-black/[0.02]">
         <button
-          v-for="tab in tabs"
+          v-for="tab in displayTabs"
           :key="tab.id"
           @click="activeTab = tab.id"
           class="flex-1 min-w-[90px] py-2 px-3 rounded-xl text-[10px] font-bold transition-all duration-300 outline-none flex flex-col items-center justify-center gap-0.5"
@@ -76,7 +77,7 @@
 
       <!-- Active Tab Description -->
       <div class="p-3 bg-white/40 rounded-xl border border-white/50 text-[10px] text-zen-gray italic select-text flex justify-between items-center">
-        <span>📌 当前分类定位: {{ tabs.find(t => t.id === activeTab)?.desc }}</span>
+        <span>📌 当前分类定位: {{ displayTabs.find(t => t.id === activeTab)?.desc }}</span>
         <span class="font-mono not-italic font-bold text-zen-green bg-zen-green/10 px-2 py-0.5 rounded-md">
           已编译 {{ filteredItems.length }} 条
         </span>
@@ -94,15 +95,26 @@
               <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
               {{ item.title }}
             </h4>
-            <p class="text-[10px] leading-relaxed text-zen-gray font-serif-sc whitespace-pre-wrap select-text">
+            <p v-if="expandedId !== item.id" class="text-[10px] leading-relaxed text-zen-gray font-serif-sc whitespace-pre-wrap select-text">
               {{ item.content }}
             </p>
+            <div v-else class="space-y-1">
+              <p v-if="expandedError" class="text-[10px] text-red-600">{{ expandedError }}</p>
+              <div class="mh-md max-h-[360px] overflow-y-auto select-text" v-html="expandedHtml"></div>
+            </div>
           </div>
           <div class="flex sm:flex-col items-end gap-1.5 select-none shrink-0 self-stretch justify-between sm:justify-center border-t sm:border-t-0 border-black/[0.03] pt-2 sm:pt-0">
             <span class="text-[8px] text-zen-gray font-mono bg-black/[0.04] px-2 py-0.5 rounded-md">
-              更新于 {{ item.date }}
+              {{ item.source === 'archive-file' ? '本地 Markdown' : '更新于' }} {{ item.date }}
             </span>
             <button
+              @click="toggleKnowledgeDoc(item)"
+              class="text-[9px] text-indigo-700 hover:underline outline-none"
+            >
+              {{ expandedId === item.id ? '收起' : '阅读' }}
+            </button>
+            <button
+              v-if="item.source !== 'archive-file'"
               @click="deleteItem(item.id)"
               class="text-[9px] text-zen-crimson hover:underline opacity-0 group-hover:opacity-100 transition-opacity outline-none"
             >
@@ -136,7 +148,7 @@
                   v-model="manualIngestTab"
                   class="bg-white/50 border border-white/60 rounded-lg px-2 py-0.5 text-[8px] font-bold outline-none focus:bg-white focus:border-zen-green"
                 >
-                  <option v-for="t in tabs" :key="t.id" :value="t.id">{{ t.label.split(' ')[1] }}</option>
+                  <option v-for="t in displayTabs" :key="t.id" :value="t.id">{{ t.label }}</option>
                 </select>
               </div>
               <textarea
@@ -467,6 +479,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import ZenModal from './ZenModal.vue';
+import { markdownToHtml, mergeKnowledge, persistableKnowledge, splitFrontmatter } from '../lib/localArchives.js';
 
 const totalChunks = ref(544);
 const lastSyncTime = ref('2026-06-01 12:45');
@@ -481,6 +494,19 @@ const tabs = [
   { id: 'marketing', label: '✍️ 营销话术', desc: '开发信模板、跟进模板、痛点攻坚话术等' },
   { id: 'skills', label: '🛠️ 业务技能', desc: 'RAG 提示词技巧、常用外贸计算公式等' }
 ];
+
+const displayTabs = computed(() => {
+  const known = new Set(tabs.map((tab) => tab.id));
+  const extras = [];
+  for (const key of Object.keys(knowledgeItems.value || {})) {
+    if (known.has(key)) continue;
+    const list = knowledgeItems.value[key];
+    if (!Array.isArray(list) || !list.length) continue;
+    known.add(key);
+    extras.push({ id: key, label: key, desc: '来自本地知识库文件夹' });
+  }
+  return [...tabs, ...extras];
+});
 
 const knowledgeItems = ref({
   products: [
@@ -551,11 +577,12 @@ const KB_ANCHORS_KEY = 'magichub_knowledge_anchors';
 
 const persistKnowledge = async () => {
   try {
-    const payload = JSON.stringify(knowledgeItems.value);
+    const stored = persistableKnowledge(JSON.parse(JSON.stringify(knowledgeItems.value)));
+    const payload = JSON.stringify(stored);
     localStorage.setItem(KB_STORAGE_KEY, payload);
     localStorage.setItem(KB_ANCHORS_KEY, JSON.stringify(marketingAnchors.value));
     if (window.electronAPI?.saveSettings) {
-      await window.electronAPI.saveSettings(KB_STORAGE_KEY, JSON.parse(JSON.stringify(knowledgeItems.value)));
+      await window.electronAPI.saveSettings(KB_STORAGE_KEY, stored);
       await window.electronAPI.saveSettings(KB_ANCHORS_KEY, JSON.parse(JSON.stringify(marketingAnchors.value)));
     }
   } catch (e) {
@@ -581,9 +608,21 @@ const loadKnowledge = async () => {
       const localA = localStorage.getItem(KB_ANCHORS_KEY);
       if (localA) savedAnchors = JSON.parse(localA);
     }
-    if (savedItems && typeof savedItems === 'object') {
-      // Merge so newly added default categories still appear
-      knowledgeItems.value = { ...knowledgeItems.value, ...savedItems };
+    const savedObject = savedItems && typeof savedItems === 'object' && !Array.isArray(savedItems) ? savedItems : null;
+    const base = savedObject
+      ? { ...knowledgeItems.value, ...savedObject }
+      : knowledgeItems.value;
+    let fileItems = [];
+    if (window.electronAPI?.listKnowledgeFiles) {
+      try {
+        const listed = await window.electronAPI.listKnowledgeFiles();
+        if (listed?.success && Array.isArray(listed.items)) fileItems = listed.items;
+      } catch (err) {
+        console.warn('[MagicHub] knowledge folder scan failed', err);
+      }
+    }
+    if (savedObject || fileItems.length) {
+      knowledgeItems.value = mergeKnowledge(base, fileItems);
     }
     if (savedAnchors && typeof savedAnchors === 'object') {
       marketingAnchors.value = { ...marketingAnchors.value, ...savedAnchors };
@@ -627,6 +666,32 @@ const buildKnowledgeContext = (scenarioKey, queryText = '') => {
   const label = tabs.find(t => t.id === categoryId)?.label || '综合知识库';
   const lines = items.map((it, i) => `${i + 1}. 【${it.title}】${it.content}`).join('\n');
   return `以下是来自企业知识仓库「${label}」的相关背景资料，请在回答时优先参考这些事实：\n${lines}`;
+};
+
+const expandedId = ref(null);
+const expandedHtml = ref('');
+const expandedError = ref('');
+
+const toggleKnowledgeDoc = async (item) => {
+  if (expandedId.value === item.id) {
+    expandedId.value = null;
+    expandedHtml.value = '';
+    expandedError.value = '';
+    return;
+  }
+  expandedId.value = item.id;
+  expandedError.value = '';
+  let raw = item.content || '';
+  if (item.filePath && window.electronAPI?.readFile) {
+    try {
+      const res = await window.electronAPI.readFile(item.filePath);
+      if (res?.success && typeof res.content === 'string') raw = res.content;
+      else expandedError.value = res?.error || '读取失败';
+    } catch (err) {
+      expandedError.value = err?.message || String(err);
+    }
+  }
+  expandedHtml.value = markdownToHtml(splitFrontmatter(raw).body);
 };
 
 // Expose the retrieval bridge globally so the floating AI assistant (App.vue) can inject knowledge

@@ -61,7 +61,30 @@
     scanDirectory: async () => ({ success: true, files: [] }),
     saveSettings,
     loadSettings,
-    readFile: async () => ({ success: false, error: "浏览器无本地读文件" }),
+    readFile: async (filePath) => {
+      try {
+        const res = await fetch("/api/mh/local-text?path=" + encodeURIComponent(filePath || ""), {
+          credentials: "same-origin",
+          cache: "no-store",
+        });
+        if (res.ok) return await res.json();
+      } catch (_) {}
+      return { success: false, error: "浏览器无本地读文件" };
+    },
+    listCustomerArchives: async () => {
+      try {
+        const res = await fetch("/api/mh/customer-archives", { credentials: "same-origin", cache: "no-store" });
+        if (res.ok) return await res.json();
+      } catch (_) {}
+      return { success: true, archives: [] };
+    },
+    listKnowledgeFiles: async () => {
+      try {
+        const res = await fetch("/api/mh/knowledge-files", { credentials: "same-origin", cache: "no-store" });
+        if (res.ok) return await res.json();
+      } catch (_) {}
+      return { success: true, items: [] };
+    },
     writeFile: async () => ({ success: false, error: "浏览器无本地写文件" }),
     selectLocalZipAndUpdate: async () => ({ success: false, error: "请用 Mac 应用更新" }),
     openGlobalSettings: async () => ({ success: false, error: "浏览器请使用本页设置" }),
