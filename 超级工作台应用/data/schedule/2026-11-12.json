@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "date": "2026-11-12",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-12T02:08:00+08:00",
+  "tasks": [
+    {
+      "id": "t-1112-1",
+      "title": "再次优化 gongly 网站",
+      "ownerBotId": "user",
+      "ownerName": "花生",
+      "status": "待办",
+      "dueAt": "2026-11-12T18:00:00+08:00",
+      "note": "用户 11-12 计划"
+    },
+    {
+      "id": "t-1112-2",
+      "title": "剪辑并更新南驰电池网站产品视频",
+      "ownerBotId": "user",
+      "ownerName": "花生",
+      "status": "待办",
+      "dueAt": "2026-11-12T18:00:00+08:00",
+      "note": "用户 11-12 计划"
+    },
+    {
+      "id": "t-1112-3",
+      "title": "打包视频和账号信息给英摩客",
+      "ownerBotId": "user",
+      "ownerName": "花生",
+      "status": "待办",
+      "dueAt": "2026-11-12T18:00:00+08:00",
+      "note": "用户 11-12 计划"
+    },
+    {
+      "id": "t-1112-4",
+      "title": "完成连衣裙网站设计",
+      "ownerBotId": "user",
+      "ownerName": "花生",
+      "status": "待办",
+      "dueAt": "2026-11-12T18:00:00+08:00",
+      "note": "用户 11-12 计划"
+    },
+    {
+      "id": "t-1112-5",
+      "title": "制作澳洲客户网站报价",
+      "ownerBotId": "user",
+      "ownerName": "花生",
+      "status": "待办",
+      "dueAt": "2026-11-12T18:00:00+08:00",
+      "note": "用户 11-12 计划"
+    }
+  ],
+  "schedule": [],
+  "meta": {
+    "hasEmailSummary": false,
+    "hasDailyReport": false
+  }
+}
