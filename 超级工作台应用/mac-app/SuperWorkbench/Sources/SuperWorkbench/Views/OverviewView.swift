@@ -45,6 +45,7 @@ struct OverviewView: View {
             }
         )
         .onPreferenceChange(OverviewWidthKey.self) { contentWidth = max($0, 320) }
+        .onAppear { store.refreshScheduleFiles() }
     }
 
     /// FULL-WIDTH: ≥2560 gets more columns instead of centering/capping.
@@ -366,13 +367,16 @@ struct OverviewView: View {
         let cols: [TaskColumn] = [.todo, .doing, .review, .done]
         return VStack(alignment: .leading, spacing: 12) {
             sectionHead("日程管理 · 任务看板", badge: "\(tasks.count)")
-            Text("只读 · 工作台任务 + SmartPlan（若本地库可读）")
+            Text("今日与即将到来 · data/schedule 可勾选完成 · 另含工作台任务")
                 .font(.system(size: 12)).foregroundStyle(SWTheme.textMuted)
             HStack(alignment: .top, spacing: 12) {
                 ForEach(cols) { col in
                     let items = tasks.filter {
                         $0.status == col.rawValue || (col == .review && ($0.status == "审核" || $0.status == "验收"))
+                            || (col == .todo && $0.source == "schedule" && !["进行中", "验收", "审核", "完成"].contains($0.status))
                     }
+                    let scheduleItems = items.filter { $0.source == "schedule" }
+                    let shown = scheduleItems + Array(items.filter { $0.source != "schedule" }.prefix(8))
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 6) {
                             Circle().fill(SWTheme.columnColor(col)).frame(width: 8, height: 8)
@@ -381,25 +385,15 @@ struct OverviewView: View {
                         }
                         ScrollView {
                             VStack(spacing: 8) {
-                                ForEach(items.prefix(8)) { t in
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(t.title).font(.system(size: 12, weight: .semibold)).lineLimit(2)
-                                        Text(t.source == "smartplan" ? "SmartPlan" : "工作台")
-                                            .font(.system(size: 10)).foregroundStyle(SWTheme.textMuted)
-                                    }
-                                    .padding(10)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .background(Color.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(SWTheme.borderSoft))
-                                    .shadow(color: .black.opacity(0.03), radius: 3, y: 1)
+                                ForEach(shown) { t in
+                                    scheduleTaskCard(t)
                                 }
                                 if items.isEmpty {
                                     Text("—").font(.caption).foregroundStyle(SWTheme.textMuted).padding(8)
                                 }
                             }
                         }
-                        .frame(maxHeight: 220)
+                        .frame(maxHeight: 320)
                     }
                     .padding(12)
                     .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -414,6 +408,53 @@ struct OverviewView: View {
         .clipShape(RoundedRectangle(cornerRadius: SWTheme.radiusSection, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: SWTheme.radiusSection).stroke(SWTheme.borderGroup))
         .shadow(color: SWTheme.shadowElevated, radius: 20, y: 6)
+    }
+
+    @ViewBuilder
+    private func scheduleTaskCard(_ t: OverviewMetrics.SmartPlanTask) -> some View {
+        let card = VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .top, spacing: 8) {
+                if t.source == "schedule" {
+                    Image(systemName: t.status == "完成" ? "checkmark.circle.fill" : "circle")
+                        .foregroundStyle(t.status == "完成" ? Color(red: 0.15, green: 0.65, blue: 0.45) : SWTheme.textMuted)
+                }
+                Text(t.title)
+                    .font(.system(size: 12, weight: .semibold))
+                    .strikethrough(t.status == "完成", color: SWTheme.textMuted)
+                    .lineLimit(3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            Text(scheduleMeta(t))
+                .font(.system(size: 10)).foregroundStyle(SWTheme.textMuted)
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(SWTheme.borderSoft))
+        .shadow(color: .black.opacity(0.03), radius: 3, y: 1)
+
+        if t.source == "schedule", let date = t.scheduleDate, let id = t.scheduleTaskId {
+            Button {
+                store.toggleScheduleTask(date: date, taskId: id, done: t.status != "完成")
+            } label: {
+                card
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(t.status == "完成" ? "把\(t.title)改回待办" : "把\(t.title)标为完成")
+        } else {
+            card
+        }
+    }
+
+    private func scheduleMeta(_ t: OverviewMetrics.SmartPlanTask) -> String {
+        if t.source == "schedule" {
+            var bits = ["日程"]
+            if let day = t.scheduleDate { bits.append(String(day.suffix(5))) }
+            if let owner = t.ownerLabel, !owner.isEmpty { bits.append(owner) }
+            return bits.joined(separator: " · ")
+        }
+        return t.source == "smartplan" ? "SmartPlan" : "工作台"
     }
 
     // MARK: - Email

@@ -237,22 +237,96 @@
     const names = new Set(scopedBots().map(b => b.name));
     return tasks.filter(t => names.has(t.executor) || names.has(t.reviewer) || [...names].some(n => (t.executor || "").includes(n)));
   }
+  let scheduleApiPromise = null;
+  function scheduleApi() {
+    if (window.ScheduleBoard && window.ScheduleBoard.homeBoardScheduleTasks) return Promise.resolve(window.ScheduleBoard);
+    if (!scheduleApiPromise) {
+      scheduleApiPromise = import("./assets/schedule-board.mjs").then((m) => {
+        window.ScheduleBoard = m;
+        return m;
+      }).catch(() => null);
+    }
+    return scheduleApiPromise;
+  }
+  async function fetchScheduleIndex(bases, ym) {
+    for (const base of bases) {
+      try {
+        const res = await fetch(base + ym + ".index.json", { cache: "no-store" });
+        if (!res.ok) continue;
+        const idx = await res.json();
+        return idx.dates || [];
+      } catch (_) {}
+    }
+    return [];
+  }
+  async function loadHomeSchedule() {
+    const api = await scheduleApi();
+    if (!api) return;
+    const today = api.shanghaiYMD(new Date());
+    state.scheduleToday = today;
+    if (!state._scheduleMonthInit) {
+      state.calMonth = today.slice(0, 7);
+      state._scheduleMonthInit = true;
+    }
+    const bases = api.fetchBases(isHostedPages());
+    const months = new Set([today.slice(0, 7)]);
+    if (!isHostedPages()) {
+      for (const d of api.localProbeDates(today)) months.add(d.slice(0, 7));
+    }
+    const indexDates = [];
+    for (const ym of months) indexDates.push(...await fetchScheduleIndex(bases, ym));
+    const dates = api.datesForHome(today, indexDates, isHostedPages());
+    const map = await api.loadScheduleMap({
+      fetchImpl: (url) => fetch(url, { cache: "no-store" }),
+      bases,
+      dates,
+    });
+    state.scheduleByDate = Object.assign({}, state.scheduleByDate || {}, map);
+  }
+  async function toggleScheduleInPage(date, id, done) {
+    const api = await scheduleApi();
+    if (!api) return;
+    const doc = (state.scheduleByDate || {})[date];
+    const applied = api.applyTaskStatus(doc, id, done, api.shanghaiStamp(new Date()));
+    if (!applied.ok) { toast("没有找到这条日程"); return; }
+    state.scheduleByDate = Object.assign({}, state.scheduleByDate, { [date]: applied.doc });
+    render();
+    const writer = window.electronAPI && window.electronAPI.setScheduleTaskStatus;
+    if (!writer) {
+      if (!state._scheduleWriteNote) {
+        state._scheduleWriteNote = true;
+        toast("已在本页更新。网页不能写回 data/schedule，请用 Mac 超级工作台勾选保存。");
+      }
+      return;
+    }
+    try {
+      const res = await writer(date, id, done);
+      if (!res || res.success === false) throw new Error((res && res.error) || "write failed");
+      if (res.doc) state.scheduleByDate[date] = res.doc;
+      toast(done ? "已标为完成" : "已改回待办");
+    } catch (e) {
+      toast("写回失败：" + (e && e.message ? e.message : e));
+    }
+  }
   async function loadScheduleMonth(ym) {
     if (state.scheduleLoadedMonth === ym) return;
-    const map = {};
-    let days = [];
-    try {
-      const idxRes = await fetch("./data/schedule/" + ym + ".index.json", { cache: "no-store" });
-      if (idxRes.ok) { const idx = await idxRes.json(); days = idx.dates || []; }
-    } catch (_) {}
-    await Promise.all(days.map(async (date) => {
-      try {
-        const res = await fetch("./data/schedule/" + date + ".json", { cache: "no-store" });
-        if (!res.ok) return;
-        const doc = await res.json();
-        if (doc && doc.date) map[doc.date] = doc;
-      } catch (_) {}
-    }));
+    const api = await scheduleApi();
+    const bases = api ? api.fetchBases(isHostedPages()) : ["./data/schedule/"];
+    const listed = await fetchScheduleIndex(bases, ym);
+    const days = api ? api.datesForMonth(ym, listed, isHostedPages()) : listed;
+    const map = api
+      ? await api.loadScheduleMap({ fetchImpl: (url) => fetch(url, { cache: "no-store" }), bases, dates: days })
+      : {};
+    if (!api) {
+      await Promise.all(days.map(async (date) => {
+        try {
+          const res = await fetch("./data/schedule/" + date + ".json", { cache: "no-store" });
+          if (!res.ok) return;
+          const doc = await res.json();
+          if (doc && doc.date) map[doc.date] = doc;
+        } catch (_) {}
+      }));
+    }
     try {
       const res = await fetch("./data/daily-reports-index.json", { cache: "no-store" });
       if (res.ok) {
@@ -265,7 +339,7 @@
         }
       }
     } catch (_) {}
-    state.scheduleByDate = map;
+    state.scheduleByDate = Object.assign({}, state.scheduleByDate || {}, map);
     state.scheduleLoadedMonth = ym;
   }
   function shiftCalMonth(delta) {
@@ -301,7 +375,9 @@
         <div class="cal-cell__meta">${tn ? `<span class="cal-tag cal-tag--task">${tn} 任务</span>` : ""}${sn ? `<span class="cal-tag cal-tag--sched">${sn} 日程</span>` : ""}
         <span class="cal-flags">${hasEmail ? "✉️" : ""}${hasReport ? "📄" : ""}</span></div></button>`;
     }).join("");
-    const detail = state.calSelected ? renderCalDayDetail(state.calSelected) : `<p class="muted">点击日期查看当日详情。</p>`;
+    const detail = state.calSelected
+      ? `<div class="cal-modal-back" data-cal-close="1"><div class="cal-modal" role="dialog" aria-modal="true">${renderCalDayDetail(state.calSelected)}</div></div>`
+      : `<p class="muted">点击日期查看当天全部日程。</p>`;
     return `<h2 class="section-title">任务与日程中心</h2>
       <p class="muted">仅加载当月 · 邮件正文不在 Pages 展示</p>
       <div class="cal-toolbar"><button type="button" class="btn" data-cal-shift="-1">‹</button><strong>${y}年 ${m}月</strong>
@@ -310,8 +386,8 @@
   }
   function renderCalDayDetail(date) {
     const doc = (state.scheduleByDate || {})[date] || { tasks: [], schedule: [], meta: {} };
-    const tasks = (doc.tasks || []).map(t => `<div class="cal-item"><span class="pill">${esc(t.status || "待办")}</span> <strong>${esc(t.title)}</strong>
-      <div class="muted" style="font-size:12px">${esc(t.ownerName || t.ownerBotId || "")}</div></div>`).join("") || `<p class="muted">本日暂无任务</p>`;
+    const tasks = (doc.tasks || []).map(t => `<div class="cal-item sched-row"><input type="checkbox" data-sched-toggle="1" data-sched-date="${esc(date)}" data-sched-id="${esc(t.id)}" ${t.status === "完成" ? "checked" : ""}/> <span class="pill">${esc(t.status || "待办")}</span> <strong${t.status === "完成" ? ' style="text-decoration:line-through"' : ""}>${esc(t.title)}</strong>
+      <div class="muted" style="font-size:12px">${esc(t.ownerName || t.ownerBotId || "")} ${esc(t.note || "")}</div></div>`).join("") || `<p class="muted">本日暂无任务</p>`;
     const sched = (doc.schedule || []).map(s => `<div class="cal-item"><strong>${esc(s.title)}</strong> <span class="muted">${esc(s.who || "")}</span></div>`).join("") || `<p class="muted">本日暂无日程</p>`;
     const hasEmail = !!(doc.meta && doc.meta.hasEmailSummary);
     const hasReport = !!(doc.meta && doc.meta.hasDailyReport);
@@ -1040,16 +1116,41 @@
       ["验收", "kdot-review"],
       ["完成", "kdot-done"],
     ];
-    const colMap = { "待办": [], "进行中": [], "验收": [], "完成": [] };
+    const api = window.ScheduleBoard;
+    const today = state.scheduleToday || (api && api.shanghaiYMD ? api.shanghaiYMD(new Date()) : "");
+    const scheduleTasks = (api && today) ? api.homeBoardScheduleTasks(state.scheduleByDate || {}, today) : [];
+    const boardTasks = [];
+    const seenTask = new Set();
+    for (const t of scheduleTasks) {
+      const key = "s:" + t.date + ":" + t.id;
+      if (seenTask.has(key)) continue;
+      seenTask.add(key);
+      boardTasks.push(Object.assign({}, t, { source: "schedule" }));
+    }
     for (const t of tasks) {
+      if (seenTask.has(t.id)) continue;
+      seenTask.add(t.id);
+      boardTasks.push(Object.assign({}, t, { source: "workspace" }));
+    }
+    const colMap = { "待办": [], "进行中": [], "验收": [], "完成": [] };
+    for (const t of boardTasks) {
       const st = t.status === "审核" ? "验收" : t.status;
       (colMap[st] || colMap["待办"]).push(t);
     }
     const kanban = colMeta.map(([col, dot]) => {
-      const items = (colMap[col] || []).slice(0, 8).map(t =>
-        `<div class="task-chip"><div class="task-chip__title">${esc(t.title)}</div><div class="task-chip__meta">工作台</div></div>`
-      ).join("") || `<div class="muted" style="font-size:12px;padding:8px">—</div>`;
-      return `<div class="kanban-col"><div class="kanban-col__head"><span class="kdot ${dot}"></span>${esc(col)} <span class="n">${(colMap[col]||[]).length}</span></div>${items}</div>`;
+      const all = colMap[col] || [];
+      const shown = all.filter(t => t.source === "schedule").concat(all.filter(t => t.source !== "schedule").slice(0, 8));
+      const items = shown.map(t => {
+        const done = t.status === "完成";
+        const box = t.source === "schedule"
+          ? `<input type="checkbox" data-sched-toggle="1" data-sched-date="${esc(t.date)}" data-sched-id="${esc(t.id)}" ${done ? "checked" : ""}/>`
+          : "";
+        const meta = t.source === "schedule"
+          ? ("日程 · " + esc(String(t.date || "").slice(5)) + (t.ownerName ? " · " + esc(t.ownerName) : ""))
+          : "工作台";
+        return `<div class="task-chip sched-row">${box}<div><div class="task-chip__title"${done ? ' style="text-decoration:line-through"' : ""}>${esc(t.title)}</div><div class="task-chip__meta">${meta}</div></div></div>`;
+      }).join("") || `<div class="muted" style="font-size:12px;padding:8px">—</div>`;
+      return `<div class="kanban-col"><div class="kanban-col__head"><span class="kdot ${dot}"></span>${esc(col)} <span class="n">${all.length}</span></div><div class="kanban-col__body">${items}</div></div>`;
     }).join("");
 
     let emailHtml = "";
@@ -1131,8 +1232,8 @@
         <div class="prio-list">${topHtml}</div>
       </section>`}
       <section class="section-shell">
-        <div class="section-shell__head"><h3 class="section-shell__title">日程管理 · 任务看板</h3><span class="section-shell__badge">${tasks.length}</span></div>
-        <div class="section-shell__meta">只读 · 工作台任务</div>
+        <div class="section-shell__head"><h3 class="section-shell__title">日程管理 · 任务看板</h3><span class="section-shell__badge">${boardTasks.length}</span></div>
+        <div class="section-shell__meta">今日与即将到来 · data/schedule 可勾选 · 另含工作台任务</div>
         <div class="kanban-row">${kanban}</div>
       </section>
       <section class="section-shell">
@@ -1729,6 +1830,18 @@ function renderKanban() {
     document.querySelectorAll("[data-cal-day]").forEach((el) => {
       el.onclick = () => { state.calSelected = el.getAttribute("data-cal-day"); render(); };
     });
+    document.querySelectorAll("[data-cal-close]").forEach((el) => {
+      el.onclick = (ev) => {
+        if (ev.target !== el) return;
+        state.calSelected = null;
+        render();
+      };
+    });
+    document.querySelectorAll("[data-sched-toggle]").forEach((el) => {
+      el.onchange = () => {
+        toggleScheduleInPage(el.getAttribute("data-sched-date"), el.getAttribute("data-sched-id"), !!el.checked);
+      };
+    });
     document.querySelectorAll("[data-open-daily]").forEach((el) => {
       el.onclick = () => { state.dailyReportDate = el.getAttribute("data-open-daily"); state.tab = "每日总结"; render(); };
     });
@@ -1869,6 +1982,7 @@ function renderKanban() {
     await loadData();
     await maybeApplyStressOverlay();
     await loadOverviewExtras();
+    await loadHomeSchedule();
     render();
   }
 

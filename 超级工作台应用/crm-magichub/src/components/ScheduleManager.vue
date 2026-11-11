@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6 font-sans text-zen-ink relative z-10">
-    <div v-if="viewState === 'calendar'" class="space-y-6 animate-fadeIn">
+    <div class="space-y-6 animate-fadeIn">
       <!-- 1. Yearly Schedule Dashboard Header -->
       <div class="apple-glass rounded-2xl p-6 relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-[#627254]/[0.02] to-transparent pointer-events-none"></div>
@@ -62,6 +62,31 @@
           </div>
         </div>
 
+        <p v-if="scheduleError" class="text-[11px] text-zen-crimson">{{ scheduleError }}</p>
+        <div v-if="scheduleHomeTasks.length" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <label
+            v-for="item in scheduleHomeTasks"
+            :key="'file-' + item.date + '-' + item.id"
+            class="p-4 rounded-2xl border border-white/60 bg-white/55 shadow-sm flex items-start gap-3 cursor-pointer"
+            :class="item.status === '完成' ? 'opacity-60' : ''"
+          >
+            <input
+              type="checkbox"
+              class="mt-1 accent-[#627254]"
+              :checked="item.status === '完成'"
+              @change="toggleFileTask(item, $event)"
+            />
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="text-[8px] px-2 py-0.5 rounded font-bold bg-zen-tea/10 text-zen-tea">本地日程</span>
+                <span class="text-[8px] text-zen-gray font-mono">{{ item.date }}</span>
+              </div>
+              <h4 class="text-xs font-bold text-zen-ink mt-1.5 leading-tight" :class="item.status === '完成' ? 'line-through' : ''">{{ item.title }}</h4>
+              <p class="text-[10px] text-zen-gray leading-relaxed mt-1">{{ item.note || item.ownerName || item.status }}</p>
+            </div>
+          </label>
+        </div>
+
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
           <div class="xl:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3">
             <div
@@ -115,7 +140,7 @@
             {{ filter.name }}
           </button>
         </div>
-        <span class="text-[9px] text-zen-gray font-mono pr-2">当前看板：2026年 {{ currentMonthConfig.name }}</span>
+        <span class="text-[9px] text-zen-gray font-mono pr-2">当前看板：{{ viewYear }}年 {{ currentMonthConfig.name }}</span>
       </div>
 
       <!-- 4. Current Month Full-width Calendar -->
@@ -128,7 +153,7 @@
             <!-- Month Header -->
             <div class="flex justify-between items-center mb-3.5 border-b border-white/20 pb-2">
               <h3 class="text-xs font-bold text-zen-ink font-serif-sc flex items-center gap-1.5">
-                📅 2026年 {{ currentMonthConfig.name }} · 当月全宽月历
+                📅 {{ viewYear }}年 {{ currentMonthConfig.name }} · 当月全宽月历
               </h3>
               <span
                 v-if="getMonthLogsCount(currentMonthConfig.monthNum)"
@@ -181,7 +206,7 @@
                     </span>
                   </div>
 
-                  <div v-if="getDayLogs(currentMonthConfig.monthNum, day).length" class="space-y-1.5 max-h-[120px] overflow-y-auto scrollbar-elegant pr-0.5">
+                  <div v-if="getDayLogs(currentMonthConfig.monthNum, day).length" class="space-y-1.5 max-h-[40vh] overflow-y-auto scrollbar-elegant pr-0.5">
                     <div
                       v-for="(rec, idx) in getDayLogs(currentMonthConfig.monthNum, day)"
                       :key="idx"
@@ -219,7 +244,7 @@
           class="apple-glass rounded-2xl border border-white/50 overflow-hidden"
         >
           <summary class="cursor-pointer select-none px-5 py-4 flex items-center justify-between text-xs font-bold text-zen-ink">
-            <span>2026年 {{ month.name }} · {{ getMonthLogsCount(month.monthNum) }} 项记录</span>
+            <span>{{ viewYear }}年 {{ month.name }} · {{ getMonthLogsCount(month.monthNum) }} 项记录</span>
             <span class="text-[9px] text-zen-gray font-normal">点击展开</span>
           </summary>
           <div class="px-5 pb-5 space-y-2">
@@ -241,8 +266,20 @@
       </div>
     </div>
 
-    <!-- 4. Daily Details Page View (NEW inline view replacing modal) -->
-    <div v-else-if="viewState === 'detail'" class="space-y-6 animate-fadeIn">
+    <teleport to="body">
+    <div
+      v-if="viewState === 'detail'"
+      class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-[3vh] backdrop-blur-sm"
+      @click.self="viewState = 'calendar'"
+    >
+    <div
+      class="flex flex-col overflow-hidden rounded-3xl bg-[#f7f5f0] shadow-2xl border border-white/70"
+      style="width: min(80vw, 1200px); height: min(80vh, 920px);"
+      role="dialog"
+      aria-modal="true"
+      @click.stop
+    >
+    <div class="flex-1 overflow-y-auto p-6 space-y-6 animate-fadeIn">
       <!-- Back Header -->
       <div class="pb-4 border-b border-white/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 select-none">
         <div class="flex items-center gap-4">
@@ -261,7 +298,7 @@
           
           <div>
             <h2 class="text-xl font-bold font-serif-sc tracking-wide flex items-center gap-2 text-zen-ink">
-              2026年{{ activeMonth }}月{{ activeDay }}日 · 日志详情工作台
+              {{ viewYear }}年{{ activeMonth }}月{{ activeDay }}日 · 日志详情工作台
               <span class="text-xs font-normal text-zen-gray font-sans bg-white/40 border border-white/50 px-2 py-0.5 rounded-lg select-none">
                 Consolidated CRM data flow
               </span>
@@ -289,6 +326,13 @@
                 class="p-4 rounded-2xl border border-white/60 bg-white/30 shadow-sm flex items-start justify-between gap-4"
               >
                 <div class="flex items-start gap-3">
+                  <input
+                    v-if="rec._scheduleTaskId"
+                    type="checkbox"
+                    class="mt-1 accent-[#627254]"
+                    :checked="rec._done"
+                    @change="toggleLog(rec, $event)"
+                  />
                   <span class="text-xl shrink-0 mt-0.5 select-none">{{ rec.icon }}</span>
                   <div>
                     <h5 class="font-bold text-xs text-zen-ink leading-tight flex items-center gap-2">
@@ -310,7 +354,7 @@
                   </div>
                 </div>
                 <button
-                  v-if="!rec._fromTimeline"
+                  v-if="!rec._fromTimeline && !rec._fromScheduleFile"
                   @click="deleteLogItem(rec)"
                   class="text-[10px] text-zen-crimson hover:underline select-none font-semibold shrink-0"
                 >
@@ -404,11 +448,14 @@
         </div>
       </div>
     </div>
+    </div>
+    </div>
+    </teleport>
 
     <!-- 5. AI Annual Summary Report Modal (年度报告显示器) -->
     <div
       v-if="isReportModalOpen"
-      class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm select-text transition-all duration-300"
+      class="fixed inset-0 z-[220] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm select-text transition-all duration-300"
       @click.self="isReportModalOpen = false"
     >
       <div class="apple-glass rounded-2xl w-full max-w-3xl shadow-2xl border border-white/50 relative overflow-hidden flex flex-col max-h-[85vh]">
@@ -472,6 +519,8 @@
 
 <script setup>
 import { ref, watch, onMounted, computed } from 'vue';
+import { calendarEntries, isDayKey, shanghaiYMD } from '../../../app/assets/schedule-board.mjs';
+import { refreshSchedule, scheduleHomeTasks as readScheduleHomeTasks, scheduleState, toggleScheduleTask } from '../lib/scheduleClient.js';
 
 const props = defineProps({
   jumpToScheduleDate: {
@@ -528,24 +577,25 @@ const filters = [
   { id: 'system', name: '系统与 AI' }
 ];
 
-// 3. Mathematical Calendar Months Matrix Config for 2026
-const monthsConfig = [
-  { name: '1月 (January)', days: 31, offset: 4, monthNum: 1 },
-  { name: '2月 (February)', days: 28, offset: 0, monthNum: 2 },
-  { name: '3月 (March)', days: 31, offset: 0, monthNum: 3 },
-  { name: '4月 (April)', days: 30, offset: 3, monthNum: 4 },
-  { name: '5月 (May)', days: 31, offset: 5, monthNum: 5 },
-  { name: '6月 (June)', days: 30, offset: 1, monthNum: 6 },
-  { name: '7月 (July)', days: 31, offset: 3, monthNum: 7 },
-  { name: '8月 (August)', days: 31, offset: 6, monthNum: 8 },
-  { name: '9月 (September)', days: 30, offset: 2, monthNum: 9 },
-  { name: '10月 (October)', days: 31, offset: 4, monthNum: 10 },
-  { name: '11月 (November)', days: 30, offset: 0, monthNum: 11 },
-  { name: '12月 (December)', days: 31, offset: 2, monthNum: 12 }
-];
-
-const currentMonthConfig = computed(() => monthsConfig.find(month => month.monthNum === 6) || monthsConfig[0]);
-const otherMonthsConfig = computed(() => monthsConfig.filter(month => month.monthNum !== currentMonthConfig.value.monthNum));
+const viewYear = computed(() => Number(shanghaiYMD(new Date()).slice(0, 4)));
+const monthConfig = (monthNum) => {
+  const year = viewYear.value;
+  const first = new Date(Date.UTC(year, monthNum - 1, 1));
+  return {
+    name: `${monthNum}月`,
+    days: new Date(Date.UTC(year, monthNum, 0)).getUTCDate(),
+    offset: first.getUTCDay(),
+    monthNum,
+    year,
+  };
+};
+const currentMonthConfig = computed(() => monthConfig(Number(shanghaiYMD(new Date()).slice(5, 7))));
+const otherMonthsConfig = computed(() => {
+  const cur = currentMonthConfig.value.monthNum;
+  return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].filter((m) => m !== cur).map(monthConfig);
+});
+const scheduleHomeTasks = computed(() => readScheduleHomeTasks());
+const scheduleError = computed(() => scheduleState.error);
 
 // 4. Annual Schedules Database (January to December 2026)
 // Structure: annualSchedules[monthNum][dayNum] = [ { type, icon, title, desc } ]
@@ -704,6 +754,27 @@ const mergedSchedules = computed(() => {
     });
   });
 
+  const year = String(viewYear.value);
+  for (const doc of Object.values(scheduleState.byDate || {})) {
+    if (!doc || !isDayKey(doc.date) || !doc.date.startsWith(year + '-')) continue;
+    const month = Number(doc.date.slice(5, 7));
+    const day = Number(doc.date.slice(8, 10));
+    if (!merged[month]) merged[month] = {};
+    if (!merged[month][day]) merged[month][day] = [];
+    for (const entry of calendarEntries(doc)) {
+      merged[month][day].push({
+        icon: entry.icon,
+        type: 'task',
+        title: entry.title,
+        desc: [entry.owner, entry.note, entry.status].filter(Boolean).join(' · '),
+        _fromScheduleFile: true,
+        _scheduleDate: entry.kind === 'task' ? entry.date : '',
+        _scheduleTaskId: entry.kind === 'task' ? entry.id : '',
+        _done: !!entry.done,
+      });
+    }
+  }
+
   return merged;
 });
 
@@ -827,7 +898,15 @@ watch(() => props.jumpToScheduleDate, (newVal) => {
   }
 }, { immediate: true });
 
+const toggleFileTask = (item, ev) => {
+  toggleScheduleTask(item.date, item.id, ev.target.checked);
+};
+const toggleLog = (rec, ev) => {
+  toggleScheduleTask(rec._scheduleDate, rec._scheduleTaskId, ev.target.checked);
+};
+
 onMounted(() => {
+  refreshSchedule();
   if (props.jumpToScheduleDate && props.jumpToScheduleDate.day) {
     openDayDetails(props.jumpToScheduleDate.month, props.jumpToScheduleDate.day);
     emit('clear-jump-schedule');

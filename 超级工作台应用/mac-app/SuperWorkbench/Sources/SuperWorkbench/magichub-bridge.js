@@ -43,6 +43,10 @@
     importAssetsCsv: (csv) => invoke('import-assets-csv', [csv])
   };
   document.documentElement.setAttribute('data-sw-host', 'mac');
+  if (window.electronAPI) {
+    window.electronAPI.listScheduleDocs = () => invoke('list-schedule-docs', []);
+    window.electronAPI.setScheduleTaskStatus = (date, taskId, done) => invoke('set-schedule-task-status', [date, taskId, !!done]);
+  }
   // Always embed when hosted by SuperWorkbench Mac WKWebView
   try {
     const q = new URLSearchParams(location.search || '');

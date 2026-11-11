@@ -413,6 +413,41 @@ rm -rf "${tempExtractDir}"
 });
 
 
+function scheduleDirs() {
+  const fs = require('fs');
+  const candidates = [
+    path.join(__dirname, '../../data/schedule'),
+    path.join(process.cwd(), '超级工作台应用/data/schedule'),
+  ];
+  return candidates.find((p) => fs.existsSync(p)) || candidates[0];
+}
+
+async function scheduleFsApi() {
+  const { pathToFileURL } = require('url');
+  return import(pathToFileURL(path.join(__dirname, '../../app/assets/schedule-board-fs.mjs')).href);
+}
+
+ipcMain.handle('list-schedule-docs', async () => {
+  try {
+    const api = await scheduleFsApi();
+    return { success: true, docs: api.listDayDocs(scheduleDirs()) };
+  } catch (e) {
+    return { success: false, error: e.message, docs: [] };
+  }
+});
+
+ipcMain.handle('set-schedule-task-status', async (_event, date, taskId, done) => {
+  try {
+    const api = await scheduleFsApi();
+    const dir = scheduleDirs();
+    const mirror = path.join(__dirname, '../../app/data/schedule');
+    const doc = api.setTaskStatusOnDisk(dir, date, taskId, !!done, new Date(), mirror);
+    return { success: true, doc };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});
+
 // ── Seed data: auto-import on first launch ──────────────────────────────────
 // If magichub_leads.json doesn't exist in userData (fresh install),
 // copy the bundled leads_seed.json into userData so all 19,000+ customers

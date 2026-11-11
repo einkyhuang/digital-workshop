@@ -79,6 +79,10 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
 
     private func dispatch(method: String, args: [Any]) -> (Bool, Any?, String?) {
         switch method {
+        case "list-schedule-docs":
+            return scheduleListDocs()
+        case "set-schedule-task-status":
+            return scheduleSetStatus(args: args)
         case "get-secure-mode":
             return (true, ["secure": secureMode], nil)
         case "open-path":
