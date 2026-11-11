@@ -31,6 +31,8 @@
     saveSettings: (key, data) => invoke('save-settings', [key, data]),
     loadSettings: (key) => invoke('load-settings', [key]),
     readFile: (path) => invoke('read-file', [path]),
+    listCustomerArchives: () => invoke('list-customer-archives', []),
+    listKnowledgeFiles: () => invoke('list-knowledge-files', []),
     writeFile: (path, content) => invoke('write-file', [path, content]),
     selectLocalZipAndUpdate: () => invoke('select-local-zip-and-update', []),
     openGlobalSettings: () => invoke('open-global-settings', [])
