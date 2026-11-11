@@ -222,7 +222,7 @@
                 </div>
 
                 <!-- Popover list -->
-                <div v-if="daySchedules[day]" class="space-y-1.5 max-h-[120px] overflow-y-auto scrollbar-elegant pr-0.5">
+                <div v-if="daySchedules[day]" class="space-y-1.5 max-h-[40vh] overflow-y-auto scrollbar-elegant pr-0.5">
                   <div
                     v-for="(rec, idx) in daySchedules[day]"
                     :key="idx"
@@ -240,13 +240,40 @@
                 </div>
 
                 <div class="text-[8px] text-center text-zen-tea font-semibold border-t border-black/5 pt-1.5 mt-1.5 select-none">
-                  点击查看日程总览大图 ➡️
+                  点击查看当天全部日程
                 </div>
 
                 <!-- Arrow down indicator -->
                 <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-white/95"></div>
               </div>
             </div>
+          </div>
+
+          <div class="mt-4 border-t border-white/30 pt-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-semibold text-zen-ink">今日与即将到来</span>
+              <span class="text-[9px] text-zen-gray font-mono">data/schedule</span>
+            </div>
+            <p v-if="scheduleError" class="text-[10px] text-zen-crimson mb-2">{{ scheduleError }}</p>
+            <div v-if="upcomingTasks.length" class="space-y-1.5 max-h-[220px] overflow-y-auto scrollbar-elegant pr-1">
+              <label
+                v-for="item in upcomingTasks"
+                :key="item.date + '-' + item.id"
+                class="flex items-start gap-2 rounded-lg border border-white/50 bg-white/50 px-2 py-1.5 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  class="mt-0.5 accent-[#627254]"
+                  :checked="item.status === '完成'"
+                  @change="onToggleTask(item, $event)"
+                />
+                <span class="min-w-0">
+                  <span class="block text-[11px] font-semibold text-zen-ink leading-snug" :class="item.status === '完成' ? 'line-through text-zen-gray' : ''">{{ item.title }}</span>
+                  <span class="block text-[9px] text-zen-gray">{{ item.date.slice(5) }}<template v-if="item.ownerName"> · {{ item.ownerName }}</template> · {{ item.status }}</span>
+                </span>
+              </label>
+            </div>
+            <p v-else class="text-[10px] text-zen-gray/60">这段时间的日程文件里没有待办。</p>
           </div>
         </div>
       </div>
@@ -408,11 +435,77 @@
       </div>
       <p class="text-[9px] text-zen-gray mt-2">本地加密底仓已就绪：当前共存储 {{ customerCount }} 条客户档案、{{ contractCount }} 份合同、{{ timelineLogs.length }} 条跟进记录，全部完成增量加密备份。</p>
     </div>
+
+    <teleport to="body">
+      <div
+        v-if="openDay"
+        class="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-[3vh] backdrop-blur-sm"
+        @click.self="openDay = null"
+      >
+        <div
+          class="flex flex-col overflow-hidden rounded-3xl bg-[#f7f5f0] shadow-2xl border border-white/70"
+          style="width: min(80vw, 1200px); height: min(80vh, 920px);"
+          role="dialog"
+          aria-modal="true"
+          @click.stop
+        >
+          <header class="flex items-center justify-between gap-3 border-b border-black/5 px-6 py-4 bg-white/70">
+            <div>
+              <h3 class="text-lg font-semibold text-zen-ink font-serif-sc">{{ modalYmd }} · 当天日程</h3>
+              <p class="text-[11px] text-zen-gray mt-1">勾选会写回 data/schedule 里这一天的 JSON，只改这一条的状态。</p>
+            </div>
+            <button type="button" class="w-8 h-8 rounded-full hover:bg-black/5 text-zen-gray" @click="openDay = null" aria-label="关闭">×</button>
+          </header>
+          <div class="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+            <p v-if="scheduleError" class="text-xs text-zen-crimson">{{ scheduleError }}</p>
+            <label
+              v-for="item in modalSchedule"
+              :key="(item.kind || 'x') + '-' + item.id + '-' + item.title"
+              class="flex items-start gap-3 rounded-2xl border border-black/5 bg-white px-4 py-3"
+              :class="item.kind === 'task' ? 'cursor-pointer' : ''"
+            >
+              <input
+                v-if="item.kind === 'task'"
+                type="checkbox"
+                class="mt-1 accent-[#627254]"
+                :checked="item.done"
+                @change="onToggleEntry(item, $event)"
+              />
+              <span v-else class="mt-0.5 text-base">{{ item.icon }}</span>
+              <span class="min-w-0">
+                <span class="block text-sm font-semibold text-zen-ink" :class="item.done ? 'line-through text-zen-gray' : ''">{{ item.icon }} {{ item.title }}</span>
+                <span class="block text-xs text-zen-gray mt-1 leading-relaxed">
+                  {{ [item.owner, item.dueAt, item.status, item.note].filter(Boolean).join(' · ') }}
+                </span>
+              </span>
+            </label>
+            <div
+              v-for="(rec, idx) in modalOther"
+              :key="'other-' + idx"
+              class="flex items-start gap-3 rounded-2xl border border-black/5 bg-white/70 px-4 py-3"
+            >
+              <span class="text-base">{{ rec.icon }}</span>
+              <span>
+                <span class="block text-sm font-semibold text-zen-ink">{{ rec.title }}</span>
+                <span class="block text-xs text-zen-gray mt-1">{{ rec.desc }}</span>
+              </span>
+            </div>
+            <p v-if="!modalSchedule.length && !modalOther.length" class="text-sm text-zen-gray/60 py-8 text-center">这一天还没有日程。</p>
+          </div>
+          <footer class="flex justify-end gap-2 border-t border-black/5 px-6 py-3 bg-white/70">
+            <button type="button" class="px-3 py-1.5 text-xs rounded-lg border border-black/10" @click="openDay = null">关闭</button>
+            <button type="button" class="px-3 py-1.5 text-xs rounded-lg bg-zen-ink text-white" @click="openInSchedule">在日程管理中打开</button>
+          </footer>
+        </div>
+      </div>
+    </teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { calendarEntries, shanghaiYMD } from '../../../app/assets/schedule-board.mjs';
+import { refreshSchedule, scheduleEntries, scheduleHomeTasks, scheduleState, toggleScheduleTask } from '../lib/scheduleClient.js';
 
 const emit = defineEmits(['go-to-tab']);
 
@@ -482,9 +575,9 @@ const avgMarginRatio = computed(() => {
 const totalProfit = computed(() => totalRevenue.value * avgMarginRatio.value);
 
 // ── Calendar (fully dynamic from real dates) ────────────────────────────────
-const now = new Date();
-const displayYear = ref(now.getFullYear());
-const displayMonth = ref(now.getMonth() + 1); // 1-12
+const shanghaiToday = shanghaiYMD(new Date());
+const displayYear = ref(Number(shanghaiToday.slice(0, 4)));
+const displayMonth = ref(Number(shanghaiToday.slice(5, 7)));
 const monthLabel = computed(() => `${displayYear.value}年${displayMonth.value}月`);
 const leadingBlanks = computed(() => new Date(displayYear.value, displayMonth.value - 1, 1).getDay());
 const daysInMonth = computed(() => new Date(displayYear.value, displayMonth.value, 0).getDate());
@@ -516,16 +609,62 @@ const daySchedules = computed(() => {
       desc: `${c.product || ''} ${c.value || ''}`.trim()
     });
   });
+  Object.values(scheduleState.byDate || {}).forEach(doc => {
+    const d = parseLogToDate(doc && doc.date);
+    if (!d || d.year !== displayYear.value || d.month !== displayMonth.value) return;
+    calendarEntries(doc).forEach(item => {
+      push(d.day, {
+        icon: item.icon,
+        type: 'schedule',
+        title: item.title,
+        desc: [item.owner, item.status, item.note].filter(Boolean).join(' · ')
+      });
+    });
+  });
   return map;
 });
 
-const selectedDay = ref(now.getDate());
+const selectedDay = ref(Number(shanghaiToday.slice(8, 10)));
 const hoveredDay = ref(null);
+
+const openDay = ref(null);
+const modalYmd = computed(() => {
+  if (!openDay.value) return '';
+  const m = String(displayMonth.value).padStart(2, '0');
+  const d = String(openDay.value).padStart(2, '0');
+  return `${displayYear.value}-${m}-${d}`;
+});
+const modalSchedule = computed(() => scheduleEntries(modalYmd.value));
+const modalOther = computed(() => (daySchedules.value[openDay.value] || []).filter(rec => rec.type !== 'schedule'));
+const upcomingTasks = computed(() => scheduleHomeTasks());
+const scheduleError = computed(() => scheduleState.error);
 
 const goToScheduleDay = (day) => {
   selectedDay.value = day;
+  openDay.value = day;
+};
+
+const openInSchedule = () => {
+  const day = openDay.value;
+  openDay.value = null;
   emit('go-to-tab', 'schedule', { selectedDay: day, selectedMonth: displayMonth.value });
 };
+
+const onToggleTask = (item, ev) => {
+  toggleScheduleTask(item.date, item.id, ev.target.checked);
+};
+const onToggleEntry = (item, ev) => {
+  toggleScheduleTask(item.date, item.id, ev.target.checked);
+};
+
+let scheduleTimer = null;
+onMounted(() => {
+  refreshSchedule();
+  scheduleTimer = setInterval(() => { refreshSchedule(); }, 12000);
+});
+onUnmounted(() => {
+  if (scheduleTimer) clearInterval(scheduleTimer);
+});
 
 const getDayClass = (day) => {
   if (selectedDay.value === day) {

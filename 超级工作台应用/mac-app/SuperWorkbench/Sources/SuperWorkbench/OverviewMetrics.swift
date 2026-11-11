@@ -110,6 +110,9 @@ enum OverviewMetrics {
         var priority: String?
         var dueDate: String?
         var source: String
+        var scheduleDate: String? = nil
+        var scheduleTaskId: String? = nil
+        var ownerLabel: String? = nil
     }
 
     static func currency(_ v: Double) -> String {

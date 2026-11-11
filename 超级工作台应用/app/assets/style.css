@@ -511,6 +511,7 @@ th { color: var(--muted); font-weight: 600; }
   background: var(--sw-page-bg,#F6F7F8); border: 1px solid var(--sw-border-soft,rgba(0,0,0,.06));
   border-radius: 14px; padding: 12px; min-height: 200px;
 }
+.kanban-col__body { max-height: 320px; overflow: auto; }
 .kanban-col__head { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; font-size: 12px; font-weight: 600; }
 .kanban-col__head .n { color: var(--sw-text-muted,#8A8A8E); font-weight: 500; font-size: 11px; }
 .kdot { width: 8px; height: 8px; border-radius: 50%; }
@@ -645,6 +646,10 @@ th { color: var(--muted); font-weight: 600; }
 .cal-cell__meta{display:flex;flex-direction:column;gap:3px;font-size:10px}
 .cal-tag{display:inline-block;padding:1px 6px;border-radius:999px;background:#F1F5F9}
 .cal-tag--task{background:#DBEAFE;color:#1D4ED8}
+.cal-modal-back{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:4vh 4vw}
+.cal-modal{width:min(80vw,1200px);height:min(80vh,920px);overflow:auto;background:#fff;border-radius:20px;padding:24px 28px;box-shadow:0 24px 80px rgba(0,0,0,.28)}
+.sched-row{display:flex;gap:10px;align-items:flex-start}
+.sched-row input{margin-top:3px;flex:none}
 .cal-detail{margin-top:20px}
 .cal-detail-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:16px}
 .cal-item{padding:8px 0;border-bottom:1px solid rgba(0,0,0,.05)}

@@ -49,6 +49,10 @@ final class WorkspaceStore: ObservableObject {
     @Published var selectedFeedDates: [String: String] = [:]
     @Published var feedLoading: Bool = false
     private let feedWatcher = FeedWatcher()
+    private let scheduleWatcher = FeedWatcher()
+    private var scheduleWatchStarted = false
+    private var scheduleLoadGen = 0
+    private var ignoreScheduleWatchUntil = Date.distantPast
 
 
     @Published private(set) var botById: [String: Bot] = [:]
@@ -180,6 +184,8 @@ final class WorkspaceStore: ObservableObject {
         if decoded.bots.contains(where: { $0.id.hasPrefix("stress-bot") }) {
             syncMessage = "压测夹具：\(decoded.bots.count) 员工 · \((decoded.websiteProjects ?? []).count) 网站项目（本地 /tmp，未入库）"
         }
+        refreshScheduleFiles()
+        startScheduleWatchIfNeeded()
     }
 
     func rebuildIndexes() {
@@ -407,25 +413,70 @@ final class WorkspaceStore: ObservableObject {
         smartPlanTasks = remote
     }
 
-    /// Merged read-only board: workspace tasks + SmartPlan (dedupe by title+status soft)
+    /// Workspace tasks + SmartPlan + today/upcoming rows from data/schedule.
     func overviewBoardTasks() -> [OverviewMetrics.SmartPlanTask] {
         var out: [OverviewMetrics.SmartPlanTask] = []
         var seen = Set<String>()
-        for t in data.tasks {
-            let key = t.id
+        let today = ScheduleFileStore.shanghaiYMD(Date())
+        for t in ScheduleFileStore.homeBoardEntries(docs: scheduleByDate, today: today) {
+            let key = "sched:" + t.date + ":" + t.id
+            if seen.contains(key) { continue }
             seen.insert(key)
+            out.append(.init(
+                id: key,
+                title: t.title,
+                status: t.status,
+                priority: nil,
+                dueDate: t.date,
+                source: "schedule",
+                scheduleDate: t.date,
+                scheduleTaskId: t.id,
+                ownerLabel: t.owner.isEmpty ? nil : t.owner
+            ))
+        }
+        for t in data.tasks {
+            if seen.contains(t.id) { continue }
+            seen.insert(t.id)
             out.append(.init(id: t.id, title: t.title, status: t.status, priority: nil, dueDate: nil, source: "workspace"))
         }
         for t in smartPlanTasks {
-            let soft = t.title + "|" + t.status
             if seen.contains(t.id) { continue }
-            // skip near-dup titles already in workspace
-            if out.contains(where: { $0.title == t.title }) { continue }
+            if out.contains(where: { $0.title == t.title && $0.source != "schedule" }) { continue }
             seen.insert(t.id)
-            _ = soft
             out.append(t)
         }
         return out
+    }
+
+    func toggleScheduleTask(date: String, taskId: String, done: Bool) {
+        guard ScheduleFileStore.isDayKey(date) else { return }
+        ignoreScheduleWatchUntil = Date().addingTimeInterval(1.5)
+        if var doc = scheduleByDate[date], var tasks = doc.tasks,
+           let idx = tasks.firstIndex(where: { $0.id == taskId }) {
+            tasks[idx].status = done ? "完成" : "待办"
+            doc.tasks = tasks
+            doc.updatedAt = ScheduleFileStore.shanghaiStamp(Date())
+            scheduleByDate[date] = doc
+        }
+        let dir = scheduleDirURL
+        let mirror = repoRoot.appendingPathComponent("超级工作台应用/app/data/schedule")
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            do {
+                _ = try ScheduleFileStore.setTaskDone(
+                    directory: dir,
+                    date: date,
+                    taskId: taskId,
+                    done: done,
+                    mirrorDirectory: mirror
+                )
+                DispatchQueue.main.async { self?.refreshScheduleFiles() }
+            } catch {
+                DispatchQueue.main.async {
+                    self?.syncMessage = "日程写回失败：\(error.localizedDescription)"
+                    self?.refreshScheduleFiles()
+                }
+            }
+        }
     }
 
     func websiteKPI() -> OverviewMetrics.KPI {
@@ -1037,30 +1088,24 @@ final class WorkspaceStore: ObservableObject {
 
     func loadScheduleMonth(around date: Date = Date()) {
         calendarMonth = date
-        let prefix = Self.monthPrefix(date)
+        refreshScheduleFiles()
+    }
+
+    /// Scan every YYYY-MM-DD.json. A new day file shows up without a code change.
+    func refreshScheduleFiles() {
         let dir = scheduleDirURL
+        let emailDir = emailDailyDirURL
+        let reportDir = dailyReportDirURL
+        scheduleLoadGen += 1
+        let gen = scheduleLoadGen
         isScheduleLoading = true
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self else { return }
-            var map: [String: ScheduleDayDoc] = [:]
-            if let files = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) {
-                for u in files where u.pathExtension == "json" {
-                    let name = u.deletingPathExtension().lastPathComponent
-                    guard name.hasPrefix(prefix), name.count == 10 else { continue }
-                    if let raw = try? Data(contentsOf: u),
-                       let doc = try? JSONDecoder().decode(ScheduleDayDoc.self, from: raw) {
-                        map[doc.date] = doc
-                    }
-                }
-            }
-            // Also fold workspace tasks without due into "today" markers lightly — skip
-            // Enrich meta flags from email-daily filenames + daily report filenames
-            let emailDir = self.emailDailyDirURL
-            let reportDir = self.dailyReportDirURL
+            var map = ScheduleFileStore.loadDayDocs(directory: dir)
             if let emails = try? FileManager.default.contentsOfDirectory(at: emailDir, includingPropertiesForKeys: nil) {
                 for u in emails where u.pathExtension == "json" {
                     let d = u.deletingPathExtension().lastPathComponent
-                    guard d.hasPrefix(prefix) else { continue }
+                    guard ScheduleFileStore.isDayKey(d) else { continue }
                     var doc = map[d] ?? ScheduleDayDoc(version: 1, date: d, timezone: "Asia/Shanghai", updatedAt: nil, tasks: [], schedule: [], meta: .init(hasEmailSummary: true, hasDailyReport: false, emailSource: nil, dailyReportSource: nil))
                     var meta = doc.meta ?? ScheduleDayMeta(hasEmailSummary: true, hasDailyReport: false, emailSource: nil, dailyReportSource: nil)
                     meta.hasEmailSummary = true
@@ -1071,7 +1116,7 @@ final class WorkspaceStore: ObservableObject {
             if let reps = try? FileManager.default.contentsOfDirectory(at: reportDir, includingPropertiesForKeys: nil) {
                 for u in reps where u.lastPathComponent.hasPrefix("日报-") && u.pathExtension == "md" {
                     let d = u.deletingPathExtension().lastPathComponent.replacingOccurrences(of: "日报-", with: "")
-                    guard d.hasPrefix(prefix) else { continue }
+                    guard ScheduleFileStore.isDayKey(d) else { continue }
                     var doc = map[d] ?? ScheduleDayDoc(version: 1, date: d, timezone: "Asia/Shanghai", updatedAt: nil, tasks: [], schedule: [], meta: .init(hasEmailSummary: false, hasDailyReport: true, emailSource: nil, dailyReportSource: nil))
                     var meta = doc.meta ?? ScheduleDayMeta(hasEmailSummary: false, hasDailyReport: true, emailSource: nil, dailyReportSource: nil)
                     meta.hasDailyReport = true
@@ -1080,10 +1125,25 @@ final class WorkspaceStore: ObservableObject {
                 }
             }
             DispatchQueue.main.async {
+                guard gen == self.scheduleLoadGen else { return }
                 self.scheduleByDate = map
                 self.isScheduleLoading = false
             }
         }
+    }
+
+    private func startScheduleWatchIfNeeded() {
+        guard !scheduleWatchStarted else { return }
+        scheduleWatchStarted = true
+        let dir = scheduleDirURL
+        scheduleWatcher.onChange = { [weak self] _ in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if Date() < self.ignoreScheduleWatchUntil { return }
+                self.refreshScheduleFiles()
+            }
+        }
+        scheduleWatcher.watch(feedId: "schedule", directory: dir)
     }
 
     func scheduleDay(for ymd: String) -> ScheduleDayDoc? { scheduleByDate[ymd] }

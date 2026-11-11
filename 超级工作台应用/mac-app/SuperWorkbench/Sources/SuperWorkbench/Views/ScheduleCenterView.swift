@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 /// 「任务与日程中心」— month calendar + day detail sheet（样式对齐网站项目详情弹层）
 struct ScheduleCenterView: View {
@@ -192,7 +193,7 @@ struct ScheduleCenterView: View {
             Label("邮件总结", systemImage: "envelope.fill").font(.caption).foregroundStyle(.secondary)
             Label("纪纪日报", systemImage: "doc.text.fill").font(.caption).foregroundStyle(.secondary)
             Spacer()
-            Text("仅加载当月 · data/schedule/")
+            Text("扫描 data/schedule/ · 勾选写回当日文件")
                 .font(.caption2)
                 .foregroundStyle(SWTheme.textMuted)
         }
@@ -275,7 +276,13 @@ struct ScheduleDayDetailSheet: View {
             }
             .background(SWTheme.pageBg)
         }
-        .frame(minWidth: 640, idealWidth: 720, minHeight: 520, idealHeight: 640)
+        .frame(width: daySheetSize.width, height: daySheetSize.height)
+    }
+
+    /// About 78% of the visible screen, so a full day list can be read without a tiny sheet.
+    private var daySheetSize: CGSize {
+        let screen = NSScreen.main?.visibleFrame.size ?? CGSize(width: 1280, height: 800)
+        return CGSize(width: max(760, screen.width * 0.78), height: max(560, screen.height * 0.78))
     }
 
     private var tasksCard: some View {
@@ -286,9 +293,20 @@ struct ScheduleDayDetailSheet: View {
             } else {
                 ForEach(items) { t in
                     HStack(alignment: .top, spacing: 10) {
+                        Button {
+                            store.toggleScheduleTask(date: ymd, taskId: t.id, done: (t.status ?? "") != "完成")
+                        } label: {
+                            Image(systemName: (t.status ?? "") == "完成" ? "checkmark.circle.fill" : "circle")
+                                .font(.body)
+                                .foregroundStyle((t.status ?? "") == "完成" ? Color(red: 0.15, green: 0.65, blue: 0.45) : SWTheme.textMuted)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel((t.status ?? "") == "完成" ? "改回待办" : "标为完成")
                         statusPill(t.status ?? "待办")
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(t.title).font(.subheadline.weight(.semibold))
+                            Text(t.title)
+                                .font(.subheadline.weight(.semibold))
+                                .strikethrough((t.status ?? "") == "完成", color: .secondary)
                             HStack(spacing: 8) {
                                 if let o = t.ownerName ?? t.ownerBotId {
                                     Text(o).font(.caption).foregroundStyle(.secondary)
