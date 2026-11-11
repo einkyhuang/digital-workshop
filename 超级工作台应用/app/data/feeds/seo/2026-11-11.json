@@ -3,22 +3,24 @@
   "feedId": "seo",
   "date": "2026-11-11",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-11T09:22:16+08:00",
+  "updatedAt": "2026-11-11T09:45:55+08:00",
   "botId": "seo",
   "botName": "搜搜-SEO专家",
-  "summary": "Formore Lighting：今日简报 Human Centric Lighting: A B2B Buyer's Guide（slug human-centric-lighting-guide）已发给墨墨和画眉；昨日 led-flood-light-manufacturer-guide 抽检 200，schema 齐全；日检 warn（无 PSI key），无新严重问题。",
+  "summary": "Formore Lighting：今日发布 Human Centric Lighting: A B2B Buyer's Guide（线上 200，canonical 与 prerender 正常，Article + FAQPage(5) + BreadcrumbList，列表与 sitemap 已收录；2 张配图 200，desk-zone 图因显示器厂商标识未用；ISO/CIE 8995-1 使用 CIE 2025 页面；category Technical；CTA 标题正确，正文仍为模板默认路灯文案）；日检 warn（无 PSI key），无新严重问题。昨日 led-flood-light-manufacturer-guide 抽检 200，schema 齐全。",
   "articles": [
     {
       "id": "human-centric-lighting-guide",
       "title": "Human Centric Lighting: A B2B Buyer's Guide",
       "url": "https://www.formorelightings.com/insights/human-centric-lighting-guide",
-      "status": "brief",
+      "status": "published",
       "primaryKeyword": "human centric lighting",
       "secondaryKeywords": [
         "office lighting design",
         "cri 90 led"
       ],
-      "notes": "简报路径：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-11-human-centric-lighting.md。29 条内链 curl 200。目标 slug 尚未上线（预期）。已发墨墨写英文稿、画眉出 3 张 WebP。今日不发布。"
+      "notes": "简报路径：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-11-human-centric-lighting.md。发布前上午记录（非当前状态）：计划地址当时尚未上线，稿与配图审稿中。当前已上线：文章 HTTP 200，canonical 正确，prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap 已收录；2 张配图 HTTP 200（human-centric-lighting-open-office-linear.webp、human-centric-lighting-meeting-room-panels.webp）；desk-zone 图因显示器厂商标识未发布；ISO/CIE 8995-1 使用 CIE 2025 页面；category Technical；CTA 标题 Ready to Specify Your Project? 正确，正文为模板注入的路灯默认文案（road class, sun hours, pole height, and target autonomy），与成稿 CTA 不一致。site PR #5 squash 3c873b7fd22fbcc91831ecf7f63e8e5f7a347c93",
+      "publishedAt": "2026-11-11T09:45:55+08:00",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/human-centric-lighting-open-office-linear.webp"
     },
     {
       "id": "led-flood-light-manufacturer-guide",
@@ -54,22 +56,16 @@
   ],
   "images": [
     {
-      "url": "",
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/human-centric-lighting-open-office-linear.webp",
       "alt": "Open-plan office lit by suspended linear LED bars and daylight from large windows, with empty desks and no people or text visible.",
       "ofArticleId": "human-centric-lighting-guide",
-      "notes": "requested hero: human-centric-lighting-open-office-linear.webp (1600x900); awaiting 画眉 delivery"
+      "notes": "hero: human-centric-lighting-open-office-linear.webp (1600x900); live HTTP 200 image/webp"
     },
     {
-      "url": "",
-      "alt": "Linear bar office suspended light over an empty desk zone, showing the fixture profile and even light on the work surface, with no people or text.",
-      "ofArticleId": "human-centric-lighting-guide",
-      "notes": "requested inline 1: office-linear-suspended-light-desk-zone.webp (1200x800); awaiting 画眉 delivery"
-    },
-    {
-      "url": "",
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/human-centric-lighting-meeting-room-panels.webp",
       "alt": "Empty meeting room lit by surface-mounted LED panel lights, with even light on the table and walls and no people or text visible.",
       "ofArticleId": "human-centric-lighting-guide",
-      "notes": "requested inline 2: human-centric-lighting-meeting-room-panels.webp (1200x800); awaiting 画眉 delivery"
+      "notes": "inline: human-centric-lighting-meeting-room-panels.webp (1200x800); live HTTP 200 image/webp"
     }
   ],
   "checks": [
@@ -95,19 +91,25 @@
       "id": "brief-links",
       "name": "简报内链核验",
       "status": "pass",
-      "detail": "human-centric-lighting 简报 29 条内链均 curl 200；目标 slug 尚未上线，符合预期"
+      "detail": "发布前上午日检（文章上线前，非当前线上状态）：human-centric-lighting 简报 29 条内链均 curl 200；当时目标 slug 尚未上线。当前文章已上线并校验通过。"
     },
     {
       "id": "sitemap",
       "name": "Sitemap 覆盖",
       "status": "pass",
-      "detail": "sitemap-insights.xml 共 26 篇，已含 led-flood-light-manufacturer-guide；human-centric-lighting-guide 尚未收录（预期）"
+      "detail": "发布前上午日检（文章上线前，非当前篇数）：sitemap-insights.xml 当时已含 led-flood-light-manufacturer-guide。当前线上 sitemap 已收录 human-centric-lighting-guide。"
     },
     {
       "id": "product-schema-spotcheck",
       "name": "Day13 产品页 Product/FAQPage 抽检",
       "status": "warn",
       "detail": "抽样 4 个产品页均已有 Product + Brand + BreadcrumbList，均缺 FAQPage；未改站点、未开 PR（需用户批准）"
+    },
+    {
+      "id": "live-validation",
+      "name": "今日 human-centric-lighting-guide 上线校验",
+      "status": "pass",
+      "detail": "文章与 2 张配图 HTTP 200（desk-zone 未发布）；canonical 正确；prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap 已收录。CTA 标题正确，正文为模板默认路灯文案（road class / sun hours / pole height / target autonomy），已记录为发现项。"
     }
   ],
   "issues": [
@@ -142,13 +144,13 @@
       "detail": "Day13 抽检：Product schema 已在，FAQPage 仍缺；批量补齐需用户批准，未开 PR"
     }
   ],
-  "tomorrow": "下一候选：office lighting design（P1，US vol 140，KD 6）。收到墨墨成稿与画眉 3 张 WebP 后审稿并走发布校验。",
+  "tomorrow": "下一候选：office lighting design（P1，US vol 140，KD 6）。CTA 模板默认路灯文案为已知问题，需单独改布局增强器（站点改动需预览与用户确认）。",
   "items": [
     {
-      "type": "brief",
+      "type": "publish",
       "title": "Human Centric Lighting: A B2B Buyer's Guide",
       "url": "https://www.formorelightings.com/insights/human-centric-lighting-guide",
-      "status": "brief_sent"
+      "status": "live"
     }
   ]
 }

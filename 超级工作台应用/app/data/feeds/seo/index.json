@@ -2,12 +2,12 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-11T01:22:16+00:00",
+  "updatedAt": "2026-11-11T01:45:55+00:00",
   "dates": [
     {
       "date": "2026-11-11",
       "file": "2026-11-11.json",
-      "summary": "Formore Lighting：今日简报 Human Centric Lighting: A B2B Buyer's Guide（slug human-centric-lighting-guide）已发给墨墨和画眉；昨日 led-flood-light-manufacturer-guide 抽检 200，schema 齐全；日检 warn（无 PSI key），无新严重问题。",
+      "summary": "Formore Lighting：今日发布 Human Centric Lighting: A B2B Buyer's Guide（线上 200，canonical 与 prerender 正常，Article + FAQPage(5) + BreadcrumbList，列表与 sitemap 已收录；2 张配图 200，desk-zone 图因显示器厂商标识未用；ISO/CIE 8995-1 使用 CIE 2025 页面；category Technical；CTA 标题正确，正文仍为模板默认路灯文案）；日检 warn（无 PSI key），无新严重问题。昨日 led-flood-light-manufacturer-guide 抽检 200，schema 齐全。",
       "articleCount": 2,
       "issueCount": 6
     },
