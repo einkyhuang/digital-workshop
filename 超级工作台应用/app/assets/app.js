@@ -1110,12 +1110,12 @@
       return `<div class="prio-item"><span class="pill ${pill}">${esc(st)} · ${w.progress || 0}%</span><span class="prio-name">${esc(w.name)}</span><span class="prio-pct">${w.progress || 0}%</span></div>`;
     }).join("") : `<p class="muted">暂无进行中项目</p>`;
 
-    const colMeta = [
-      ["待办", "kdot-todo"],
-      ["进行中", "kdot-doing"],
-      ["验收", "kdot-review"],
-      ["完成", "kdot-done"],
-    ];
+    const colMeta = {
+      "待办": "kdot-todo",
+      "进行中": "kdot-doing",
+      "验收": "kdot-review",
+      "完成": "kdot-done",
+    };
     const api = window.ScheduleBoard;
     const today = state.scheduleToday || (api && api.shanghaiYMD ? api.shanghaiYMD(new Date()) : "");
     const scheduleTasks = (api && today) ? api.homeBoardScheduleTasks(state.scheduleByDate || {}, today) : [];
@@ -1137,21 +1137,40 @@
       const st = t.status === "审核" ? "验收" : t.status;
       (colMap[st] || colMap["待办"]).push(t);
     }
-    const kanban = colMeta.map(([col, dot]) => {
+    const scheduleChip = (t) => {
+      const done = t.status === "完成";
+      const box = t.source === "schedule"
+        ? `<input type="checkbox" data-sched-toggle="1" data-sched-date="${esc(t.date)}" data-sched-id="${esc(t.id)}" ${done ? "checked" : ""}/>`
+        : "";
+      const meta = t.source === "schedule"
+        ? ("日程 · " + esc(String(t.date || "").slice(5)) + (t.ownerName ? " · " + esc(t.ownerName) : ""))
+        : "工作台";
+      return `<div class="task-chip sched-row">${box}<div><div class="task-chip__title"${done ? ' style="text-decoration:line-through"' : ""}>${esc(t.title)}</div><div class="task-chip__meta">${meta}</div></div></div>`;
+    };
+    const scheduleColumn = (col, capWorkspace) => {
       const all = colMap[col] || [];
-      const shown = all.filter(t => t.source === "schedule").concat(all.filter(t => t.source !== "schedule").slice(0, 8));
-      const items = shown.map(t => {
-        const done = t.status === "完成";
-        const box = t.source === "schedule"
-          ? `<input type="checkbox" data-sched-toggle="1" data-sched-date="${esc(t.date)}" data-sched-id="${esc(t.id)}" ${done ? "checked" : ""}/>`
-          : "";
-        const meta = t.source === "schedule"
-          ? ("日程 · " + esc(String(t.date || "").slice(5)) + (t.ownerName ? " · " + esc(t.ownerName) : ""))
-          : "工作台";
-        return `<div class="task-chip sched-row">${box}<div><div class="task-chip__title"${done ? ' style="text-decoration:line-through"' : ""}>${esc(t.title)}</div><div class="task-chip__meta">${meta}</div></div></div>`;
-      }).join("") || `<div class="muted" style="font-size:12px;padding:8px">—</div>`;
+      const shown = capWorkspace
+        ? all.filter(t => t.source === "schedule").concat(all.filter(t => t.source !== "schedule").slice(0, 8))
+        : all;
+      const items = shown.map(scheduleChip).join("") || `<div class="muted" style="font-size:12px;padding:8px">—</div>`;
+      const dot = colMeta[col] || "kdot-todo";
       return `<div class="kanban-col"><div class="kanban-col__head"><span class="kdot ${dot}"></span>${esc(col)} <span class="n">${all.length}</span></div><div class="kanban-col__body">${items}</div></div>`;
-    }).join("");
+    };
+    const kanban = `
+      <div class="schedule-board">
+        <section class="schedule-module schedule-module--todo">
+          <div class="kanban-col__head"><span class="kdot kdot-todo"></span>待办 <span class="n">${(colMap["待办"] || []).length}</span></div>
+          <div class="schedule-todo__grid">${((colMap["待办"] || []).map(scheduleChip).join("")) || '<div class="muted" style="font-size:12px;padding:8px">—</div>'}</div>
+        </section>
+        <section class="schedule-module schedule-module--rest">
+          <h4 class="schedule-module__label">进行中 · 验收 · 完成</h4>
+          <div class="schedule-rest">
+            ${scheduleColumn("进行中", true)}
+            ${scheduleColumn("验收", true)}
+            ${scheduleColumn("完成", true)}
+          </div>
+        </section>
+      </div>`;
 
     let emailHtml = "";
     if (!state.emailDaily.length) {
@@ -1234,7 +1253,7 @@
       <section class="section-shell">
         <div class="section-shell__head"><h3 class="section-shell__title">日程管理 · 任务看板</h3><span class="section-shell__badge">${boardTasks.length}</span></div>
         <div class="section-shell__meta">今日与即将到来 · data/schedule 可勾选 · 另含工作台任务</div>
-        <div class="kanban-row">${kanban}</div>
+        ${kanban}
       </section>
       <section class="section-shell">
         <div class="section-shell__head"><h3 class="section-shell__title">邮件看板</h3><span class="section-shell__badge">${state.emailDaily.length}</span></div>
@@ -1432,22 +1451,39 @@ function renderKanban() {
     const tasks = scopedTasks();
     const edit = selectedTask();
     const names = botNames();
-    const cols = COLS.map((c) => {
-      const items = tasks.filter((t) => t.status === c).map((t) =>
-        `<div class="task ${edit && t.id === edit.id ? "selected" : ""}" data-task="${esc(t.id)}" draggable="true">
-          <div class="t">${esc(t.title)}</div>
-          <div class="m">执行：${esc(t.executor)} · 验收：${esc(t.reviewer)}</div>
-          <div class="m">${esc(t.note)}</div>
-        </div>`
-      ).join("");
-      return `<div class="col" data-col="${esc(c)}"><h3>${c}（${tasks.filter((t)=>t.status===c).length}）</h3>${items || '<p class="muted">拖入卡片</p>'}</div>`;
-    }).join("");
+    const cardsFor = (c) => tasks.filter((t) => t.status === c).map((t) =>
+      `<div class="task ${edit && t.id === edit.id ? "selected" : ""}" data-task="${esc(t.id)}" draggable="true">
+        <div class="t">${esc(t.title)}</div>
+        <div class="m">执行：${esc(t.executor)} · 验收：${esc(t.reviewer)}</div>
+        <div class="m">${esc(t.note)}</div>
+      </div>`
+    ).join("");
+    const colBox = (c) => {
+      const items = cardsFor(c);
+      const count = tasks.filter((t) => t.status === c).length;
+      return `<div class="col" data-col="${esc(c)}"><h3>${c}（${count}）</h3><div class="kanban-cards">${items || '<p class="muted">拖入卡片</p>'}</div></div>`;
+    };
     const optBots = names.map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join("");
     const optReview = names.concat(["用户"]).map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join("");
     return `
       <h2 class="section-title">任务看板</h2>
       <p class="muted">拖拽卡片到任意列改状态（localStorage；Pages 不能写仓库文件）。亦可 ←/→。</p>
-      <div class="kanban">${cols}</div>
+      <div class="kanban">
+        <section class="kanban-module kanban-module--todo">
+          <div class="col" data-col="待办">
+            <h3 class="kanban-module__title">待办（${tasks.filter((t) => t.status === "待办").length}）</h3>
+            <div class="kanban-cards">${cardsFor("待办") || '<p class="muted">拖入卡片</p>'}</div>
+          </div>
+        </section>
+        <section class="kanban-module kanban-module--rest">
+          <h3 class="kanban-module__title">进行中 · 验收 · 完成</h3>
+          <div class="kanban-rest">
+            ${colBox("进行中")}
+            ${colBox("验收")}
+            ${colBox("完成")}
+          </div>
+        </section>
+      </div>
       ${edit ? `
       <h3>编辑选中任务</h3>
       <div class="field"><label>标题</label><input id="editTitle" value="${esc(edit.title)}"/></div>

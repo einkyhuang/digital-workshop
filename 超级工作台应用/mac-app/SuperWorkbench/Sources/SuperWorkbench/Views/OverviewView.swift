@@ -364,50 +364,126 @@ struct OverviewView: View {
 
     private var scheduleBoard: some View {
         let tasks = store.overviewBoardTasks()
-        let cols: [TaskColumn] = [.todo, .doing, .review, .done]
-        return VStack(alignment: .leading, spacing: 12) {
+        let todo = scheduleItems(in: tasks, column: .todo)
+        let doing = scheduleItems(in: tasks, column: .doing)
+        let review = scheduleItems(in: tasks, column: .review)
+        let done = scheduleItems(in: tasks, column: .done)
+        let todoCardColumns = contentWidth >= 1680 ? 3 : (contentWidth >= 860 ? 2 : 1)
+        return VStack(alignment: .leading, spacing: 14) {
             sectionHead("日程管理 · 任务看板", badge: "\(tasks.count)")
             Text("今日与即将到来 · data/schedule 可勾选完成 · 另含工作台任务")
                 .font(.system(size: 12)).foregroundStyle(SWTheme.textMuted)
-            HStack(alignment: .top, spacing: 12) {
-                ForEach(cols) { col in
-                    let items = tasks.filter {
-                        $0.status == col.rawValue || (col == .review && ($0.status == "审核" || $0.status == "验收"))
-                            || (col == .todo && $0.source == "schedule" && !["进行中", "验收", "审核", "完成"].contains($0.status))
-                    }
-                    let scheduleItems = items.filter { $0.source == "schedule" }
-                    let shown = scheduleItems + Array(items.filter { $0.source != "schedule" }.prefix(8))
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack(spacing: 6) {
-                            Circle().fill(SWTheme.columnColor(col)).frame(width: 8, height: 8)
-                            Text(col.rawValue).font(.system(size: 12, weight: .semibold))
-                            Text("\(items.count)").font(.system(size: 11)).foregroundStyle(SWTheme.textMuted)
-                        }
-                        ScrollView {
-                            VStack(spacing: 8) {
-                                ForEach(shown) { t in
-                                    scheduleTaskCard(t)
-                                }
-                                if items.isEmpty {
-                                    Text("—").font(.caption).foregroundStyle(SWTheme.textMuted).padding(8)
-                                }
-                            }
-                        }
-                        .frame(maxHeight: 320)
-                    }
-                    .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .topLeading)
-                    .background(SWTheme.pageBg)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(SWTheme.borderSoft))
-                }
-            }
+            scheduleTodoModule(items: todo, columns: todoCardColumns)
+            scheduleRestModule(doing: doing, review: review, done: done)
         }
         .padding(22)
         .background(SWTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: SWTheme.radiusSection, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: SWTheme.radiusSection).stroke(SWTheme.borderGroup))
         .shadow(color: SWTheme.shadowElevated, radius: 20, y: 6)
+    }
+
+    private func scheduleItems(in tasks: [OverviewMetrics.SmartPlanTask], column col: TaskColumn) -> [OverviewMetrics.SmartPlanTask] {
+        tasks.filter {
+            $0.status == col.rawValue || (col == .review && ($0.status == "审核" || $0.status == "验收"))
+                || (col == .todo && $0.source == "schedule" && !["进行中", "验收", "审核", "完成"].contains($0.status))
+        }
+    }
+
+    /// 待办列出全部。其余列仍只多展示 8 条工作台任务，日程文件里的条目不截断。
+    private func scheduleVisible(_ items: [OverviewMetrics.SmartPlanTask], capWorkspace: Bool) -> [OverviewMetrics.SmartPlanTask] {
+        guard capWorkspace else { return items }
+        let fromSchedule = items.filter { $0.source == "schedule" }
+        let others = items.filter { $0.source != "schedule" }
+        return fromSchedule + Array(others.prefix(8))
+    }
+
+    private func scheduleColumnHead(_ col: TaskColumn, count: Int) -> some View {
+        HStack(spacing: 6) {
+            Circle().fill(SWTheme.columnColor(col)).frame(width: 8, height: 8)
+            Text(col.rawValue).font(.system(size: 13, weight: .semibold))
+            Text("\(count)").font(.system(size: 11)).foregroundStyle(SWTheme.textMuted)
+            Spacer(minLength: 0)
+        }
+    }
+
+    private func scheduleTodoModule(items: [OverviewMetrics.SmartPlanTask], columns: Int) -> some View {
+        let shown = scheduleVisible(items, capWorkspace: false)
+        let grid = Array(repeating: GridItem(.flexible(), spacing: 8), count: max(columns, 1))
+        return VStack(alignment: .leading, spacing: 10) {
+            scheduleColumnHead(.todo, count: items.count)
+            ScrollView {
+                if shown.isEmpty {
+                    Text("—").font(.caption).foregroundStyle(SWTheme.textMuted).padding(8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    LazyVGrid(columns: grid, alignment: .leading, spacing: 8) {
+                        ForEach(shown) { t in
+                            scheduleTaskCard(t)
+                        }
+                    }
+                }
+            }
+            .frame(minHeight: 140, maxHeight: 560)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .background(SWTheme.pageBg)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(SWTheme.borderSoft))
+    }
+
+    private func scheduleRestModule(
+        doing: [OverviewMetrics.SmartPlanTask],
+        review: [OverviewMetrics.SmartPlanTask],
+        done: [OverviewMetrics.SmartPlanTask]
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("进行中 · 验收 · 完成")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(SWTheme.textSecondary)
+            if contentWidth < 860 {
+                VStack(alignment: .leading, spacing: 12) {
+                    scheduleMiniColumn(.doing, items: doing)
+                    scheduleMiniColumn(.review, items: review)
+                    scheduleMiniColumn(.done, items: done)
+                }
+            } else {
+                HStack(alignment: .top, spacing: 12) {
+                    scheduleMiniColumn(.doing, items: doing)
+                    scheduleMiniColumn(.review, items: review)
+                    scheduleMiniColumn(.done, items: done)
+                }
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .background(SWTheme.pageBg)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(SWTheme.borderSoft))
+    }
+
+    private func scheduleMiniColumn(_ col: TaskColumn, items: [OverviewMetrics.SmartPlanTask]) -> some View {
+        let shown = scheduleVisible(items, capWorkspace: true)
+        return VStack(alignment: .leading, spacing: 8) {
+            scheduleColumnHead(col, count: items.count)
+            ScrollView {
+                VStack(spacing: 8) {
+                    ForEach(shown) { t in
+                        scheduleTaskCard(t)
+                    }
+                    if items.isEmpty {
+                        Text("—").font(.caption).foregroundStyle(SWTheme.textMuted).padding(8)
+                    }
+                }
+            }
+            .frame(maxHeight: 280)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(SWTheme.borderSoft))
     }
 
     @ViewBuilder

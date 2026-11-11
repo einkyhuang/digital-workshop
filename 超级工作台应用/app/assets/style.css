@@ -219,8 +219,37 @@ th { color: var(--muted); font-weight: 600; }
   color: var(--text); border-radius: 8px; padding: 8px 10px; font: inherit;
 }
 .field textarea { min-height: 70px; resize: vertical; }
-.kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-@media (max-width: 900px) { .kanban { grid-template-columns: 1fr 1fr; } }
+.sw-main #main:has(.kanban) { width: 100%; max-width: none; box-sizing: border-box; }
+.kanban { display: flex; flex-direction: column; gap: 14px; width: 100%; }
+.kanban-module--todo .col { min-height: 220px; }
+.kanban-module--todo .kanban-module__title { font-size: 15px; margin: 0 0 10px; }
+.kanban-module--todo .kanban-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+  max-height: 640px;
+  overflow: auto;
+  align-content: start;
+}
+.kanban-module--todo .task { margin-bottom: 0; }
+.kanban-module--rest {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255,255,255,.45);
+}
+.kanban-module--rest > .kanban-module__title {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--sw-text, #111);
+}
+.kanban-rest { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.kanban-rest .col { max-height: 480px; overflow: auto; }
+@media (max-width: 900px) {
+  .kanban-rest { grid-template-columns: 1fr; }
+  .kanban-module--todo .kanban-cards { grid-template-columns: 1fr; }
+}
 .col { background: #12151c; border: 1px solid var(--border); border-radius: 12px; padding: 10px; min-height: 120px; }
 .col h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); }
 .task {
@@ -504,8 +533,39 @@ th { color: var(--muted); font-weight: 600; }
 .prio-name { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .prio-pct { margin-left: auto; font-size: 12px; color: var(--sw-text-muted,#8A8A8E); font-variant-numeric: tabular-nums; }
 
-.kanban-row {
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;
+.schedule-board { display: flex; flex-direction: column; gap: 14px; }
+.schedule-module {
+  background: var(--sw-page-bg,#F6F7F8);
+  border: 1px solid var(--sw-border-soft,rgba(0,0,0,.06));
+  border-radius: 14px;
+  padding: 14px;
+}
+.schedule-module--todo { padding: 16px; }
+.schedule-module__label {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sw-text-secondary,#737373);
+}
+.schedule-todo__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+  max-height: 560px;
+  overflow: auto;
+  align-content: start;
+}
+.schedule-todo__grid .task-chip { margin-bottom: 0; }
+.schedule-rest {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.schedule-rest .kanban-col { background: #fff; min-height: 160px; }
+.schedule-rest .kanban-col__body { max-height: 280px; }
+@media (max-width: 900px) {
+  .schedule-todo__grid { grid-template-columns: 1fr; }
+  .schedule-rest { grid-template-columns: 1fr; }
 }
 .kanban-col {
   background: var(--sw-page-bg,#F6F7F8); border: 1px solid var(--sw-border-soft,rgba(0,0,0,.06));
@@ -569,10 +629,6 @@ th { color: var(--muted); font-weight: 600; }
 
 @media (max-width: 1279px) {
   .overview-stack { gap: 20px; }
-  .kanban-row {
-    grid-template-columns: repeat(4, minmax(180px, 1fr));
-    overflow-x: auto;
-  }
 }
 @media (min-width: 1440px) {
   .overview-stack { gap: 24px; }
@@ -584,7 +640,7 @@ th { color: var(--muted); font-weight: 600; }
   .kpi-grid { grid-template-columns: repeat(5, 1fr); gap: 16px; }
   .goal-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
   .email-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
-  .kanban-row { gap: 16px; }
+  .schedule-board { gap: 16px; }
   .roster-groups-ov { gap: 20px; }
 }
 /* FULL-WIDTH override (user): no 1680 cap — add columns instead of centering */
@@ -593,7 +649,8 @@ th { color: var(--muted); font-weight: 600; }
   .kpi-grid { grid-template-columns: repeat(6, 1fr); gap: 20px; }
   .goal-grid { grid-template-columns: repeat(5, 1fr); gap: 20px; }
   .email-grid { grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-  .kanban-row { gap: 20px; }
+  .schedule-board { gap: 20px; }
+  .schedule-todo__grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
   .roster-groups-ov { gap: 20px; }
   .section-shell { padding: 24px 26px 26px; }
 }

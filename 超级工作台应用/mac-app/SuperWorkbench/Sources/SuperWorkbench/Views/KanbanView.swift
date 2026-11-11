@@ -1,11 +1,18 @@
 import SwiftUI
 
+private struct KanbanWidthKey: PreferenceKey {
+    static var defaultValue: CGFloat = 1100
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
+}
+
 struct KanbanView: View {
     @EnvironmentObject var store: WorkspaceStore
     @State private var draggingTaskId: String? = nil
     @State private var dropTargetColumn: TaskColumn? = nil
+    @State private var boardWidth: CGFloat = 1100
 
     var body: some View {
+        let todoCardColumns = boardWidth >= 980 ? 2 : 1
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 16) {
                 ForEach(TaskColumn.allCases) { col in
@@ -21,22 +28,49 @@ struct KanbanView: View {
                     .foregroundStyle(SWTheme.textMuted)
             }
 
-            HStack(alignment: .top, spacing: 12) {
-                ForEach(TaskColumn.allCases) { col in
-                    column(col)
+            column(.todo, cardColumns: todoCardColumns, maxHeight: 640, minHeight: 280)
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text("进行中 · 验收 · 完成")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(SWTheme.textSecondary)
+                if boardWidth < 860 {
+                    VStack(alignment: .leading, spacing: 12) {
+                        column(.doing)
+                        column(.review)
+                        column(.done)
+                    }
+                } else {
+                    HStack(alignment: .top, spacing: 12) {
+                        column(.doing)
+                        column(.review)
+                        column(.done)
+                    }
                 }
             }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+            .background(Color.white.opacity(0.35))
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(SWTheme.border))
 
             if let task = store.data.tasks.first(where: { $0.id == store.selectedTaskId }) {
                 TaskEditor(task: task)
             }
             Spacer(minLength: 80)
         }
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(key: KanbanWidthKey.self, value: geo.size.width)
+            }
+        )
+        .onPreferenceChange(KanbanWidthKey.self) { boardWidth = max($0, 320) }
     }
 
-    private func column(_ col: TaskColumn) -> some View {
+    private func column(_ col: TaskColumn, cardColumns: Int = 1, maxHeight: CGFloat = 420, minHeight: CGFloat = 220) -> some View {
         let items = store.filteredTasks.filter { $0.status == col.rawValue }
         let highlighted = dropTargetColumn == col
+        let grid = Array(repeating: GridItem(.flexible(), spacing: 10), count: max(cardColumns, 1))
         return VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Circle().fill(SWTheme.columnColor(col)).frame(width: 8, height: 8)
@@ -50,24 +84,30 @@ struct KanbanView: View {
                 Spacer()
             }
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 10) {
-                    if items.isEmpty {
-                        Text("暂无\(col.rawValue) · 拖入卡片")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, minHeight: 80)
-                    } else {
+                if items.isEmpty {
+                    Text("暂无\(col.rawValue) · 拖入卡片")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, minHeight: 80)
+                } else if cardColumns > 1 {
+                    LazyVGrid(columns: grid, alignment: .leading, spacing: 10) {
+                        ForEach(items) { t in
+                            taskCard(t, col: col)
+                        }
+                    }
+                } else {
+                    LazyVStack(alignment: .leading, spacing: 10) {
                         ForEach(items) { t in
                             taskCard(t, col: col)
                         }
                     }
                 }
             }
-            .frame(maxHeight: 520)
+            .frame(maxHeight: maxHeight)
             Spacer(minLength: 0)
         }
         .padding(12)
-        .frame(maxWidth: .infinity, minHeight: 280, alignment: .top)
+        .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .top)
         .background(highlighted ? SWTheme.focus.opacity(0.08) : Color.white.opacity(0.55))
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(

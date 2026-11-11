@@ -166,7 +166,7 @@ struct TopBar: View {
         switch store.selectedSection {
         case .overview: return "网站业绩 → 日程 → 邮件 → 员工 · 金额仅本地"
         case .roster: return store.showingBotDetail ? "员工详情 · 可查看 bots 文件夹" : "共 \(store.data.bots.count) 位数字员工 · 点击卡片查看详情"
-        case .tasks: return "共 \(store.data.tasks.count) 项任务 · 拖拽卡片改状态 · 待办/进行中/验收/完成"
+        case .tasks: return "共 \(store.data.tasks.count) 项任务 · 待办单独一区 · 拖到进行中/验收/完成改状态"
         case .scheduleCenter: return "月历 · 当日任务/日程/邮件标记/纪纪日报 · 仅加载当月"
         case .dailySummary: return "纪纪日报 · 按需加载 · 左选日期右看卡片"
         case .dailySeo: return "搜搜 SEO 日更 · feeds/seo · FSEvents 刷新"
