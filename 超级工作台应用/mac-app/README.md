@@ -15,6 +15,10 @@
 
 工具栏「同步」会在本仓库执行 `git pull --rebase` / commit / push。
 
+## 资产管理
+
+平台账号的档案在本机 `data/private/资产管理/`，密码在 macOS 钥匙串。构建和安全说明见 `超级工作台应用/docs/asset-vault.md`。
+
 ## 从源码构建
 ```bash
 cd 超级工作台应用/mac-app/SuperWorkbench

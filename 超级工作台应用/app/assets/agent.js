@@ -23,7 +23,7 @@
     scheduleCenter: "任务与日程中心", dailySummary: "每日总结", dailySeo: "每日 SEO",
     tradeLeads: "客户与线索", crmCustomers: "客户管理", tradePipeline: "开发进度",
     tradeQuotes: "询盘与报价", rooms: "群聊协作", routines: "定时巡检",
-    hiring: "招聘规划", rules: "规则与文档", projects: "网站项目"
+    hiring: "招聘规划", rules: "规则与文档", projects: "网站项目", assets: "资产管理"
   };
 
   function summarize(params) {

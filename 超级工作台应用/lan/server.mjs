@@ -14,6 +14,7 @@
  */
 import http from "http";
 import https from "https";
+import { handleAssetVault, redactPrivateAssetBody } from "./asset-vault-http.mjs";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
@@ -396,6 +397,17 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     const ext = path.extname(full).toLowerCase();
+    const redacted = redactPrivateAssetBody(rel, ext, fs.readFileSync(full));
+    if (redacted) {
+      if (redacted.status !== 200) {
+        send(res, redacted.status, "Not Found\n");
+        return;
+      }
+      send(res, 200, redacted.body, {
+        "Content-Type": redacted.contentType || "application/json; charset=utf-8",
+      });
+      return;
+    }
     send(res, 200, fs.readFileSync(full), {
       "Content-Type": MIME[ext] || "application/octet-stream",
     });
@@ -417,6 +429,8 @@ const server = http.createServer(async (req, res) => {
     });
     return;
   }
+
+  if (await handleAssetVault(req, res, url, { privateRoot: PRIVATE_ROOT, send, readBody })) return;
 
   // Static app
   let rel = decodeURIComponent(url.pathname);

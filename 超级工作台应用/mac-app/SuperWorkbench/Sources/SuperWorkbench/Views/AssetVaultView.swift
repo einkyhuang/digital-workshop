@@ -1,0 +1,553 @@
+import SwiftUI
+import AppKit
+import LocalAuthentication
+import UniformTypeIdentifiers
+import AssetVaultCore
+
+extension Notification.Name {
+    static let swNewAssetAccount = Notification.Name("swNewAssetAccount")
+}
+
+enum DeviceOwnerAuth {
+    /// Touch ID when the Mac has it, otherwise the device password. Fail closed.
+    static func confirm(reason: String) async -> Bool {
+        let context = LAContext()
+        context.localizedCancelTitle = "取消"
+        var error: NSError?
+        guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else { return false }
+        do {
+            return try await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)
+        } catch {
+            return false
+        }
+    }
+}
+
+@MainActor
+final class AssetVaultModel: ObservableObject {
+    @Published var accounts: [AssetAccount] = []
+    @Published var query = ""
+    @Published var category = "全部"
+    @Published var status = "密码只在钥匙串里。显示或复制需要 Touch ID 或开机密码。"
+    @Published var editor: AssetEditorSession?
+    @Published var pendingDelete: AssetAccount?
+    @Published var importing = false
+
+    private var fileStore: AssetFileStore?
+    private let keychain = KeychainAssetSecretStore()
+    private let clipboard = AssetClipboard()
+    private var configured = false
+
+    var categoryChoices: [String] {
+        let extras = Set(accounts.map(\.category)).subtracting(AssetVaultCatalog.categories)
+        return ["全部"] + AssetVaultCatalog.categories + extras.sorted()
+    }
+
+    var filtered: [AssetAccount] {
+        AssetVault.filter(accounts, query: query, category: category)
+    }
+
+    func configure(repoRoot: URL) {
+        let root = repoRoot.appendingPathComponent("超级工作台应用/data/private/资产管理", isDirectory: true)
+        if configured, fileStore?.root.path == root.path { return }
+        fileStore = AssetFileStore(root: root)
+        configured = true
+        reload()
+    }
+
+    func reload() {
+        guard let fileStore else { return }
+        do {
+            accounts = try fileStore.list(secrets: keychain)
+        } catch {
+            status = "读取档案失败"
+        }
+    }
+
+    func startNew() {
+        editor = AssetEditorSession(account: .empty)
+    }
+
+    func save(account: AssetAccount, patch: AssetSecretPatch) {
+        guard let fileStore else { return }
+        var raw = account.fileJSON()
+        raw.removeValue(forKey: "id")
+        if !account.id.isEmpty { raw["id"] = account.id }
+        for (key, value) in patch.values { raw[key] = value }
+        do {
+            _ = try fileStore.save(raw: raw, secrets: keychain)
+            editor = nil
+            reload()
+            status = "已保存。密码在钥匙串里，没有写进文件。"
+        } catch AssetVaultError.invalidPlatform {
+            status = "请填写平台名称"
+        } catch {
+            status = "保存失败"
+        }
+    }
+
+    func delete(_ account: AssetAccount) async {
+        guard let fileStore, AssetVault.isValidId(account.id) else { return }
+        if account.hasSecret {
+            let ok = await DeviceOwnerAuth.confirm(reason: "删除「\(account.platform)」及其钥匙串密码")
+            guard ok else {
+                status = "未通过设备验证，没有删除"
+                return
+            }
+        }
+        do {
+            _ = try fileStore.delete(id: account.id, secrets: keychain)
+            if editor?.account.id == account.id { editor = nil }
+            pendingDelete = nil
+            reload()
+            status = "已删除"
+        } catch {
+            status = "删除失败"
+        }
+    }
+
+    func revealSecrets(for account: AssetAccount) async -> AssetSecrets? {
+        let ok = await DeviceOwnerAuth.confirm(reason: "查看「\(account.platform)」的密码")
+        guard ok else {
+            status = "未通过设备验证"
+            return nil
+        }
+        guard AssetVault.isValidId(account.id) else { return .empty }
+        return (try? keychain.load(id: account.id)) ?? .empty
+    }
+
+    func copy(_ text: String, platform: String) async {
+        let ok = await DeviceOwnerAuth.confirm(reason: "复制「\(platform)」的密码")
+        guard ok else {
+            status = "未通过设备验证，没有复制"
+            return
+        }
+        copyVerified(text)
+    }
+
+    func copyVerified(_ text: String) {
+        guard !text.isEmpty else {
+            status = "没有可复制的密码"
+            return
+        }
+        clipboard.copy(text)
+        status = "已复制。约 45 秒后，如果剪贴板仍是这条密码，会自动清除。"
+    }
+
+    func importCSV(_ text: String) {
+        guard let fileStore else { return }
+        guard text.count <= AssetVaultCatalog.csvMaxChars else {
+            status = "CSV 过大，没有导入"
+            return
+        }
+        let result = fileStore.importCSV(text, secrets: keychain)
+        reload()
+        status = "导入 \(result.imported) 条。其中 \(result.secretsStored) 条的密钥已放入钥匙串，没有写入文件。"
+    }
+
+    func openLogin(_ account: AssetAccount) {
+        guard let url = URL(string: account.loginURL),
+              let scheme = url.scheme?.lowercased(),
+              scheme == "https" || scheme == "http",
+              url.user == nil, url.password == nil else {
+            status = "登录地址需要是 http 或 https，且不能在地址里夹带密码"
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+}
+
+private final class AssetClipboard {
+    private var timer: Timer?
+    private var expected = ""
+    private var changeCount = 0
+
+    func copy(_ text: String) {
+        let board = NSPasteboard.general
+        board.clearContents()
+        board.setString(text, forType: .string)
+        expected = text
+        changeCount = board.changeCount
+        timer?.invalidate()
+        let seconds = AssetVaultCatalog.clipboardClearSeconds
+        timer = Timer.scheduledTimer(withTimeInterval: seconds, repeats: false) { [weak self] _ in
+            guard let self else { return }
+            let board = NSPasteboard.general
+            let current = board.string(forType: .string)
+            guard board.changeCount == self.changeCount,
+                  ClipboardClearPolicy.shouldClear(copied: self.expected, current: current, elapsed: seconds) else { return }
+            board.clearContents()
+            self.expected = ""
+        }
+    }
+}
+
+struct AssetVaultView: View {
+    @EnvironmentObject var store: WorkspaceStore
+    @StateObject private var model = AssetVaultModel()
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            header
+            if model.filtered.isEmpty {
+                Text(model.accounts.isEmpty ? "还没有账号。点「新建」添加，或从 CSV 导入。密码不会出现在仓库里。" : "没有符合筛选的账号。")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .swCard()
+            } else {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 10) {
+                        ForEach(model.filtered) { account in
+                            row(account)
+                        }
+                    }
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .onAppear {
+            model.configure(repoRoot: store.repoRoot)
+            store.assetAccountCount = model.accounts.count
+        }
+        .onChange(of: model.accounts.count) { _, _ in
+            store.assetAccountCount = model.accounts.count
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .swNewAssetAccount)) { _ in
+            model.startNew()
+        }
+        .sheet(item: $model.editor) { session in
+            AssetEditorSheet(account: session.account, model: model)
+        }
+        .alert("删除这条账号？", isPresented: Binding(
+            get: { model.pendingDelete != nil },
+            set: { if !$0 { model.pendingDelete = nil } }
+        )) {
+            Button("删除", role: .destructive) {
+                if let account = model.pendingDelete {
+                    Task { await model.delete(account) }
+                }
+            }
+            Button("取消", role: .cancel) { model.pendingDelete = nil }
+        } message: {
+            Text("会删除本地档案，并移除钥匙串里对应的密码。不能撤销。")
+        }
+        .fileImporter(isPresented: $model.importing, allowedContentTypes: [.commaSeparatedText, .plainText, .text]) { result in
+            guard case .success(let url) = result else { return }
+            let started = url.startAccessingSecurityScopedResource()
+            defer { if started { url.stopAccessingSecurityScopedResource() } }
+            guard let text = try? String(contentsOf: url, encoding: .utf8) else {
+                model.status = "读不到这个 CSV"
+                return
+            }
+            model.importCSV(text)
+        }
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                TextField("搜索平台、用户名、备注、标签", text: $model.query)
+                    .textFieldStyle(.roundedBorder)
+                Picker("分类", selection: $model.category) {
+                    ForEach(model.categoryChoices, id: \.self) { Text($0).tag($0) }
+                }
+                .frame(width: 140)
+                Button("新建") { model.startNew() }
+                    .buttonStyle(.borderedProminent)
+                Button("导入 CSV") { model.importing = true }
+                    .buttonStyle(.bordered)
+            }
+            Text(model.status)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func row(_ account: AssetAccount) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(account.platform).font(.headline)
+                Text(account.category)
+                    .font(.caption.weight(.semibold))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.black.opacity(0.06))
+                    .clipShape(Capsule())
+                if account.hasSecret {
+                    Text("钥匙串")
+                        .font(.caption.weight(.semibold))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.green.opacity(0.12))
+                        .clipShape(Capsule())
+                }
+                Spacer()
+                Text(account.twoFactorLabel).font(.caption).foregroundStyle(.secondary)
+            }
+            HStack(spacing: 12) {
+                if !account.username.isEmpty {
+                    Text(account.username).font(.subheadline)
+                }
+                if !account.loginURL.isEmpty {
+                    Button("打开登录页") { model.openLogin(account) }
+                        .buttonStyle(.borderless)
+                }
+            }
+            if !account.company.isEmpty || !account.brand.isEmpty {
+                Text([account.company, account.brand].filter { !$0.isEmpty }.joined(separator: " · "))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            if !account.tags.isEmpty {
+                Text(account.tags.joined(separator: "  "))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            if !account.notes.isEmpty {
+                Text(account.notes).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+            }
+            HStack {
+                Button("编辑") { model.editor = AssetEditorSession(account: account) }
+                Button("删除") { model.pendingDelete = account }
+                Spacer()
+                Text(account.updatedAt).font(.caption2).foregroundStyle(.tertiary)
+            }
+        }
+        .padding(14)
+        .swCard()
+    }
+}
+
+struct AssetEditorSession: Identifiable {
+    let id = UUID()
+    var account: AssetAccount
+}
+
+private struct AssetEditorSheet: View {
+    let account: AssetAccount
+    @ObservedObject var model: AssetVaultModel
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var platform: String
+    @State private var category: String
+    @State private var customCategory = ""
+    @State private var loginURL: String
+    @State private var username: String
+    @State private var notes: String
+    @State private var twoFactor: String
+    @State private var tags: String
+    @State private var company: String
+    @State private var brand: String
+    @State private var password = ""
+    @State private var apiKey = ""
+    @State private var recoveryCodes = ""
+    @State private var totpSecret = ""
+    @State private var keepTotp = false
+    @State private var passwordDirty = false
+    @State private var apiDirty = false
+    @State private var recoveryDirty = false
+    @State private var totpDirty = false
+    @State private var revealed = false
+    @State private var length = 20.0
+    @State private var useSymbols = true
+
+    init(account: AssetAccount, model: AssetVaultModel) {
+        self.account = account
+        self.model = model
+        _platform = State(initialValue: account.platform)
+        _category = State(initialValue: AssetVaultCatalog.categories.contains(account.category) ? account.category : "其他")
+        _customCategory = State(initialValue: AssetVaultCatalog.categories.contains(account.category) ? "" : account.category)
+        _loginURL = State(initialValue: account.loginURL)
+        _username = State(initialValue: account.username)
+        _notes = State(initialValue: account.notes)
+        _twoFactor = State(initialValue: account.twoFactor.isEmpty ? "none" : account.twoFactor)
+        _tags = State(initialValue: account.tags.joined(separator: ", "))
+        _company = State(initialValue: account.company)
+        _brand = State(initialValue: account.brand)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(account.id.isEmpty ? "新建账号" : "编辑账号").font(.title2.bold())
+            Text(account.hasSecret ? "钥匙串里已有密钥。留空表示不修改；显示或复制需要验证。" : "密码默认隐藏。不会写进 JSON 或 iCloud 文档。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            form
+            secretFields
+            generator
+            HStack {
+                if !account.id.isEmpty {
+                    Button("删除", role: .destructive) {
+                        let target = account
+                        dismiss()
+                        model.pendingDelete = target
+                    }
+                }
+                Spacer()
+                Button("取消") { dismiss() }
+                Button("保存") { save() }
+                    .keyboardShortcut(.defaultAction)
+                    .buttonStyle(.borderedProminent)
+            }
+        }
+        .padding(24)
+        .frame(width: 520)
+    }
+
+    private var form: some View {
+        Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 8) {
+            labeled("平台") { TextField("例如：店铺后台", text: $platform) }
+            labeled("分类") {
+                HStack {
+                    Picker("分类", selection: $category) {
+                        ForEach(AssetVaultCatalog.categories, id: \.self) { Text($0).tag($0) }
+                    }
+                    .labelsHidden()
+                    TextField("或自定义", text: $customCategory)
+                }
+            }
+            labeled("登录地址") { TextField("https://", text: $loginURL) }
+            labeled("用户名") { TextField("邮箱或用户名", text: $username) }
+            labeled("二次验证") {
+                Picker("二次验证", selection: $twoFactor) {
+                    ForEach(AssetVaultCatalog.twoFactorOptions, id: \.id) { option in
+                        Text(option.label).tag(option.id)
+                    }
+                }
+                .labelsHidden()
+            }
+            labeled("标签") { TextField("用逗号分隔", text: $tags) }
+            labeled("公司") { TextField("关联公司", text: $company) }
+            labeled("品牌") { TextField("关联品牌", text: $brand) }
+            labeled("备注") { TextField("不要在备注里写密码", text: $notes, axis: .vertical) }
+        }
+    }
+
+    private var secretFields: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("密钥").font(.headline)
+                Spacer()
+                Button(revealed ? "隐藏" : "显示") { Task { await toggleReveal() } }
+                Button("复制密码") { Task { await copyPassword() } }
+            }
+            secretRow("密码", text: $password, dirty: $passwordDirty)
+            secretRow("API 密钥", text: $apiKey, dirty: $apiDirty)
+            DisclosureGroup("恢复码（只有明确要保存时才填）") {
+                secretRow("恢复码", text: $recoveryCodes, dirty: $recoveryDirty)
+            }
+            Toggle("我明确要保存验证器密钥", isOn: $keepTotp)
+                .font(.caption)
+            if keepTotp {
+                secretRow("验证器密钥", text: $totpSecret, dirty: $totpDirty)
+            }
+        }
+    }
+
+    private var generator: some View {
+        HStack {
+            Text("生成密码")
+            Slider(value: $length, in: 12...40, step: 1)
+            Text("\(Int(length))").frame(width: 28)
+            Toggle("符号", isOn: $useSymbols).toggleStyle(.checkbox)
+            Button("生成") { generate() }
+        }
+        .font(.caption)
+    }
+
+    @ViewBuilder
+    private func labeled<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        GridRow {
+            Text(title).frame(width: 72, alignment: .leading)
+            content().textFieldStyle(.roundedBorder)
+        }
+    }
+
+    private func secretRow(_ title: String, text: Binding<String>, dirty: Binding<Bool>) -> some View {
+        HStack {
+            Text(title).frame(width: 72, alignment: .leading).font(.caption)
+            Group {
+                if revealed {
+                    TextField(title, text: text)
+                } else {
+                    SecureField(account.hasSecret ? "已保存，留空不修改" : title, text: text)
+                }
+            }
+            .textFieldStyle(.roundedBorder)
+            .onChange(of: text.wrappedValue) { _, _ in dirty.wrappedValue = true }
+        }
+    }
+
+    private func currentAccount() -> AssetAccount {
+        var next = account
+        next.platform = platform.trimmingCharacters(in: .whitespacesAndNewlines)
+        let custom = customCategory.trimmingCharacters(in: .whitespacesAndNewlines)
+        next.category = custom.isEmpty ? category : custom
+        next.loginURL = loginURL
+        next.username = username
+        next.notes = notes
+        next.twoFactor = twoFactor
+        next.tags = tags.split { ",，;；".contains($0) }.map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        next.company = company
+        next.brand = brand
+        return next
+    }
+
+    private func patch() -> AssetSecretPatch {
+        var values: [String: String] = [:]
+        if passwordDirty { values["password"] = password }
+        if apiDirty { values["apiKey"] = apiKey }
+        if recoveryDirty { values["recoveryCodes"] = recoveryCodes }
+        if keepTotp && totpDirty { values["totpSecret"] = totpSecret }
+        return AssetSecretPatch(values: values)
+    }
+
+    private func save() {
+        model.save(account: currentAccount(), patch: patch())
+    }
+
+    private func generate() {
+        guard let value = try? AssetVault.generatePassword(length: Int(length), symbols: useSymbols) else { return }
+        password = value
+        passwordDirty = true
+        revealed = false
+    }
+
+    private func toggleReveal() async {
+        if revealed {
+            revealed = false
+            return
+        }
+        if let loaded = await model.revealSecrets(for: account) {
+            if !passwordDirty && password.isEmpty { password = loaded.password }
+            if !apiDirty && apiKey.isEmpty { apiKey = loaded.apiKey }
+            if !recoveryDirty && recoveryCodes.isEmpty { recoveryCodes = loaded.recoveryCodes }
+            if !totpDirty && !loaded.totpSecret.isEmpty {
+                totpSecret = loaded.totpSecret
+                keepTotp = true
+            }
+            revealed = true
+        }
+    }
+
+    private func copyPassword() async {
+        let name = platform.isEmpty ? account.platform : platform
+        if passwordDirty || revealed {
+            await model.copy(password, platform: name)
+            return
+        }
+        guard let loaded = await model.revealSecrets(for: account) else { return }
+        if password.isEmpty { password = loaded.password }
+        model.copyVerified(loaded.password)
+    }
+}
+
+private extension AssetAccount {
+    var twoFactorLabel: String {
+        AssetVaultCatalog.twoFactorOptions.first { $0.id == twoFactor }?.label ?? "无"
+    }
+}

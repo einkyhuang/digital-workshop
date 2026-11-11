@@ -42,6 +42,8 @@ final class WorkspaceStore: ObservableObject {
     @Published var magicHubTab: String = UserDefaults.standard.string(forKey: "sw.mhTab") ?? "dashboard"
     @Published var tradeLeadsIndex: TradeLeadsIndex? = nil
     @Published var crmLeadsTotal: Int? = nil
+    /// Count of asset-vault metadata records. Passwords are not loaded here.
+    @Published var assetAccountCount: Int = 0
     // MARK: Feeds (data/feeds)
     @Published var feedsRegistry: FeedsRegistryFile? = nil
     @Published var feedIndexes: [String: FeedIndexFile] = [:]

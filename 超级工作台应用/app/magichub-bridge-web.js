@@ -88,5 +88,66 @@
     writeFile: async () => ({ success: false, error: "浏览器无本地写文件" }),
     selectLocalZipAndUpdate: async () => ({ success: false, error: "请用 Mac 应用更新" }),
     openGlobalSettings: async () => ({ success: false, error: "浏览器请使用本页设置" }),
+    // Metadata only. Secret fields are removed before the request leaves the page.
+    listAssets: async () => {
+      try {
+        const res = await fetch("/api/assets", { credentials: "same-origin", cache: "no-store" });
+        if (!res.ok) return { success: false, error: "http " + res.status, accounts: [] };
+        return await res.json();
+      } catch (e) {
+        return { success: false, error: String(e), accounts: [] };
+      }
+    },
+    saveAsset: async (record) => {
+      const account = stripAssetSecrets(record);
+      try {
+        const res = await fetch("/api/assets", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ account }),
+        });
+        if (!res.ok) return { success: false, error: "http " + res.status };
+        return await res.json();
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+    deleteAsset: async (id) => {
+      try {
+        const res = await fetch("/api/assets?id=" + encodeURIComponent(id || ""), {
+          method: "DELETE",
+          credentials: "same-origin",
+        });
+        if (!res.ok) return { success: false, error: "http " + res.status };
+        return await res.json();
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
+    importAssetsCsv: async (csv) => {
+      try {
+        const res = await fetch("/api/assets", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ csv: String(csv || "") }),
+        });
+        if (!res.ok) return { success: false, error: "http " + res.status };
+        return await res.json();
+      } catch (e) {
+        return { success: false, error: String(e) };
+      }
+    },
   };
+  function stripAssetSecrets(record) {
+    const blocked = /^(password|passwd|pwd|apikey|recoverycodes|recovery|totpsecret|totp|otpsecret|secret|token|accesstoken|secrets)$/i;
+    const out = {};
+    if (!record || typeof record !== "object") return out;
+    for (const [key, value] of Object.entries(record)) {
+      if (blocked.test(String(key).replace(/[\s_-]/g, ""))) continue;
+      out[key] = value;
+    }
+    return out;
+  }
 })();

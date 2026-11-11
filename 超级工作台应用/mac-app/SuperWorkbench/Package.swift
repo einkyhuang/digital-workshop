@@ -5,12 +5,23 @@ let package = Package(
     name: "SuperWorkbench",
     platforms: [.macOS(.v14)],
     products: [
-        .executable(name: "SuperWorkbench", targets: ["SuperWorkbench"])
+        .library(name: "AssetVaultCore", targets: ["AssetVaultCore"]),
+        .executable(name: "SuperWorkbench", targets: ["SuperWorkbench"]),
     ],
     targets: [
+        .target(
+            name: "AssetVaultCore",
+            path: "Sources/AssetVaultCore"
+        ),
         .executableTarget(
             name: "SuperWorkbench",
+            dependencies: ["AssetVaultCore"],
             path: "Sources/SuperWorkbench"
-        )
+        ),
+        .testTarget(
+            name: "AssetVaultCoreTests",
+            dependencies: ["AssetVaultCore"],
+            path: "Tests/AssetVaultCoreTests"
+        ),
     ]
 )

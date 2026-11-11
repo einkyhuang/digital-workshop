@@ -1,5 +1,14 @@
 const { app, BrowserWindow, Menu, shell, ipcMain } = require('electron');
 const path = require('path');
+const { pathToFileURL } = require('url');
+
+function looksLikeAssetVaultPath(filePath) {
+  return String(filePath || '').split(/[/\\]/).includes('资产管理');
+}
+
+async function assetVaultApi() {
+  return import(pathToFileURL(path.join(__dirname, '../../app/assets/asset-vault.mjs')).href);
+}
 const globalModels = require('../../shared/global-models-store.cjs');
 
 let mainWindow = null;
@@ -269,9 +278,17 @@ ipcMain.handle('read-file', async (event, filePath) => {
     if (!fs.existsSync(filePath)) {
       return { success: false, error: '文件不存在' };
     }
+    if (looksLikeAssetVaultPath(filePath)) {
+      const vault = await assetVaultApi();
+      const content = fs.readFileSync(filePath, 'utf-8');
+      return { success: true, content: vault.redactAssetJsonText(content) };
+    }
     const content = fs.readFileSync(filePath, 'utf-8');
     return { success: true, content };
   } catch (e) {
+    if (looksLikeAssetVaultPath(filePath)) {
+      return { success: false, error: '资产管理文件已拒绝直接读取' };
+    }
     return { success: false, error: e.message };
   }
 });
@@ -279,6 +296,9 @@ ipcMain.handle('read-file', async (event, filePath) => {
 // Secure physical file writing for Electron (Saves generated AI reports locally on disk)
 ipcMain.handle('write-file', async (event, filePath, content) => {
   try {
+    if (looksLikeAssetVaultPath(filePath)) {
+      return { success: false, error: '资产管理不能直接写文件' };
+    }
     const fs = require('fs').promises;
     const fsSync = require('fs');
     const dirname = path.dirname(filePath);

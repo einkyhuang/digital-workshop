@@ -28,6 +28,7 @@
 | projects | 网站项目 |
 | hiring | 招聘规划 |
 | rules | 规则与文档 |
+| assets | 资产管理 |
 | tradeLeads | 客户与线索 |
 | tradePipeline | 开发进度 |
 | tradeQuotes | 询盘与报价 |

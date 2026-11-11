@@ -29,6 +29,8 @@ node_modules/
 智能日程管理/.env.*
 # Website project PII (client/amounts/localPath) — local only
 超级工作台应用/data/private/
+# 资产管理元数据（平台、用户名、备注）。密码和密钥只进 macOS 钥匙串，禁止提交。
+超级工作台应用/data/private/资产管理/
 超级工作台应用/app/data/private/
 **/websiteProjects.local.json
 # Finance dashboard local calc (amounts) — never commit

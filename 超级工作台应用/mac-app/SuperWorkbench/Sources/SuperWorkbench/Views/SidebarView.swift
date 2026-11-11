@@ -165,6 +165,7 @@ struct SidebarView: View {
         case .tradeQuotes: return store.tradeLeadsIndex?.counts?.quotesDraft
         case .crmCustomers: return store.crmLeadsTotal
         case .dailySeo: return store.feedIndexes["seo"]?.dates.count
+        case .assets: return store.assetAccountCount > 0 ? store.assetAccountCount : nil
         default: return nil
         }
     }
