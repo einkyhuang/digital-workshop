@@ -13,6 +13,7 @@ import SmartTools from './components/SmartTools.vue';
 import CompanyInfo from './components/CompanyInfo.vue';
 import TeamManager from './components/TeamManager.vue';
 import KnowledgeBase from './components/KnowledgeBase.vue'; // [NEW] Knowledge Base Component
+import AssetVault from './components/AssetVault.vue';
 import ZenModal from './components/ZenModal.vue';
 import ScheduleManager from './components/ScheduleManager.vue'; // [NEW] Schedule Manager Component
 import SmartMarketing from './components/SmartMarketing.vue'; // [NEW] Smart Email Marketing Component
@@ -921,6 +922,7 @@ const activeComponent = computed(() => {
     contracts: ContractManager,
     products: ProductLibrary,
     knowledge: KnowledgeBase,
+    assets: AssetVault,
     company: CompanyInfo,
     team: TeamManager,
     agentRoom: AgentRoom,
@@ -941,6 +943,7 @@ const tabs = [
   { id: 'contracts', name: '订单合同', label: 'Contracts', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
   { id: 'products', name: '产品管理', label: 'Products', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
   { id: 'knowledge', name: '知识仓库', label: 'KnowledgeBase', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
+  { id: 'assets', name: '资产管理', label: 'AssetVault', icon: 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z' },
   { id: 'company', name: '公司信息', label: 'CompanyInfo', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
   { id: 'team', name: '团队管理', label: 'TeamManager', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
   { id: 'agentRoom', name: 'Agent 协同', label: 'AgentRoom', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },

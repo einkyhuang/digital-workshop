@@ -17,7 +17,18 @@ struct ContentView: View {
                 Divider()
                 if isTradeWorkbench {
                     // Sidebar keeps Qianwen-style workbench segment; MagicHub fills main pane.
-                    TradeMagicHubHost()
+                    // 资产管理 stays in the native view so the webview never receives passwords.
+                    ZStack {
+                        TradeMagicHubHost()
+                            .opacity(store.magicHubTab == "assets" ? 0 : 1)
+                            .allowsHitTesting(store.magicHubTab != "assets")
+                        if store.magicHubTab == "assets" {
+                            AssetVaultView()
+                                .padding(24)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                                .background(SWTheme.pageBg)
+                        }
+                    }
                 } else {
                     VStack(spacing: 0) {
                         TopBar(
@@ -25,7 +36,7 @@ struct ContentView: View {
                             onNew: { handleNew() },
                             onSync: { store.syncGit() }
                         )
-                        if store.selectedSection == .projects {
+                        if store.selectedSection == .projects || store.selectedSection == .assets {
                             sectionBody
                                 .padding(24)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -130,15 +141,17 @@ struct ContentView: View {
         case .routines: RoutinesView()
         case .hiring: HiringView()
         case .rules: RulesView()
+        case .assets: AssetVaultView()
         case .projects: ProjectsView()
         }
     }
 
     private func handleNew() {
-        switch store.selectedSection {
-        case .tasks, .overview: showNewTask = true
-        default: showNewTask = true
+        if store.selectedSection == .assets || (isTradeWorkbench && store.magicHubTab == "assets") {
+            NotificationCenter.default.post(name: .swNewAssetAccount, object: nil)
+            return
         }
+        showNewTask = true
     }
 }
 
@@ -165,6 +178,7 @@ struct TopBar: View {
         case .routines: return "规划中的定时巡检（尚未启用）"
         case .hiring: return "待招岗位 · 本地标记不会真正创建 Bot"
         case .rules: return "协作铁律与审批边界"
+        case .assets: return "平台账号档案在本机 private 目录 · 密码只在钥匙串"
         case .projects: return "SmartPlan 同步的客户网站档案"
         }
     }
@@ -245,6 +259,7 @@ struct TopBar: View {
         case .tradeQuotes: return "询盘与报价"
         case .crmCustomers: return "客户管理"
         case .projects: return selectedProjectTitle
+        case .assets: return "资产管理"
         default: return title
         }
     }

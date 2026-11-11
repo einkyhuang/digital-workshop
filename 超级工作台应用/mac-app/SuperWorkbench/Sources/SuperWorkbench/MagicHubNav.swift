@@ -19,6 +19,7 @@ struct MagicHubNavItem: Identifiable, Hashable {
         .init(id: "contracts", name: "订单合同", icon: "doc.text"),
         .init(id: "products", name: "产品管理", icon: "cube.box"),
         .init(id: "knowledge", name: "知识仓库", icon: "books.vertical"),
+        .init(id: "assets", name: "资产管理", icon: "key.fill"),
         .init(id: "company", name: "公司信息", icon: "building.2"),
         .init(id: "team", name: "团队管理", icon: "person.3"),
         .init(id: "agentRoom", name: "Agent 协同", icon: "sparkles"),

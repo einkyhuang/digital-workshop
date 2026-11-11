@@ -300,6 +300,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
     case routines = "定时巡检"
     case hiring = "招聘规划"
     case rules = "规则与文档"
+    case assets = "资产管理"
     case projects = "网站项目"
 
     var id: String { rawValue }
@@ -321,6 +322,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
         case .routines: return "巡检"
         case .hiring: return "招聘"
         case .rules: return "规则"
+        case .assets: return "资产管理"
         case .projects: return "网站"
         }
     }
@@ -342,6 +344,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
         case .routines: return "routines"
         case .hiring: return "hiring"
         case .rules: return "rules"
+        case .assets: return "assets"
         case .projects: return "projects"
         }
     }
@@ -366,6 +369,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
         case .routines: return "clock.arrow.2.circlepath"
         case .hiring: return "person.badge.plus"
         case .rules: return "checklist"
+        case .assets: return "key.fill"
         case .projects: return "folder"
         }
     }
@@ -376,6 +380,7 @@ enum SidebarSection: String, CaseIterable, Identifiable, Hashable {
         case .tradeLeads, .tradePipeline, .tradeQuotes, .crmCustomers: return "外贸业务"
         case .rooms, .routines: return "协作与运维"
         case .hiring, .rules: return "组织与规则"
+        case .assets: return "账号与资产"
         case .projects: return "网站项目"
         }
     }

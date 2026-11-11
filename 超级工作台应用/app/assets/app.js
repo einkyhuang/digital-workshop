@@ -1,6 +1,6 @@
 (function () {
   const LS_KEY = "digital-workshop-v2";
-  const TABS = ["总览", "员工档案", "网站项目", "任务看板", "任务与日程中心", "每日总结", "每日 SEO", "客户与线索", "客户管理", "开发进度", "询盘与报价", "群聊协作", "定时巡检", "招聘规划", "规则与文档"];
+  const TABS = ["总览", "员工档案", "网站项目", "任务看板", "任务与日程中心", "每日总结", "每日 SEO", "客户与线索", "客户管理", "开发进度", "询盘与报价", "群聊协作", "定时巡检", "招聘规划", "规则与文档", "资产管理"];
   /** Plug 搜搜 field spec / 画眉 visual tokens via ../data/ui-config.json (mirrored here for static Pages). */
   const WEBSITE_UI = {
     defaultView: "list",
@@ -118,14 +118,15 @@
     "定时巡检": "巡检",
     "招聘规划": "招聘",
     "规则与文档": "规则",
-    "网站项目": "网站"
+    "网站项目": "网站",
+    "资产管理": "资产管理"
   };
   const MODULE_TAB = {
     overview: "总览", roster: "员工档案", tasks: "任务看板",
     scheduleCenter: "任务与日程中心", dailySummary: "每日总结", dailySeo: "每日 SEO",
     tradeLeads: "客户与线索", crmCustomers: "客户管理", tradePipeline: "开发进度", tradeQuotes: "询盘与报价",
     rooms: "群聊协作", routines: "定时巡检", hiring: "招聘规划",
-    rules: "规则与文档", projects: "网站项目"
+    rules: "规则与文档", projects: "网站项目", assets: "资产管理"
   };
 
   /** MagicHub menus (外贸工作台 outer sidebar). Order matches crm-magichub App.vue. */
@@ -141,6 +142,7 @@
     { id: "contracts", name: "订单合同" },
     { id: "products", name: "产品管理" },
     { id: "knowledge", name: "知识仓库" },
+    { id: "assets", name: "资产管理" },
     { id: "company", name: "公司信息" },
     { id: "team", name: "团队管理" },
     { id: "agentRoom", name: "Agent 协同" },
@@ -1426,6 +1428,34 @@ function renderKanban() {
       <div class="step"><h4>复盘</h4><p>缺口与教训写回规则与测试用例。</p></div>`;
   }
 
+  const assetUi = { accounts: [], query: "", category: "全部", form: null, generated: "" };
+
+  function renderAssetVault() {
+    const cats = ["全部", "电商", "社交", "广告", "主机", "域名", "邮箱", "支付", "其他"];
+    const options = cats.map((item) => `<option ${assetUi.category === item ? "selected" : ""}>${esc(item)}</option>`).join("");
+    return `<div id="assetVault">
+      <h2 class="section-title">资产管理</h2>
+      <p class="muted">平台、网址、用户名和备注保存在本机 private/资产管理/。密码、API 密钥和恢复码只进 Mac 钥匙串，这个网页不保存，也不能一次性读出。</p>
+      <p id="assetMsg" class="muted"></p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0">
+        <input id="assetQuery" placeholder="搜索平台、用户名、备注、标签" value="${esc(assetUi.query)}" style="flex:1;min-width:180px"/>
+        <select id="assetCategory">${options}</select>
+        <button type="button" id="assetNew" class="btn">新建</button>
+        <label class="btn">导入 CSV<input id="assetCsv" type="file" accept=".csv,text/csv" hidden/></label>
+      </div>
+      <div id="assetList"></div>
+      <form id="assetForm" hidden style="gap:8px;max-width:640px;margin-top:16px"></form>
+      <section style="margin-top:18px">
+        <h3>密码生成器</h3>
+        <p class="muted">生成结果只留在本页，不会写入文件或浏览器存储。</p>
+        <button type="button" id="assetGen" class="btn">生成</button>
+        <button type="button" id="assetGenShow" class="btn">显示</button>
+        <button type="button" id="assetGenCopy" class="btn">复制</button>
+        <input id="assetGenOut" type="password" readonly style="display:block;margin-top:8px;width:min(420px,100%)"/>
+      </section>
+    </div>`;
+  }
+
   function renderMain() {
     const map = {
       "总览": renderOverview,
@@ -1443,16 +1473,183 @@ function renderKanban() {
       "招聘规划": renderHire,
       "规则与文档": renderRules,
       "网站项目": renderProjects,
+      "资产管理": renderAssetVault,
     };
-    if (isTradeWorkbench()) {
+    if (isTradeWorkbench() && magicHubTabId() !== "assets") {
       document.getElementById("main").innerHTML = renderTradeMagicHub();
+    } else if (isTradeWorkbench()) {
+      document.getElementById("main").innerHTML = renderAssetVault();
     } else {
       document.getElementById("main").innerHTML = (map[state.tab] || renderOverview)();
     }
     bindMain();
   }
 
+  async function bindAssetVault() {
+    const root = document.getElementById("assetVault");
+    if (!root || root.dataset.bound === "1") return;
+    root.dataset.bound = "1";
+    const vault = await import("./asset-vault.mjs");
+    const msg = document.getElementById("assetMsg");
+    const list = document.getElementById("assetList");
+    const form = document.getElementById("assetForm");
+    const say = (text) => { if (msg) msg.textContent = text; };
+    const hosted = isHostedPages();
+
+    async function load() {
+      if (hosted) {
+        assetUi.accounts = [];
+        say("公开网页没有本机档案。请在 Mac 超级工作台里使用资产管理。");
+        draw();
+        return;
+      }
+      try {
+        const response = await fetch("/api/assets", { credentials: "same-origin", cache: "no-store" });
+        if (!response.ok) throw new Error("unavailable");
+        const body = await response.json();
+        assetUi.accounts = body.accounts || [];
+        say("密码不会出现在这个列表里。");
+      } catch {
+        assetUi.accounts = [];
+        say("局域网接口不可用。档案和密码请在 Mac 超级工作台里管理。");
+      }
+      draw();
+    }
+
+    function draw() {
+      const rows = vault.filterAccounts(assetUi.accounts, { query: assetUi.query, category: assetUi.category });
+      list.innerHTML = rows.map((account) => `<article class="sw-card" style="padding:12px;margin-bottom:8px">
+        <strong>${esc(account.platform)}</strong>
+        <span class="badge">${esc(account.category || "")}</span>
+        <div class="muted">${esc(account.username || "")}</div>
+        <div style="margin-top:8px">
+          ${account.loginURL ? `<button type="button" data-asset-open="${esc(account.id)}" class="btn">打开登录页</button>` : ""}
+          <button type="button" data-asset-edit="${esc(account.id)}" class="btn">编辑</button>
+          <button type="button" data-asset-del="${esc(account.id)}" class="btn">删除</button>
+        </div>
+      </article>`).join("") || `<p class="muted">没有账号。</p>`;
+      list.querySelectorAll("[data-asset-open]").forEach((el) => {
+        el.onclick = () => {
+          const account = assetUi.accounts.find((item) => item.id === el.getAttribute("data-asset-open"));
+          if (account && account.loginURL) window.open(account.loginURL, "_blank", "noopener");
+        };
+      });
+      list.querySelectorAll("[data-asset-edit]").forEach((el) => {
+        el.onclick = () => openForm(assetUi.accounts.find((item) => item.id === el.getAttribute("data-asset-edit")));
+      });
+      list.querySelectorAll("[data-asset-del]").forEach((el) => {
+        el.onclick = async () => {
+          const account = assetUi.accounts.find((item) => item.id === el.getAttribute("data-asset-del"));
+          if (!account || !confirm("删除「" + account.platform + "」？此网页删的是档案；钥匙串条目要在 Mac 应用里删除。")) return;
+          await fetch("/api/assets?id=" + encodeURIComponent(account.id), { method: "DELETE", credentials: "same-origin" });
+          await load();
+        };
+      });
+    }
+
+    function openForm(account) {
+      const current = account || { platform: "", category: "电商", loginURL: "", username: "", notes: "", twoFactor: "none", tags: [], company: "", brand: "" };
+      form.hidden = false;
+      form.style.display = "grid";
+      form.innerHTML = `
+        <input name="platform" placeholder="平台" value="${esc(current.platform || "")}"/>
+        <input name="category" placeholder="分类" value="${esc(current.category || "电商")}"/>
+        <input name="loginURL" placeholder="https://登录地址" value="${esc(current.loginURL || "")}"/>
+        <input name="username" placeholder="用户名" value="${esc(current.username || "")}"/>
+        <input name="company" placeholder="公司" value="${esc(current.company || "")}"/>
+        <input name="brand" placeholder="品牌" value="${esc(current.brand || "")}"/>
+        <input name="tags" placeholder="标签，用逗号分隔" value="${esc((current.tags || []).join(", "))}"/>
+        <textarea name="notes" placeholder="备注，不要写密码">${esc(current.notes || "")}</textarea>
+        <p class="muted">这里没有密码框。密码请在 Mac 应用里填写。</p>
+        <div><button type="submit" class="btn">保存档案</button> <button type="button" id="assetCancel" class="btn">取消</button></div>`;
+      form.onsubmit = async (event) => {
+        event.preventDefault();
+        const data = Object.fromEntries(new FormData(form).entries());
+        data.id = current.id || "";
+        data.twoFactor = current.twoFactor || "none";
+        let split;
+        try { split = vault.splitRecord(data); } catch { say("请填写平台名称"); return; }
+        if (vault.patchHasValue(split.patch)) {
+          say("检测到密钥字段，已丢弃，没有写入。");
+        }
+        const response = await fetch("/api/assets", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ account: vault.fileRecord(split.account) }),
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!body.success) { say(body.error || "没有保存"); return; }
+        form.hidden = true;
+        form.style.display = "";
+        say("档案已保存。");
+        await load();
+      };
+      const cancel = document.getElementById("assetCancel");
+      if (cancel) cancel.onclick = () => { form.hidden = true; form.style.display = ""; };
+    }
+
+    document.getElementById("assetQuery").oninput = (event) => { assetUi.query = event.target.value; draw(); };
+    document.getElementById("assetCategory").onchange = (event) => { assetUi.category = event.target.value; draw(); };
+    document.getElementById("assetNew").onclick = () => openForm(null);
+    document.getElementById("assetCsv").onchange = async (event) => {
+      const file = event.target.files && event.target.files[0];
+      event.target.value = "";
+      if (!file) return;
+      const text = await file.text();
+      const parsed = vault.parseCSV(text);
+      let imported = 0;
+      let dropped = 0;
+      for (const row of parsed.rows) {
+        if (vault.patchHasValue(row.patch)) dropped += 1;
+        if (hosted) continue;
+        const response = await fetch("/api/assets", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ account: vault.fileRecord(row.account) }),
+        });
+        const body = await response.json().catch(() => ({}));
+        if (body.success) imported += 1;
+      }
+      say(hosted
+        ? "公开网页不能导入。请在 Mac 超级工作台里导入，密码才会进钥匙串。"
+        : `导入 ${imported} 条。已丢弃 ${dropped} 条里的密码，没有写进文件。`);
+      if (!hosted) await load();
+    };
+    document.getElementById("assetGen").onclick = () => {
+      assetUi.generated = vault.generatePassword({ length: 20 });
+      const output = document.getElementById("assetGenOut");
+      output.value = assetUi.generated;
+      output.type = "password";
+    };
+    document.getElementById("assetGenShow").onclick = () => {
+      const output = document.getElementById("assetGenOut");
+      output.type = output.type === "password" ? "text" : "password";
+    };
+    document.getElementById("assetGenCopy").onclick = async () => {
+      if (!assetUi.generated) return;
+      try {
+        await navigator.clipboard.writeText(assetUi.generated);
+        const copied = assetUi.generated;
+        say("已复制生成的密码。若浏览器允许回读剪贴板，大约 45 秒后会清除。");
+        setTimeout(async () => {
+          try {
+            const current = await navigator.clipboard.readText();
+            if (vault.shouldClearClipboard({ copied, current, elapsedMs: vault.CLIPBOARD_CLEAR_MS })) {
+              await navigator.clipboard.writeText("");
+            }
+          } catch { /* 不覆盖用户后来复制的内容 */ }
+        }, vault.CLIPBOARD_CLEAR_MS);
+      } catch {
+        say("浏览器没有允许写入剪贴板。");
+      }
+    };
+    await load();
+  }
+
   function bindMain() {
+    if (document.getElementById("assetVault")) bindAssetVault();
     document.querySelectorAll("[data-bot]").forEach((el) => {
       el.onclick = () => { state.selectedId = el.getAttribute("data-bot"); state.tab = "员工档案"; saveLocal(); render(); };
     });
@@ -1587,7 +1784,13 @@ function renderKanban() {
       ).join("");
       tabs.querySelectorAll("[data-mh-tab]").forEach((el) => {
         el.onclick = () => {
-          setMagicHubTab(el.getAttribute("data-mh-tab"));
+          const next = el.getAttribute("data-mh-tab");
+          const prev = magicHubTabId();
+          setMagicHubTab(next);
+          if (next === "assets" || prev === "assets") {
+            render();
+            return;
+          }
           // Re-render sidebar active only (avoid remounting iframe)
           tabs.querySelectorAll("[data-mh-tab]").forEach((b) => {
             b.classList.toggle("active", b.getAttribute("data-mh-tab") === state.magicHubTab);

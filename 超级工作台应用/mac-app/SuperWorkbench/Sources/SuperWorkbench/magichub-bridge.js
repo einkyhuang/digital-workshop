@@ -33,7 +33,12 @@
     readFile: (path) => invoke('read-file', [path]),
     writeFile: (path, content) => invoke('write-file', [path, content]),
     selectLocalZipAndUpdate: () => invoke('select-local-zip-and-update', []),
-    openGlobalSettings: () => invoke('open-global-settings', [])
+    openGlobalSettings: () => invoke('open-global-settings', []),
+    // Metadata plus one account's secret fields on save. No bulk secret read.
+    listAssets: () => invoke('list-assets', []),
+    saveAsset: (record) => invoke('save-asset', [record]),
+    deleteAsset: (id) => invoke('delete-asset', [id]),
+    importAssetsCsv: (csv) => invoke('import-assets-csv', [csv])
   };
   document.documentElement.setAttribute('data-sw-host', 'mac');
   // Always embed when hosted by SuperWorkbench Mac WKWebView

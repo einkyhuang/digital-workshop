@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import WebKit
+import AssetVaultCore
 
 /// Replaces Electron IPC for MagicHub running inside WKWebView.
 /// Settings and mutable CRM data live under data/private/crm/ (gitignored).
@@ -8,6 +9,8 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
     weak var webView: WKWebView?
     let repoRoot: URL
     private var secureMode: Bool = false
+    /// Keychain handle used only to write or delete one account. Listing never returns secret bytes.
+    private let assetSecrets = KeychainAssetSecretStore()
 
     init(repoRoot: URL) {
         self.repoRoot = repoRoot
@@ -120,6 +123,17 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
                 NotificationCenter.default.post(name: .swOpenGlobalSettings, object: nil)
             }
             return (true, ["ok": true, "opened": true], nil)
+        case "list-assets":
+            return listAssets()
+        case "save-asset":
+            guard let raw = args.first else { return (false, nil, "bad args") }
+            return saveAsset(Self.jsonSafe(raw))
+        case "delete-asset":
+            guard let id = args.first as? String else { return (false, nil, "bad args") }
+            return deleteAsset(id)
+        case "import-assets-csv":
+            guard let csv = args.first as? String else { return (false, nil, "bad args") }
+            return importAssets(csv)
         default:
             return (false, nil, "unknown method \(method)")
         }
@@ -309,6 +323,10 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
         guard FileManager.default.fileExists(atPath: url.path) else {
             return (false, ["success": false, "error": "文件不存在"], "文件不存在")
         }
+        if AssetVault.isAssetVaultPath(path) {
+            let raw = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
+            return (true, ["success": true, "content": AssetVault.redactJSONText(raw)], nil)
+        }
         do {
             let content = try String(contentsOf: url, encoding: .utf8)
             return (true, ["success": true, "content": content], nil)
@@ -318,6 +336,9 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
     }
 
     private func writeFile(path: String, content: String) -> (Bool, Any?, String?) {
+        if AssetVault.isAssetVaultPath(path) {
+            return (false, ["success": false, "error": "资产管理不能直接写文件"], "资产管理不能直接写文件")
+        }
         let url = URL(fileURLWithPath: path)
         do {
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -330,5 +351,69 @@ final class MagicHubBridge: NSObject, WKScriptMessageHandler {
 
     func setSecureMode(_ on: Bool) {
         secureMode = on
+    }
+
+    private func assetStore() -> AssetFileStore {
+        AssetFileStore(root: repoRoot.appendingPathComponent("超级工作台应用/data/private/资产管理", isDirectory: true))
+    }
+
+    /// Metadata only. There is intentionally no method that returns every secret.
+    private func listAssets() -> (Bool, Any?, String?) {
+        do {
+            let accounts = try assetStore().list(secrets: assetSecrets).map { $0.apiJSON() }
+            return guardedAsset(["success": true, "accounts": accounts, "secretsAvailable": true])
+        } catch {
+            return (false, ["success": false, "error": "读取失败"], "读取失败")
+        }
+    }
+
+    private func saveAsset(_ raw: Any) -> (Bool, Any?, String?) {
+        guard let dict = AssetVault.dictionary(raw) else { return (false, nil, "bad args") }
+        do {
+            let saved = try assetStore().save(raw: dict, secrets: assetSecrets)
+            return guardedAsset([
+                "success": true,
+                "account": saved.apiJSON(),
+                "secretsStored": saved.hasSecret,
+            ])
+        } catch AssetVaultError.invalidPlatform {
+            return (false, ["success": false, "error": "缺少平台名称"], "缺少平台名称")
+        } catch AssetVaultError.invalidId {
+            return (false, ["success": false, "error": "无效的条目 id"], "无效的条目 id")
+        } catch {
+            return (false, ["success": false, "error": "保存失败"], "保存失败")
+        }
+    }
+
+    private func deleteAsset(_ id: String) -> (Bool, Any?, String?) {
+        do {
+            let removed = try assetStore().delete(id: id, secrets: assetSecrets)
+            return (true, ["success": true, "removed": removed], nil)
+        } catch AssetVaultError.invalidId {
+            return (false, ["success": false, "error": "无效的条目 id"], "无效的条目 id")
+        } catch {
+            return (false, ["success": false, "error": "删除失败"], "删除失败")
+        }
+    }
+
+    private func importAssets(_ csv: String) -> (Bool, Any?, String?) {
+        if csv.count > AssetVaultCatalog.csvMaxChars {
+            return (false, ["success": false, "error": "csv 过大"], "csv 过大")
+        }
+        let result = assetStore().importCSV(csv, secrets: assetSecrets)
+        return guardedAsset([
+            "success": true,
+            "imported": result.imported,
+            "skipped": result.skipped,
+            "secretsStored": result.secretsStored,
+            "errors": result.errors,
+        ])
+    }
+
+    private func guardedAsset(_ payload: [String: Any]) -> (Bool, Any?, String?) {
+        if AssetVault.containsSecretKey(payload) {
+            return (false, ["success": false, "error": "拒绝返回密钥"], "拒绝返回密钥")
+        }
+        return (true, payload, nil)
     }
 }
