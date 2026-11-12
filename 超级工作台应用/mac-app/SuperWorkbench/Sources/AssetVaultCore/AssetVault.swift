@@ -13,7 +13,7 @@ public enum AssetVaultCatalog {
         ("other", "其他"),
     ]
     public static let publicFields = [
-        "id", "platform", "category", "loginURL", "username", "notes",
+        "id", "platform", "category", "loginURL", "username", "email", "notes",
         "twoFactor", "tags", "company", "brand", "updatedAt",
     ]
     public static let secretFields = ["password", "apiKey", "recoveryCodes", "totpSecret", "extra"]
@@ -28,6 +28,8 @@ public struct AssetAccount: Equatable, Identifiable {
     public var category: String
     public var loginURL: String
     public var username: String
+    /// Optional. Missing on older files; an email-shaped username is shown as 邮箱 too.
+    public var email: String
     public var notes: String
     public var twoFactor: String
     public var tags: [String]
@@ -35,6 +37,10 @@ public struct AssetAccount: Equatable, Identifiable {
     public var brand: String
     public var updatedAt: String
     public var hasSecret: Bool
+    /// Presence only. The password itself never lives on this value.
+    public var hasPassword: Bool
+    /// Presence only. The API key itself never lives on this value.
+    public var hasApiKey: Bool
 
     public init(
         id: String = "",
@@ -42,19 +48,23 @@ public struct AssetAccount: Equatable, Identifiable {
         category: String = "其他",
         loginURL: String = "",
         username: String = "",
+        email: String = "",
         notes: String = "",
         twoFactor: String = "none",
         tags: [String] = [],
         company: String = "",
         brand: String = "",
         updatedAt: String = "",
-        hasSecret: Bool = false
+        hasSecret: Bool = false,
+        hasPassword: Bool = false,
+        hasApiKey: Bool = false
     ) {
         self.id = id
         self.platform = platform
         self.category = category
         self.loginURL = loginURL
         self.username = username
+        self.email = email
         self.notes = notes
         self.twoFactor = twoFactor
         self.tags = tags
@@ -62,6 +72,8 @@ public struct AssetAccount: Equatable, Identifiable {
         self.brand = brand
         self.updatedAt = updatedAt
         self.hasSecret = hasSecret
+        self.hasPassword = hasPassword
+        self.hasApiKey = hasApiKey
     }
 
     public static var empty: AssetAccount { AssetAccount() }
@@ -73,6 +85,7 @@ public struct AssetAccount: Equatable, Identifiable {
             "category": category,
             "loginURL": loginURL,
             "username": username,
+            "email": email,
             "notes": notes,
             "twoFactor": twoFactor,
             "tags": tags,
@@ -85,7 +98,43 @@ public struct AssetAccount: Equatable, Identifiable {
     public func apiJSON() -> [String: Any] {
         var json = fileJSON()
         json["hasSecret"] = hasSecret
+        json["hasPassword"] = hasPassword
+        json["hasApiKey"] = hasApiKey
         return json
+    }
+}
+
+/// Booleans only. Callers must not keep the secret strings used to compute these.
+public struct AssetSecretFlags: Equatable {
+    public var hasPassword: Bool
+    public var hasApiKey: Bool
+    public var hasAny: Bool
+
+    public init(hasPassword: Bool, hasApiKey: Bool, hasAny: Bool) {
+        self.hasPassword = hasPassword
+        self.hasApiKey = hasApiKey
+        self.hasAny = hasAny
+    }
+
+    public static let none = AssetSecretFlags(hasPassword: false, hasApiKey: false, hasAny: false)
+}
+
+/// One card row. Secret rows keep `value` empty so a render pass cannot leak the keychain.
+public struct AssetCopyField: Equatable, Identifiable {
+    public var id: String
+    public var label: String
+    public var icon: String
+    public var value: String
+    public var secret: Bool
+    public var hint: String
+
+    public init(id: String, label: String, icon: String, value: String, secret: Bool, hint: String = "") {
+        self.id = id
+        self.label = label
+        self.icon = icon
+        self.value = value
+        self.secret = secret
+        self.hint = hint
     }
 }
 
@@ -108,6 +157,10 @@ public struct AssetSecrets: Equatable, Codable {
 
     public var isEmpty: Bool {
         password.isEmpty && apiKey.isEmpty && recoveryCodes.isEmpty && totpSecret.isEmpty && extra.isEmpty
+    }
+
+    public var flags: AssetSecretFlags {
+        AssetSecretFlags(hasPassword: !password.isEmpty, hasApiKey: !apiKey.isEmpty, hasAny: !isEmpty)
     }
 }
 
@@ -274,6 +327,64 @@ public enum AssetVault {
         return AssetDraft(account: account, patch: AssetSecretPatch(values: patch))
     }
 
+    public static func looksLikeEmail(_ raw: String) -> Bool {
+        let text = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        let parts = text.split(separator: "@", omittingEmptySubsequences: false)
+        guard parts.count == 2 else { return false }
+        let local = parts[0]
+        let domain = parts[1]
+        guard !local.isEmpty, domain.contains("."), !domain.hasPrefix("."), !domain.hasSuffix(".") else { return false }
+        let blocked = CharacterSet.whitespacesAndNewlines.union(CharacterSet(charactersIn: "/\\"))
+        return text.unicodeScalars.allSatisfy { !blocked.contains($0) }
+    }
+
+    /// 「全部」 plus categories that currently have accounts. Built-ins stay in catalog order; custom folders follow.
+    public static func categoryTabs(_ accounts: [AssetAccount]) -> [String] {
+        let present = Set(accounts.map { $0.category.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty })
+        let builtin = AssetVaultCatalog.categories.filter { present.contains($0) }
+        let custom = present.subtracting(AssetVaultCatalog.categories).sorted()
+        return ["全部"] + builtin + custom
+    }
+
+    /// Rows to show on a card. Empty fields are omitted. Password and API values are never copied into the row.
+    public static func cardFields(for account: AssetAccount) -> [AssetCopyField] {
+        var rows: [AssetCopyField] = []
+        let user = account.username.trimmingCharacters(in: .whitespacesAndNewlines)
+        let mail = account.email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let same = !user.isEmpty && !mail.isEmpty && user.lowercased() == mail.lowercased()
+        if !user.isEmpty && looksLikeEmail(user) && (mail.isEmpty || same) {
+            rows.append(AssetCopyField(
+                id: "username",
+                label: "账号/邮箱",
+                icon: "envelope",
+                value: mail.isEmpty ? user : mail,
+                secret: false
+            ))
+        } else if !user.isEmpty {
+            rows.append(AssetCopyField(id: "username", label: "账号", icon: "person", value: user, secret: false))
+        }
+        if !mail.isEmpty && !same {
+            rows.append(AssetCopyField(id: "email", label: "邮箱", icon: "envelope", value: mail, secret: false))
+        }
+        if account.hasPassword {
+            rows.append(AssetCopyField(id: "password", label: "密码", icon: "key", value: "", secret: true, hint: "请在 Mac 应用中复制"))
+        }
+        if account.hasApiKey {
+            rows.append(AssetCopyField(id: "apiKey", label: "API", icon: "api", value: "", secret: true, hint: "请在 Mac 应用中复制"))
+        }
+        let login = account.loginURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !login.isEmpty {
+            rows.append(AssetCopyField(id: "loginURL", label: "登录地址", icon: "link", value: login, secret: false))
+        }
+        return rows
+    }
+
+    /// Public copy payload. Secret rows always return an empty string.
+    public static func copyText(for field: AssetCopyField) -> String {
+        guard !field.secret else { return "" }
+        return field.value
+    }
+
     public static func filter(_ accounts: [AssetAccount], query: String, category: String) -> [AssetAccount] {
         let needle = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         let cat = category.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -281,7 +392,7 @@ public enum AssetVault {
             if !cat.isEmpty && cat != "全部" && account.category != cat { return false }
             if needle.isEmpty { return true }
             let hay = ([
-                account.platform, account.category, account.loginURL, account.username,
+                account.platform, account.category, account.loginURL, account.username, account.email,
                 account.notes, account.company, account.brand,
             ] + account.tags).joined(separator: "\n").lowercased()
             return hay.contains(needle)
@@ -401,6 +512,7 @@ public enum AssetVault {
             category: safeCategory(stringValue(meta["category"])),
             loginURL: safeLoginURL(stringValue(meta["loginURL"])),
             username: clip(stringValue(meta["username"]).trimmingCharacters(in: .whitespacesAndNewlines), 200),
+            email: clip(stringValue(meta["email"]).trimmingCharacters(in: .whitespacesAndNewlines), 200),
             notes: clip(stringValue(meta["notes"]), 8000),
             twoFactor: normalizeTwoFactor(stringValue(meta["twoFactor"])),
             tags: normalizeTags(meta["tags"]),
@@ -431,7 +543,8 @@ public enum AssetVault {
         case "platform", "name", "平台", "平台名称": return "platform"
         case "category", "分类": return "category"
         case "loginurl", "url", "登录地址", "登录网址", "网址": return "loginURL"
-        case "username", "user", "email", "用户名", "账号", "邮箱": return "username"
+        case "username", "user", "用户名", "账号": return "username"
+        case "email", "邮箱": return "email"
         case "password", "passwd", "pwd", "密码": return "password"
         case "notes", "note", "备注": return "notes"
         case "twofactor", "2fa", "二次验证", "双重验证": return "twoFactor"

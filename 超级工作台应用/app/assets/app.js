@@ -1565,21 +1565,30 @@ function renderKanban() {
       <div class="step"><h4>复盘</h4><p>缺口与教训写回规则与测试用例。</p></div>`;
   }
 
-  const assetUi = { accounts: [], query: "", category: "全部", form: null, generated: "" };
+  const assetUi = { accounts: [], query: "", category: "全部", form: null, generated: "", copied: "" };
+
+  function assetIcon(name) {
+    const paths = {
+      person: '<circle cx="8" cy="5.5" r="2.2"/><path d="M3.2 13.2c.7-2.2 2.4-3.3 4.8-3.3s4.1 1.1 4.8 3.3"/>',
+      envelope: '<rect x="2.2" y="4" width="11.6" height="8" rx="1.2"/><path d="M3 5l5 3.4L13 5"/>',
+      key: '<circle cx="6" cy="8" r="2.3"/><path d="M8 8h6M12 8v2"/>',
+      api: '<path d="M6 4L2.8 8 6 12M10 4l3.2 4L10 12"/>',
+      link: '<path d="M6.5 9.5l-1 1a2.4 2.4 0 010-3.4l1-1M9.5 6.5l1-1a2.4 2.4 0 010 3.4l-1 1M6.2 9.8l3.6-3.6"/>',
+    };
+    return `<svg class="asset-ico" viewBox="0 0 16 16" aria-hidden="true">${paths[name] || paths.person}</svg>`;
+  }
 
   function renderAssetVault() {
-    const cats = ["全部", "电商", "社交", "广告", "主机", "域名", "邮箱", "支付", "其他"];
-    const options = cats.map((item) => `<option ${assetUi.category === item ? "selected" : ""}>${esc(item)}</option>`).join("");
     return `<div id="assetVault">
       <h2 class="section-title">资产管理</h2>
-      <p class="muted">平台、网址、用户名和备注保存在本机 private/资产管理/。密码、API 密钥和恢复码只进 Mac 钥匙串，这个网页不保存，也不能一次性读出。</p>
+      <p class="muted">平台、网址、账号和邮箱保存在本机档案里。密码和 API 密钥只在 Mac 应用中复制，这个网页不显示、也不保存。</p>
       <p id="assetMsg" class="muted"></p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0">
-        <input id="assetQuery" placeholder="搜索平台、用户名、备注、标签" value="${esc(assetUi.query)}" style="flex:1;min-width:180px"/>
-        <select id="assetCategory">${options}</select>
+      <div class="asset-toolbar">
+        <input id="assetQuery" placeholder="搜索平台、账号、邮箱、备注、标签" value="${esc(assetUi.query)}"/>
         <button type="button" id="assetNew" class="btn">新建</button>
         <label class="btn">导入 CSV<input id="assetCsv" type="file" accept=".csv,text/csv" hidden/></label>
       </div>
+      <div id="assetPills" class="asset-pills"></div>
       <div id="assetList"></div>
       <form id="assetForm" hidden style="gap:8px;max-width:640px;margin-top:16px"></form>
       <section style="margin-top:18px">
@@ -1645,7 +1654,7 @@ function renderKanban() {
         if (!response.ok) throw new Error("unavailable");
         const body = await response.json();
         assetUi.accounts = body.accounts || [];
-        say("密码不会出现在这个列表里。");
+        say("密码和 API 密钥不会出现在这个列表里。");
       } catch {
         assetUi.accounts = [];
         say("局域网接口不可用。档案和密码请在 Mac 超级工作台里管理。");
@@ -1654,17 +1663,25 @@ function renderKanban() {
     }
 
     function draw() {
+      const tabs = vault.categoryTabs(assetUi.accounts);
+      if (!tabs.includes(assetUi.category)) assetUi.category = "全部";
+      const pills = document.getElementById("assetPills");
+      if (pills) {
+        pills.innerHTML = tabs.map((item) =>
+          `<button type="button" class="asset-pill${item === assetUi.category ? " is-on" : ""}" data-asset-cat="${esc(item)}">${esc(item)}</button>`
+        ).join("");
+        pills.querySelectorAll("[data-asset-cat]").forEach((el) => {
+          el.onclick = () => {
+            assetUi.category = el.getAttribute("data-asset-cat") || "全部";
+            draw();
+          };
+        });
+      }
       const rows = vault.filterAccounts(assetUi.accounts, { query: assetUi.query, category: assetUi.category });
-      list.innerHTML = rows.map((account) => `<article class="sw-card" style="padding:12px;margin-bottom:8px">
-        <strong>${esc(account.platform)}</strong>
-        <span class="badge">${esc(account.category || "")}</span>
-        <div class="muted">${esc(account.username || "")}</div>
-        <div style="margin-top:8px">
-          ${account.loginURL ? `<button type="button" data-asset-open="${esc(account.id)}" class="btn">打开登录页</button>` : ""}
-          <button type="button" data-asset-edit="${esc(account.id)}" class="btn">编辑</button>
-          <button type="button" data-asset-del="${esc(account.id)}" class="btn">删除</button>
-        </div>
-      </article>`).join("") || `<p class="muted">没有账号。</p>`;
+      list.innerHTML = rows.length ? `<div class="asset-grid">${rows.map(assetCard).join("")}</div>` : `<p class="muted asset-empty">没有符合筛选的账号。</p>`;
+      list.querySelectorAll("[data-asset-copy]").forEach((el) => {
+        el.onclick = () => copyAssetField(el.getAttribute("data-asset-copy"), el.getAttribute("data-asset-field"));
+      });
       list.querySelectorAll("[data-asset-open]").forEach((el) => {
         el.onclick = () => {
           const account = assetUi.accounts.find((item) => item.id === el.getAttribute("data-asset-open"));
@@ -1684,15 +1701,69 @@ function renderKanban() {
       });
     }
 
+    function assetCard(account) {
+      const fields = vault.cardFields(account).map((field) => {
+        const icon = assetIcon(field.icon);
+        if (field.secret || !vault.copyTextForField(field)) {
+          return `<div class="asset-row is-locked">${icon}<span class="k">${esc(field.label)}</span><span class="v">${esc(field.hint || "请在 Mac 应用中复制")}</span></div>`;
+        }
+        const mark = assetUi.copied === `${account.id}:${field.id}`
+          ? `<span class="asset-copied">已复制</span>`
+          : `<span class="asset-copy">复制</span>`;
+        const open = field.id === "loginURL"
+          ? `<button type="button" class="asset-open" data-asset-open="${esc(account.id)}">打开</button>`
+          : "";
+        return `<div class="asset-row">${icon}<button type="button" class="asset-copy-btn" data-asset-copy="${esc(account.id)}" data-asset-field="${esc(field.id)}"><span class="k">${esc(field.label)}</span><span class="v">${esc(field.value)}</span>${mark}</button>${open}</div>`;
+      }).join("");
+      const meta = [account.company, account.brand].filter(Boolean).join(" · ");
+      return `<article class="asset-card">
+        <div class="asset-card-head">
+          <h3>${esc(account.platform || "")}</h3>
+          <span class="asset-tag">${esc(account.category || "")}</span>
+        </div>
+        <div class="asset-fields">${fields}</div>
+        ${meta ? `<p class="asset-meta">${esc(meta)}</p>` : ""}
+        ${account.notes ? `<p class="asset-meta">${esc(account.notes)}</p>` : ""}
+        <div class="asset-actions">
+          <button type="button" data-asset-edit="${esc(account.id)}" class="btn">编辑</button>
+          <button type="button" data-asset-del="${esc(account.id)}" class="btn">删除</button>
+        </div>
+      </article>`;
+    }
+
+    async function copyAssetField(id, fieldId) {
+      const account = assetUi.accounts.find((item) => item.id === id);
+      if (!account) return;
+      const field = vault.cardFields(account).find((item) => item.id === fieldId);
+      const text = vault.copyTextForField(field);
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        assetUi.copied = `${id}:${fieldId}`;
+        say("已复制");
+        draw();
+        const token = assetUi.copied;
+        setTimeout(() => {
+          if (assetUi.copied === token) {
+            assetUi.copied = "";
+            draw();
+          }
+        }, 1600);
+      } catch {
+        say("浏览器没有允许写入剪贴板。");
+      }
+    }
+
     function openForm(account) {
-      const current = account || { platform: "", category: "电商", loginURL: "", username: "", notes: "", twoFactor: "none", tags: [], company: "", brand: "" };
+      const current = account || { platform: "", category: "电商", loginURL: "", username: "", email: "", notes: "", twoFactor: "none", tags: [], company: "", brand: "" };
       form.hidden = false;
       form.style.display = "grid";
       form.innerHTML = `
         <input name="platform" placeholder="平台" value="${esc(current.platform || "")}"/>
         <input name="category" placeholder="分类" value="${esc(current.category || "电商")}"/>
         <input name="loginURL" placeholder="https://登录地址" value="${esc(current.loginURL || "")}"/>
-        <input name="username" placeholder="用户名" value="${esc(current.username || "")}"/>
+        <input name="username" placeholder="账号" value="${esc(current.username || "")}"/>
+        <input name="email" placeholder="邮箱（可选）" value="${esc(current.email || "")}"/>
         <input name="company" placeholder="公司" value="${esc(current.company || "")}"/>
         <input name="brand" placeholder="品牌" value="${esc(current.brand || "")}"/>
         <input name="tags" placeholder="标签，用逗号分隔" value="${esc((current.tags || []).join(", "))}"/>
@@ -1727,7 +1798,6 @@ function renderKanban() {
     }
 
     document.getElementById("assetQuery").oninput = (event) => { assetUi.query = event.target.value; draw(); };
-    document.getElementById("assetCategory").onchange = (event) => { assetUi.category = event.target.value; draw(); };
     document.getElementById("assetNew").onclick = () => openForm(null);
     document.getElementById("assetCsv").onchange = async (event) => {
       const file = event.target.files && event.target.files[0];

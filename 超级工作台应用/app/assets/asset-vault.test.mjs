@@ -6,7 +6,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import {
   CLIPBOARD_CLEAR_MS,
+  cardFields,
+  categoryTabs,
   containsSecretKey,
+  copyTextForField,
   fileRecord,
   filterAccounts,
   generatePassword,
@@ -87,6 +90,84 @@ test("filter matches category and query without looking at secrets", () => {
   assert.equal(filterAccounts(accounts, { category: "广告" }).length, 1);
   assert.equal(filterAccounts(accounts, { query: "投放" })[0].platform, "广告户");
   assert.equal(filterAccounts(accounts, { query: "主号" }).length, 1);
+  assert.equal(filterAccounts(accounts, { category: "电商", query: "主号" }).length, 0);
+});
+
+test("category tabs list only categories that have accounts", () => {
+  const accounts = [
+    { platform: "店铺甲", category: "电商", username: "shop-user", email: "name@example.com", loginURL: "", notes: "", tags: [], company: "", brand: "" },
+    { platform: "工具", category: "AI工具", username: "name@example.com", email: "", loginURL: "", notes: "", tags: [], company: "", brand: "", hasPassword: true, password: FAKE_PASSWORD },
+    { platform: "广告户", category: "广告", username: "ads", email: "", loginURL: "https://example.com/login", notes: "", tags: [], company: "", brand: "", hasApiKey: true, apiKey: "test-api-key" },
+  ];
+  assert.deepEqual(categoryTabs(accounts), ["全部", "电商", "广告", "AI工具"]);
+  assert.equal(categoryTabs(accounts).includes("社交"), false);
+  assert.equal(categoryTabs([]).join(), "全部");
+  assert.equal(filterAccounts(accounts, { category: "电商", query: "name@example.com" }).length, 1);
+  assert.equal(filterAccounts(accounts, { category: "广告", query: "name@example.com" }).length, 0);
+  assert.equal(filterAccounts(accounts, { category: "AI工具", query: "name@example.com" }).length, 1);
+});
+
+test("card fields hide empty rows and never copy secret values", () => {
+  const shop = cardFields({
+    username: "shop-user",
+    email: "name@example.com",
+    password: FAKE_PASSWORD,
+    hasPassword: false,
+  });
+  assert.deepEqual(shop.map((row) => row.label), ["账号", "邮箱"]);
+  assert.equal(copyTextForField(shop[1]), "name@example.com");
+  assert.equal(JSON.stringify(shop).includes(FAKE_PASSWORD), false);
+
+  const tool = cardFields({
+    username: "name@example.com",
+    email: "",
+    hasPassword: true,
+    password: FAKE_PASSWORD,
+    apiKey: "test-api-key",
+  });
+  assert.deepEqual(tool.map((row) => row.label), ["账号/邮箱", "密码"]);
+  assert.equal(tool[1].secret, true);
+  assert.equal(tool[1].value, "");
+  assert.equal(copyTextForField(tool[1]), "");
+  assert.equal(tool[1].hint, "请在 Mac 应用中复制");
+  assert.equal(JSON.stringify(tool).includes(FAKE_PASSWORD), false);
+  assert.equal(JSON.stringify(tool).includes("test-api-key"), false);
+
+  const ads = cardFields({
+    username: "ads",
+    loginURL: "https://example.com/login",
+    hasApiKey: true,
+    apiKey: "test-api-key",
+  });
+  assert.deepEqual(ads.map((row) => row.id), ["username", "apiKey", "loginURL"]);
+  assert.equal(copyTextForField(ads.find((row) => row.id === "apiKey")), "");
+  assert.equal(copyTextForField(ads.find((row) => row.id === "loginURL")), "https://example.com/login");
+
+  const same = cardFields({ username: "Name@Example.com", email: "name@example.com" });
+  assert.deepEqual(same.map((row) => row.label), ["账号/邮箱"]);
+  assert.equal(copyTextForField(same[0]), "name@example.com");
+});
+
+test("optional email stays in metadata and older files still load", () => {
+  const split = splitRecord({
+    platform: "示例平台",
+    username: "shop-user",
+    email: "name@example.com",
+    password: FAKE_PASSWORD,
+  }, "2026-11-11T00:00:00Z");
+  assert.equal(split.account.email, "name@example.com");
+  assert.equal(split.account.username, "shop-user");
+  assert.equal(split.patch.password, FAKE_PASSWORD);
+  assert.equal(fileRecord(split.account).email, "name@example.com");
+  assert.equal(JSON.stringify(fileRecord(split.account)).includes(FAKE_PASSWORD), false);
+  const legacy = splitRecord({ platform: "示例平台", username: "name@example.com" }, "2026-11-11T00:00:00Z");
+  assert.equal(legacy.account.email, "");
+  assert.deepEqual(cardFields(legacy.account).map((row) => row.label), ["账号/邮箱"]);
+  const csv = parseCSV("platform,账号,邮箱\n示例平台,shop-user,name@example.com\n");
+  assert.equal(csv.errors.length, 0);
+  assert.equal(csv.rows[0].account.username, "shop-user");
+  assert.equal(csv.rows[0].account.email, "name@example.com");
+  assert.equal(csv.rows[0].patch.password, undefined);
 });
 
 test("generator stays inside the requested classes and length", () => {

@@ -16,7 +16,7 @@ export const TWO_FACTOR_OPTIONS = [
 ];
 
 export const PUBLIC_FIELDS = [
-  "id", "platform", "category", "loginURL", "username", "notes",
+  "id", "platform", "category", "loginURL", "username", "email", "notes",
   "twoFactor", "tags", "company", "brand", "updatedAt",
 ];
 
@@ -40,10 +40,10 @@ const HEADER_MAP = {
   网址: "loginURL",
   username: "username",
   user: "username",
-  email: "username",
   用户名: "username",
   账号: "username",
-  邮箱: "username",
+  email: "email",
+  邮箱: "email",
   password: "password",
   passwd: "password",
   pwd: "password",
@@ -201,6 +201,7 @@ export function normalizeAccount(meta, now = isoNow()) {
     category: safeCategory(meta.category),
     loginURL: safeLoginURL(meta.loginURL),
     username: clip(meta.username, 200).trim(),
+    email: clip(meta.email, 200).trim(),
     notes: clip(meta.notes, 8000),
     twoFactor: normalizeTwoFactor(meta.twoFactor),
     tags: normalizeTags(meta.tags),
@@ -288,8 +289,72 @@ export function fileRecord(account) {
   return out;
 }
 
-export function publicAccount(account, hasSecret = false) {
-  return { ...fileRecord(account), hasSecret: Boolean(hasSecret) };
+export function publicAccount(account, hasSecret = false, flags = {}) {
+  const hasPassword = Boolean(flags.hasPassword);
+  const hasApiKey = Boolean(flags.hasApiKey);
+  return {
+    ...fileRecord(account),
+    hasSecret: Boolean(hasSecret || hasPassword || hasApiKey),
+    hasPassword,
+    hasApiKey,
+  };
+}
+
+export function looksLikeEmail(raw) {
+  const text = String(raw || "").trim();
+  const parts = text.split("@");
+  if (parts.length !== 2 || !parts[0] || !parts[1]) return false;
+  const domain = parts[1];
+  if (!domain.includes(".") || domain.startsWith(".") || domain.endsWith(".")) return false;
+  return !/[\s/\\]/.test(text);
+}
+
+/** 「全部」 plus categories that currently have accounts. Built-ins keep catalog order. */
+export function categoryTabs(accounts) {
+  const present = new Set(
+    (accounts || [])
+      .map((account) => String(account?.category || "").trim())
+      .filter(Boolean),
+  );
+  const builtin = CATEGORIES.filter((item) => present.has(item));
+  const custom = [...present].filter((item) => !CATEGORIES.includes(item)).sort((a, b) => a.localeCompare(b, "zh"));
+  return ["全部", ...builtin, ...custom];
+}
+
+/**
+ * Card rows. Secret rows never carry the secret string.
+ * `hasPassword` / `hasApiKey` only control whether a masked hint is shown.
+ */
+export function cardFields(account) {
+  const user = String(account?.username || "").trim();
+  const mail = String(account?.email || "").trim();
+  const same = Boolean(user && mail && user.toLowerCase() === mail.toLowerCase());
+  const rows = [];
+  if (user && looksLikeEmail(user) && (!mail || same)) {
+    rows.push({ id: "username", label: "账号/邮箱", icon: "envelope", value: mail || user, secret: false, hint: "" });
+  } else if (user) {
+    rows.push({ id: "username", label: "账号", icon: "person", value: user, secret: false, hint: "" });
+  }
+  if (mail && !same) {
+    rows.push({ id: "email", label: "邮箱", icon: "envelope", value: mail, secret: false, hint: "" });
+  }
+  if (account?.hasPassword) {
+    rows.push({ id: "password", label: "密码", icon: "key", value: "", secret: true, hint: "请在 Mac 应用中复制" });
+  }
+  if (account?.hasApiKey) {
+    rows.push({ id: "apiKey", label: "API", icon: "api", value: "", secret: true, hint: "请在 Mac 应用中复制" });
+  }
+  const login = String(account?.loginURL || "").trim();
+  if (login) {
+    rows.push({ id: "loginURL", label: "登录地址", icon: "link", value: login, secret: false, hint: "" });
+  }
+  return rows;
+}
+
+/** Public copy payload. Secret rows always return an empty string. */
+export function copyTextForField(field) {
+  if (!field || field.secret) return "";
+  return String(field.value || "");
 }
 
 export function containsSecretKey(value) {
@@ -332,7 +397,7 @@ export function filterAccounts(accounts, { query = "", category = "" } = {}) {
     if (cat && cat !== "全部" && account.category !== cat) return false;
     if (!needle) return true;
     const hay = [
-      account.platform, account.category, account.loginURL, account.username,
+      account.platform, account.category, account.loginURL, account.username, account.email,
       account.notes, account.company, account.brand, ...(account.tags || []),
     ].join("\n").toLowerCase();
     return hay.includes(needle);

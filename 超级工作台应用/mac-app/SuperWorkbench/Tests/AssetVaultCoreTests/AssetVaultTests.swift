@@ -52,6 +52,7 @@ final class AssetVaultTests: XCTestCase {
         ]
         XCTAssertEqual(AssetVault.filter(accounts, query: "", category: "广告").count, 1)
         XCTAssertEqual(AssetVault.filter(accounts, query: "主号", category: "").first?.platform, "广告户")
+        XCTAssertEqual(AssetVault.filter(accounts, query: "主号", category: "电商").count, 0)
         var n = 0
         let password = try AssetVault.generatePassword(length: 16, randomByte: {
             n += 17
@@ -84,6 +85,8 @@ final class AssetVaultTests: XCTestCase {
         let store = AssetFileStore(root: root)
         let listed = try store.list(secrets: secrets)
         XCTAssertEqual(listed.count, 1)
+        XCTAssertTrue(listed[0].hasPassword)
+        XCTAssertFalse(listed[0].hasApiKey)
         XCTAssertEqual(try secrets.load(id: "plantedid1")?.password, fakePassword)
         let rewritten = try String(contentsOf: planted, encoding: .utf8)
         XCTAssertFalse(rewritten.contains(fakePassword))
@@ -97,6 +100,8 @@ final class AssetVaultTests: XCTestCase {
             "loginURL": "https://user:pw@example.com/a",
         ], secrets: secrets)
         XCTAssertTrue(saved.hasSecret)
+        XCTAssertTrue(saved.hasPassword)
+        XCTAssertFalse(saved.hasApiKey)
         XCTAssertEqual(saved.loginURL, "")
         let tree = try fileTree(root)
         XCTAssertFalse(tree.contains(fakePassword))
@@ -106,8 +111,52 @@ final class AssetVaultTests: XCTestCase {
         XCTAssertEqual(imported.imported, 1)
         XCTAssertEqual(imported.secretsStored, 1)
         XCTAssertFalse(try fileTree(root).contains(fakePassword))
+        XCTAssertFalse(try fileTree(root).contains("hasPassword"))
         XCTAssertTrue(try store.delete(id: saved.id, secrets: secrets))
         XCTAssertNil(try secrets.load(id: saved.id))
+    }
+
+    func testCategoryTabsAndCardCopyFields() throws {
+        let accounts = [
+            AssetAccount(platform: "店铺甲", category: "电商", username: "shop-user", email: "name@example.com"),
+            AssetAccount(platform: "工具", category: "AI工具", username: "name@example.com", hasPassword: true),
+            AssetAccount(platform: "广告户", category: "广告", username: "ads", hasApiKey: true, loginURL: "https://example.com/login"),
+        ]
+        XCTAssertEqual(AssetVault.categoryTabs(accounts), ["全部", "电商", "广告", "AI工具"])
+        XCTAssertFalse(AssetVault.categoryTabs(accounts).contains("社交"))
+        XCTAssertEqual(AssetVault.filter(accounts, query: "name@example.com", category: "电商").count, 1)
+        XCTAssertEqual(AssetVault.filter(accounts, query: "name@example.com", category: "广告").count, 0)
+
+        let shop = AssetVault.cardFields(for: accounts[0])
+        XCTAssertEqual(shop.map(\.label), ["账号", "邮箱"])
+        XCTAssertEqual(AssetVault.copyText(for: shop[1]), "name@example.com")
+
+        let tool = AssetVault.cardFields(for: accounts[1])
+        XCTAssertEqual(tool.map(\.label), ["账号/邮箱", "密码"])
+        XCTAssertEqual(tool[1].value, "")
+        XCTAssertTrue(tool[1].secret)
+        XCTAssertEqual(AssetVault.copyText(for: tool[1]), "")
+
+        let polluted = AssetCopyField(id: "password", label: "密码", icon: "key", value: fakePassword, secret: true)
+        XCTAssertEqual(AssetVault.copyText(for: polluted), "")
+
+        let ads = AssetVault.cardFields(for: accounts[2])
+        XCTAssertEqual(ads.map(\.id), ["username", "apiKey", "loginURL"])
+        XCTAssertEqual(ads.first { $0.id == "apiKey" }?.value, "")
+        XCTAssertEqual(AssetVault.copyText(for: ads[2]), "https://example.com/login")
+
+        let csv = "platform,账号,邮箱\n示例平台,shop-user,name@example.com\n"
+        let parsed = AssetVault.parseCSV(csv)
+        XCTAssertEqual(parsed.rows.first?.account.username, "shop-user")
+        XCTAssertEqual(parsed.rows.first?.account.email, "name@example.com")
+        XCTAssertTrue(parsed.rows.first?.patch.values.isEmpty ?? false)
+        let legacy = try AssetVault.splitRecord(["platform": "示例平台", "username": "name@example.com"])
+        XCTAssertEqual(legacy.account.email, "")
+        XCTAssertEqual(AssetVault.cardFields(for: legacy.account).map(\.label), ["账号/邮箱"])
+        let same = AssetAccount(platform: "示例平台", username: "Name@Example.com", email: "name@example.com")
+        let combined = AssetVault.cardFields(for: same)
+        XCTAssertEqual(combined.map(\.label), ["账号/邮箱"])
+        XCTAssertEqual(combined.first?.value, "name@example.com")
     }
 
     private func fileTree(_ root: URL) throws -> String {
