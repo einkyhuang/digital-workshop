@@ -3,23 +3,25 @@
   "feedId": "seo",
   "date": "2026-11-12",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-12T09:20:00+08:00",
+  "updatedAt": "2026-11-12T09:36:56+08:00",
   "botId": "seo",
   "botName": "搜搜-SEO专家",
-  "summary": "Formore Lighting：今日简报 Office Lighting Design: A B2B Buyer's Guide（slug office-lighting-design-guide）已发给墨墨和画眉；昨日 human-centric-lighting-guide 抽检 200，schema 齐全；日检 warn（无 PSI key），无新严重问题。",
+  "summary": "Formore Lighting：今日发布 Office Lighting Design: A B2B Buyer's Guide（线上 200，canonical 与 prerender 正常，Article + FAQPage(5) + BreadcrumbList，列表与 sitemap 已收录；3 张配图 200；ISO/CIE 8995-1 使用 CIE 2025 页面；category Design；CTA 标题正确，正文仍为模板默认路灯文案）；日检 warn（无 PSI key），无新严重问题。昨日 human-centric-lighting-guide 抽检 200，schema 齐全。",
   "articles": [
     {
       "id": "office-lighting-design-guide",
       "title": "Office Lighting Design: A B2B Buyer's Guide",
       "url": "https://www.formorelightings.com/insights/office-lighting-design-guide",
-      "status": "brief",
+      "status": "published",
       "primaryKeyword": "office lighting design",
       "secondaryKeywords": [
         "commercial led lighting",
         "human centric lighting",
         "cri 90 led"
       ],
-      "notes": "简报路径：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-12-office-lighting-design.md。29 条内链 curl 200。目标 slug 尚未上线（预期）。已发墨墨写英文稿、画眉出 3 张 WebP。今日不发布。"
+      "notes": "简报路径：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-12-office-lighting-design.md。发布前上午记录（非当前状态）：计划地址当时尚未上线，简报已发墨墨与画眉，当日原计划不发布。当前已上线：文章 HTTP 200，canonical 正确，prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap 已收录；3 张配图 HTTP 200（office-lighting-design-open-plan-zoned.webp、office-lighting-design-private-office-panel.webp、office-lighting-design-reception-downlights.webp）；ISO/CIE 8995-1 使用 CIE 2025 页面；category Design；CTA 标题 Ready to Specify Your Project? 正确，正文为模板注入的路灯默认文案（road class, sun hours, pole height, and target autonomy），与成稿 CTA 不一致，模板未改。site PR #6 squash c9e5f0422af014d783d44665b18f3001eabf9c81",
+      "publishedAt": "2026-11-12T09:36:56+08:00",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/office-lighting-design-open-plan-zoned.webp"
     },
     {
       "id": "human-centric-lighting-guide",
@@ -31,8 +33,8 @@
         "office lighting design",
         "cri 90 led"
       ],
-      "notes": "昨日经 PR #5 上线（3c873b7fd22fbcc91831ecf7f63e8e5f7a347c93）；今日抽检 200，canonical 正确，Article + FAQPage(5) + BreadcrumbList；CTA 正文仍为模板默认路灯文案（已知）。",
-      "publishedAt": "2026-11-11",
+      "notes": "昨日经 PR #5 上线（3c873b7fd22fbcc91831ecf7f63e8e5f7a347c93）；今日上午抽检 200，canonical 正确，Article + FAQPage(5) + BreadcrumbList；CTA 正文仍为模板默认路灯文案（已知）。",
+      "publishedAt": "2026-11-11T09:45:55+08:00",
       "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/human-centric-lighting-open-office-linear.webp"
     }
   ],
@@ -60,22 +62,22 @@
   ],
   "images": [
     {
-      "url": "",
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/office-lighting-design-open-plan-zoned.webp",
       "alt": "Open-plan office seen from a circulation aisle, with suspended linear lights over empty desk rows and recessed downlights in the aisle, and no people or text visible.",
       "ofArticleId": "office-lighting-design-guide",
-      "notes": "requested hero: office-lighting-design-open-plan-zoned.webp (1600x900); awaiting 画眉 delivery"
+      "notes": "hero: office-lighting-design-open-plan-zoned.webp (1600x900); live HTTP 200 image/webp 86536 bytes"
     },
     {
-      "url": "",
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/office-lighting-design-private-office-panel.webp",
       "alt": "Empty private office lit by a surface-mounted LED panel, with even light on a single desk and walls and no people or text visible.",
       "ofArticleId": "office-lighting-design-guide",
-      "notes": "requested inline 1: office-lighting-design-private-office-panel.webp (1200x800); awaiting 画眉 delivery"
+      "notes": "inline: office-lighting-design-private-office-panel.webp (1200x800); live HTTP 200 image/webp 37112 bytes"
     },
     {
-      "url": "",
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/office-lighting-design-reception-downlights.webp",
       "alt": "Empty office reception lit by recessed downlights around a reception desk, with no people, logos, or readable text visible.",
       "ofArticleId": "office-lighting-design-guide",
-      "notes": "requested inline 2: office-lighting-design-reception-downlights.webp (1200x800); awaiting 画眉 delivery"
+      "notes": "inline: office-lighting-design-reception-downlights.webp (1200x800); live HTTP 200 image/webp 29842 bytes"
     }
   ],
   "checks": [
@@ -89,13 +91,19 @@
       "id": "live-spot-check",
       "name": "核心页面与昨日文章抽检",
       "status": "pass",
-      "detail": "/, /robots.txt, /sitemap.xml, /sitemap-index.xml, /llms.txt, /insights, /products, /contact, /oem-odm, /solutions, /sourcing 均为 200；human-centric-lighting-guide 200，title/H1/canonical 正确，Article + FAQPage(5) + BreadcrumbList，2 张已发布配图 200；sitemap-insights.xml 27 篇。"
+      "detail": "发布前上午日检（今日文章上线前，非当前 sitemap 篇数）：/, /robots.txt, /sitemap.xml, /sitemap-index.xml, /llms.txt, /insights, /products, /contact, /oem-odm, /solutions, /sourcing 均为 200；human-centric-lighting-guide 200，title/H1/canonical 正确，Article + FAQPage(5) + BreadcrumbList，2 张已发布配图 200；当时 sitemap-insights.xml 27 篇。当前线上 sitemap 与 insights 列表已收录 office-lighting-design-guide。"
     },
     {
       "id": "product-faqpage",
       "name": "产品页 FAQPage 复核",
       "status": "warn",
       "detail": "抽检 linear-bar-office-suspended-light：已有 Product + BreadcrumbList，仍缺 FAQPage；未改站点、未开 PR（需用户批准）"
+    },
+    {
+      "id": "live-validation",
+      "name": "今日 office-lighting-design-guide 上线校验",
+      "status": "pass",
+      "detail": "文章与 3 张配图 HTTP 200；canonical 正确；prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap 已收录；category Design；ISO/CIE 8995-1 使用 CIE 2025 页面。CTA 标题 Ready to Specify Your Project? 正确，正文为模板默认路灯文案（Tell us your road class, sun hours, pole height, and target autonomy — or browse matching models and request a sample.），已记录为发现项，模板未改。"
     }
   ],
   "issues": [
@@ -132,16 +140,16 @@
     {
       "severity": "low",
       "title": "Insight CTA 正文为模板默认路灯文案",
-      "detail": "昨日及更早 Insights 正文 CTA 仍含 road class / sun hours / pole height / target autonomy；需用户同意后再改布局模板"
+      "detail": "今日及更早 Insights 正文 CTA 仍含 road class / sun hours / pole height / target autonomy；需用户同意后再改布局模板"
     }
   ],
   "tomorrow": "下一候选：led lighting manufacturer china（P1，US vol 140，KD 14）。CTA 模板默认路灯文案为已知问题，需单独改布局增强器（站点改动需预览与用户确认）。",
   "items": [
     {
-      "type": "brief",
+      "type": "publish",
       "title": "Office Lighting Design: A B2B Buyer's Guide",
       "url": "https://www.formorelightings.com/insights/office-lighting-design-guide",
-      "status": "brief"
+      "status": "live"
     }
   ]
 }
