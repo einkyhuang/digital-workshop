@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-11T01:45:55+00:00",
+  "updatedAt": "2026-11-12T01:19:43+00:00",
   "dates": [
+    {
+      "date": "2026-11-12",
+      "file": "2026-11-12.json",
+      "summary": "Formore Lighting：今日简报 Office Lighting Design: A B2B Buyer's Guide（slug office-lighting-design-guide）已发给墨墨和画眉；昨日 human-centric-lighting-guide 抽检 200，schema 齐全；日检 warn（无 PSI key），无新严重问题。",
+      "articleCount": 2,
+      "issueCount": 7
+    },
     {
       "date": "2026-11-11",
       "file": "2026-11-11.json",
