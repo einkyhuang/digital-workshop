@@ -58,7 +58,7 @@ const formCategories = computed(() => {
 const visible = computed(() => filterAccounts(accounts.value, { query: query.value, category: category.value }));
 
 watch(categories, (tabs) => {
-  if (!tabs.includes(category.value)) category.value = "全部";
+  if (!tabs.some((item) => item.name === category.value)) category.value = "全部";
 });
 
 function api() {
@@ -286,12 +286,12 @@ async function copyField(account, field) {
       <div class="flex flex-wrap gap-2 mt-3">
         <button
           v-for="item in categories"
-          :key="item"
+          :key="item.name"
           type="button"
-          class="px-3 py-1.5 rounded-full text-sm border"
-          :class="category === item ? 'bg-zen-ink text-white border-zen-ink' : 'bg-white border-black/10 text-zen-ink'"
-          @click="category = item"
-        >{{ item }}</button>
+          class="px-3 py-1.5 rounded-full text-sm border inline-flex items-center gap-1.5"
+          :class="category === item.name ? 'bg-zen-ink text-white border-zen-ink' : 'bg-white border-black/10 text-zen-ink'"
+          @click="category = item.name"
+        >{{ item.name }}<span class="text-[11px] px-1.5 rounded-full" :class="category === item.name ? 'bg-white/20' : 'bg-black/5'">{{ item.count }}</span></button>
       </div>
     </div>
 

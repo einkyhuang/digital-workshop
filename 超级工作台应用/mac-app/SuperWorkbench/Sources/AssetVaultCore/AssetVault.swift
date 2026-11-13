@@ -119,6 +119,17 @@ public struct AssetSecretFlags: Equatable {
     public static let none = AssetSecretFlags(hasPassword: false, hasApiKey: false, hasAny: false)
 }
 
+public struct AssetCategoryTab: Equatable, Identifiable {
+    public var name: String
+    public var count: Int
+    public var id: String { name }
+
+    public init(name: String, count: Int) {
+        self.name = name
+        self.count = count
+    }
+}
+
 /// One card row. Secret rows keep `value` empty so a render pass cannot leak the keychain.
 public struct AssetCopyField: Equatable, Identifiable {
     public var id: String
@@ -339,11 +350,21 @@ public enum AssetVault {
     }
 
     /// 「全部」 plus categories that currently have accounts. Built-ins stay in catalog order; custom folders follow.
-    public static func categoryTabs(_ accounts: [AssetAccount]) -> [String] {
-        let present = Set(accounts.map { $0.category.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty })
+    public static func categoryTabs(_ accounts: [AssetAccount]) -> [AssetCategoryTab] {
+        var counts: [String: Int] = [:]
+        for account in accounts {
+            let name = account.category.trimmingCharacters(in: .whitespacesAndNewlines)
+            if name.isEmpty { continue }
+            counts[name, default: 0] += 1
+        }
+        let present = Set(counts.keys)
         let builtin = AssetVaultCatalog.categories.filter { present.contains($0) }
         let custom = present.subtracting(AssetVaultCatalog.categories).sorted()
-        return ["全部"] + builtin + custom
+        var tabs = [AssetCategoryTab(name: "全部", count: accounts.count)]
+        for name in builtin + custom {
+            tabs.append(AssetCategoryTab(name: name, count: counts[name] ?? 0))
+        }
+        return tabs
     }
 
     /// Rows to show on a card. Empty fields are omitted. Password and API values are never copied into the row.

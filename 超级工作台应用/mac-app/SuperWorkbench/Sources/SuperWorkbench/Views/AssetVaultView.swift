@@ -40,7 +40,7 @@ final class AssetVaultModel: ObservableObject {
     private var configured = false
     private var copyToken = 0
 
-    var categoryChoices: [String] {
+    var categoryChoices: [AssetCategoryTab] {
         AssetVault.categoryTabs(accounts)
     }
 
@@ -60,7 +60,7 @@ final class AssetVaultModel: ObservableObject {
         guard let fileStore else { return }
         do {
             accounts = try fileStore.list(secrets: keychain)
-            if !categoryChoices.contains(category) { category = "全部" }
+            if !categoryChoices.contains(where: { $0.name == category }) { category = "全部" }
         } catch {
             status = "读取档案失败"
         }
@@ -311,6 +311,11 @@ struct AssetVaultView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
+            if store.activeWorkbenchId == "trade" {
+                Text("资产管理")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(SWTheme.text)
+            }
             HStack(spacing: 8) {
                 TextField("搜索平台、账号、邮箱、备注、标签", text: $model.query)
                     .textFieldStyle(.roundedBorder)
@@ -329,16 +334,29 @@ struct AssetVaultView: View {
     private var categoryPills: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                ForEach(model.categoryChoices, id: \.self) { name in
-                    Button(name) { model.category = name }
-                        .buttonStyle(.plain)
-                        .font(.system(size: 13, weight: model.category == name ? .semibold : .regular))
-                        .foregroundStyle(model.category == name ? Color.white : SWTheme.text)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(model.category == name ? SWTheme.accent : Color.white)
-                        .clipShape(Capsule())
-                        .overlay(Capsule().stroke(model.category == name ? Color.clear : SWTheme.border, lineWidth: 1))
+                ForEach(model.categoryChoices) { tab in
+                    let selected = model.category == tab.name
+                    Button {
+                        model.category = tab.name
+                    } label: {
+                        HStack(spacing: 6) {
+                            Text(tab.name)
+                            Text("\(tab.count)")
+                                .font(.system(size: 11, weight: .semibold))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 1)
+                                .background(selected ? Color.white.opacity(0.18) : Color.black.opacity(0.06))
+                                .clipShape(Capsule())
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .font(.system(size: 13, weight: selected ? .semibold : .regular))
+                    .foregroundStyle(selected ? Color.white : SWTheme.text)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(selected ? SWTheme.accent : Color.white)
+                    .clipShape(Capsule())
+                    .overlay(Capsule().stroke(selected ? Color.clear : SWTheme.border, lineWidth: 1))
                 }
             }
             .padding(.vertical, 2)

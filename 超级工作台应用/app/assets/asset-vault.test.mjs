@@ -99,9 +99,24 @@ test("category tabs list only categories that have accounts", () => {
     { platform: "工具", category: "AI工具", username: "name@example.com", email: "", loginURL: "", notes: "", tags: [], company: "", brand: "", hasPassword: true, password: FAKE_PASSWORD },
     { platform: "广告户", category: "广告", username: "ads", email: "", loginURL: "https://example.com/login", notes: "", tags: [], company: "", brand: "", hasApiKey: true, apiKey: "test-api-key" },
   ];
-  assert.deepEqual(categoryTabs(accounts), ["全部", "电商", "广告", "AI工具"]);
-  assert.equal(categoryTabs(accounts).includes("社交"), false);
-  assert.equal(categoryTabs([]).join(), "全部");
+  assert.deepEqual(categoryTabs(accounts), [
+    { name: "全部", count: 3 },
+    { name: "电商", count: 1 },
+    { name: "广告", count: 1 },
+    { name: "AI工具", count: 1 },
+  ]);
+  assert.equal(categoryTabs(accounts).some((item) => item.name === "社交"), false);
+  assert.deepEqual(categoryTabs([]), [{ name: "全部", count: 0 }]);
+  const custom = categoryTabs([
+    { category: "AI工具" },
+    { category: "AI工具" },
+    { category: "SUNWIN" },
+  ]);
+  assert.deepEqual(custom, [
+    { name: "全部", count: 3 },
+    { name: "AI工具", count: 2 },
+    { name: "SUNWIN", count: 1 },
+  ]);
   assert.equal(filterAccounts(accounts, { category: "电商", query: "name@example.com" }).length, 1);
   assert.equal(filterAccounts(accounts, { category: "广告", query: "name@example.com" }).length, 0);
   assert.equal(filterAccounts(accounts, { category: "AI工具", query: "name@example.com" }).length, 1);
@@ -261,6 +276,19 @@ test("asset files served from the private tree are redacted", () => {
   assert.equal(redacted.body.includes("示例平台"), true);
   assert.equal(redactPrivateAssetBody("资产管理/note.txt", ".txt", Buffer.from("hello")).status, 404);
   assert.equal(redactPrivateAssetBody("客户档案/a.json", ".json", body), null);
+});
+
+test("built magichub bundle ships the card copy UI", () => {
+  const dir = path.join(repoRoot, "超级工作台应用/app/magichub/assets");
+  const files = fs.readdirSync(dir).filter((name) => name.endsWith(".js"));
+  assert.equal(files.length, 1);
+  const src = fs.readFileSync(path.join(dir, files[0]), "utf8");
+  assert.match(src, /请在 Mac 应用中复制/);
+  assert.match(src, /账号\/邮箱/);
+  assert.equal(src.includes(FAKE_PASSWORD), false);
+  assert.equal(src.includes("SUNWIN"), false);
+  const html = fs.readFileSync(path.join(repoRoot, "超级工作台应用/app/magichub/index.html"), "utf8");
+  assert.match(html, new RegExp(files[0].replace(/\./g, "\\.")));
 });
 
 test("private asset folder stays gitignored and bridges cannot bulk-read secrets", () => {

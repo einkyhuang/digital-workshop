@@ -1664,11 +1664,11 @@ function renderKanban() {
 
     function draw() {
       const tabs = vault.categoryTabs(assetUi.accounts);
-      if (!tabs.includes(assetUi.category)) assetUi.category = "全部";
+      if (!tabs.some((item) => item.name === assetUi.category)) assetUi.category = "全部";
       const pills = document.getElementById("assetPills");
       if (pills) {
         pills.innerHTML = tabs.map((item) =>
-          `<button type="button" class="asset-pill${item === assetUi.category ? " is-on" : ""}" data-asset-cat="${esc(item)}">${esc(item)}</button>`
+          `<button type="button" class="asset-pill${item.name === assetUi.category ? " is-on" : ""}" data-asset-cat="${esc(item.name)}">${esc(item.name)}<span class="asset-pill-count">${Number(item.count) || 0}</span></button>`
         ).join("");
         pills.querySelectorAll("[data-asset-cat]").forEach((el) => {
           el.onclick = () => {

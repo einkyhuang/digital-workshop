@@ -309,16 +309,21 @@ export function looksLikeEmail(raw) {
   return !/[\s/\\]/.test(text);
 }
 
-/** 「全部」 plus categories that currently have accounts. Built-ins keep catalog order. */
+/** 「全部」 plus categories that currently have accounts, each with a count. Built-ins keep catalog order. */
 export function categoryTabs(accounts) {
-  const present = new Set(
-    (accounts || [])
-      .map((account) => String(account?.category || "").trim())
-      .filter(Boolean),
-  );
-  const builtin = CATEGORIES.filter((item) => present.has(item));
-  const custom = [...present].filter((item) => !CATEGORIES.includes(item)).sort((a, b) => a.localeCompare(b, "zh"));
-  return ["全部", ...builtin, ...custom];
+  const list = accounts || [];
+  const counts = new Map();
+  for (const account of list) {
+    const name = String(account?.category || "").trim();
+    if (!name) continue;
+    counts.set(name, (counts.get(name) || 0) + 1);
+  }
+  const builtin = CATEGORIES.filter((item) => counts.has(item));
+  const custom = [...counts.keys()].filter((item) => !CATEGORIES.includes(item)).sort((a, b) => a.localeCompare(b, "zh"));
+  return [
+    { name: "全部", count: list.length },
+    ...[...builtin, ...custom].map((name) => ({ name, count: counts.get(name) || 0 })),
+  ];
 }
 
 /**
