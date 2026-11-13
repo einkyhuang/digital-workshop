@@ -3,16 +3,16 @@
   "feedId": "seo",
   "date": "2026-11-13",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-13T09:24:46+08:00",
+  "updatedAt": "2026-11-13T23:08:43+08:00",
   "botId": "seo",
   "botName": "搜搜-SEO专家",
-  "summary": "Formore Lighting：今日无文章发布（无待审稿件）。候选词 led lighting manufacturer china 已被 11-08 制造商指南与采购指南覆盖，为避免自我竞争改选 retail lighting design，简报已写好（33 条内链核验 200），待墨墨写稿、画眉出 3 张 WebP。日检 warn（无 PSI key），无新严重问题；昨日 office-lighting-design-guide 抽检 200，schema 齐全，3 张图 200。",
+  "summary": "Formore Lighting：今日发布 Retail Lighting Design: A B2B Buyer's Guide（线上 200，canonical 与 prerender 正常，Article + FAQPage(5) + BreadcrumbList，列表与 sitemap / sitemap-insights 已收录；3 张配图 200；CIE 224:2017 使用官方 CIE 页面；category Design；CTA 标题正确，正文仍为模板默认路灯文案）；日检 warn（无 PSI key），无新严重问题。昨日 office-lighting-design-guide 抽检 200，schema 齐全。",
   "articles": [
     {
       "id": "retail-lighting-design-guide",
       "title": "Retail Lighting Design: A B2B Buyer's Guide",
       "url": "https://www.formorelightings.com/insights/retail-lighting-design-guide",
-      "status": "brief",
+      "status": "published",
       "primaryKeyword": "retail lighting design",
       "secondaryKeywords": [
         "commercial track light",
@@ -21,7 +21,9 @@
         "beam angle lighting",
         "cri 90 led"
       ],
-      "notes": "简报路径：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-13-retail-lighting-design.md。目标地址尚未上线（预期）；待墨墨成稿交付至 bots/内容营销/主笔/deliverables/formore-articles/2026-11-13-retail-lighting-design-guide.md，审稿与发布校验通过后再上线。"
+      "notes": "简报路径：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-13-retail-lighting-design.md。发布前上午记录（非当前状态）：计划地址当时尚未上线，简报已写好，成稿与配图当时仍待交付。当前已上线：文章 HTTP 200，canonical 正确，prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap / sitemap-insights 已收录；3 张配图 HTTP 200（retail-lighting-design-boutique-track-accent.webp 108446 bytes、retail-lighting-design-shelf-led-strip-display.webp 62426 bytes、retail-lighting-design-window-display-spotlights.webp 61200 bytes）；CIE 224:2017 使用官方 CIE 页面；IES RP-2、EN 12464-1、CIE 13.3 仅写名称；category Design；CTA 标题 Ready to Specify Your Project? 正确，正文为模板注入的路灯默认文案（road class, sun hours, pole height, and target autonomy），与成稿 CTA 不一致，模板未改。site PR #7 squash e7ec9913dd23e73c69b0e5cd93c8a630a733c76f",
+      "publishedAt": "2026-11-13T23:08:43+08:00",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/retail-lighting-design-boutique-track-accent.webp"
     },
     {
       "id": "office-lighting-design-guide",
@@ -34,7 +36,7 @@
         "human centric lighting",
         "cri 90 led"
       ],
-      "notes": "昨日经 PR #6 上线（c9e5f04）；今日上午抽检 200，canonical 正确，Article + FAQPage(5) + BreadcrumbList，3 张配图 200；CTA 正文仍为模板默认路灯文案（已知）。",
+      "notes": "昨日经 PR #6 上线（c9e5f0422af014d783d44665b18f3001eabf9c81）；今日上午抽检 200，canonical 正确，Article + FAQPage(5) + BreadcrumbList，3 张配图 200；CTA 正文仍为模板默认路灯文案（已知）。",
       "publishedAt": "2026-11-12T09:36:56+08:00",
       "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/office-lighting-design-open-plan-zoned.webp"
     }
@@ -71,19 +73,19 @@
       "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/retail-lighting-design-boutique-track-accent.webp",
       "alt": "Boutique apparel store main floor with black track spotlights accenting empty garment racks and a feature wall, with no people or text visible.",
       "ofArticleId": "retail-lighting-design-guide",
-      "notes": "hero 1600x900；计划地址，尚未上线；需求已写入简报，待转给画眉"
+      "notes": "hero: retail-lighting-design-boutique-track-accent.webp (1600x900); live HTTP 200 image/webp 108446 bytes"
     },
     {
       "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/retail-lighting-design-shelf-led-strip-display.webp",
       "alt": "Retail shelving display unit with integrated LED strip lighting illuminating generic unbranded ceramics and packaged goods, with no people or text visible.",
       "ofArticleId": "retail-lighting-design-guide",
-      "notes": "inline 1200x800；计划地址，尚未上线"
+      "notes": "inline: retail-lighting-design-shelf-led-strip-display.webp (1200x800); live HTTP 200 image/webp 62426 bytes"
     },
     {
       "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/retail-lighting-design-window-display-spotlights.webp",
       "alt": "Shop window display at dusk lit by adjustable spotlights on unbranded mannequins and product plinths viewed from the street, with no people or text visible.",
       "ofArticleId": "retail-lighting-design-guide",
-      "notes": "inline 1200x800；计划地址，尚未上线"
+      "notes": "inline: retail-lighting-design-window-display-spotlights.webp (1200x800); live HTTP 200 image/webp 61200 bytes"
     }
   ],
   "checks": [
@@ -97,7 +99,7 @@
       "id": "live-spot-check",
       "name": "核心页面与昨日文章抽检",
       "status": "pass",
-      "detail": "/, /robots.txt, /sitemap.xml, /sitemap-index.xml, /sitemap-insights.xml, /llms.txt, /insights, /products, /contact, /oem-odm, /solutions, /sourcing 均为 200；office-lighting-design-guide 200，title/canonical 正确，Article + FAQPage(5) + BreadcrumbList，3 张配图 200；sitemap-insights.xml 28 条。"
+      "detail": "发布前上午日检（今日文章上线前，非当前 sitemap 篇数）：/, /robots.txt, /sitemap.xml, /sitemap-index.xml, /sitemap-insights.xml, /llms.txt, /insights, /products, /contact, /oem-odm, /solutions, /sourcing 均为 200；office-lighting-design-guide 200，title/canonical 正确，Article + FAQPage(5) + BreadcrumbList，3 张配图 200；当时 sitemap-insights.xml 28 条。当前线上 sitemap 与 sitemap-insights、insights 列表已收录 retail-lighting-design-guide。"
     },
     {
       "id": "product-faqpage",
@@ -109,7 +111,13 @@
       "id": "pending-drafts",
       "name": "待发布稿件检查",
       "status": "pass",
-      "detail": "无待审稿件，最新稿件（2026-11-12）已上线"
+      "detail": "发布前上午检查（非当前状态）：当时工作台尚无待审成稿，最新已上线稿件为 2026-11-12。晚间成稿已审并上线，见 live-validation。"
+    },
+    {
+      "id": "live-validation",
+      "name": "今日 retail-lighting-design-guide 上线校验",
+      "status": "pass",
+      "detail": "文章与 3 张配图 HTTP 200（108446 / 62426 / 61200 bytes）；canonical 正确；prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap / sitemap-insights 已收录；category Design；CIE 224:2017 官方页面出现在正文。CTA 标题 Ready to Specify Your Project? 正确，正文为模板默认路灯文案（Tell us your road class, sun hours, pole height, and target autonomy — or browse matching models and request a sample.），已记录为发现项，模板未改。"
     }
   ],
   "issues": [
@@ -149,13 +157,13 @@
       "detail": "今日及更早 Insights 正文 CTA 仍含 road class / sun hours / pole height / target autonomy；需用户同意后再改布局模板"
     }
   ],
-  "tomorrow": "等墨墨的 retail-lighting-design-guide 成稿与画眉的 3 张 WebP，到齐后审稿并走发布校验。led lighting manufacturer china 不另写文章，建议以后在现有制造商指南或 /sourcing 页做站内优化（站点改动需用户确认）。Day16 排期词 how to source led lights from china 已有文章，可考虑翻新而不是新写。",
+  "tomorrow": "CTA 模板默认路灯文案为已知问题，需单独改布局增强器（站点改动需预览与用户确认）。led lighting manufacturer china 不另写独立文章（已由 11-08 制造商指南与采购指南覆盖）。下一篇日更简报按常规排期。",
   "items": [
     {
-      "type": "brief",
+      "type": "publish",
       "title": "Retail Lighting Design: A B2B Buyer's Guide",
-      "url": "bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-13-retail-lighting-design.md",
-      "status": "sent-pending"
+      "url": "https://www.formorelightings.com/insights/retail-lighting-design-guide",
+      "status": "live"
     }
   ]
 }

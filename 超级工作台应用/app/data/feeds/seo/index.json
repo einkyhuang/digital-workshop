@@ -2,12 +2,12 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-13T01:24:58+00:00",
+  "updatedAt": "2026-11-13T15:08:43+00:00",
   "dates": [
     {
       "date": "2026-11-13",
       "file": "2026-11-13.json",
-      "summary": "Formore Lighting：今日无文章发布（无待审稿件）。候选词 led lighting manufacturer china 已被 11-08 制造商指南与采购指南覆盖，为避免自我竞争改选 retail lighting design，简报已写好（33 条内链核验 200），待墨墨写稿、画眉出 3 张 WebP。日检 warn（无 PSI key），无新严重问题；昨日 office-lighting-design-guide 抽检 200，schema 齐全，3 张图 200。",
+      "summary": "Formore Lighting：今日发布 Retail Lighting Design: A B2B Buyer's Guide（线上 200，canonical 与 prerender 正常，Article + FAQPage(5) + BreadcrumbList，列表与 sitemap / sitemap-insights 已收录；3 张配图 200；CIE 224:2017 使用官方 CIE 页面；category Design；CTA 标题正确，正文仍为模板默认路灯文案）；日检 warn（无 PSI key），无新严重问题。昨日 office-lighting-design-guide 抽检 200，schema 齐全。",
       "articleCount": 2,
       "issueCount": 7
     },
