@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "date": "2026-11-13",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-13T22:57:00+08:00",
+  "tasks": [
+    {
+      "id": "t-1113-seo-article-qa",
+      "title": "Formore 今日 SEO 文章成稿质检（结构/内链/数据/配图）",
+      "ownerBotId": "patrol",
+      "ownerName": "超级茉莉-巡逻官",
+      "status": "完成",
+      "dueAt": "2026-11-13T23:30:00+08:00",
+      "note": "质检记录见 notes/2026-11-13-质检-retail-lighting-design.md（commit e41e70a）；发布与 LinkedIn 按常设许可由搜搜流程处理"
+    },
+    {
+      "id": "t-1113-bg-check",
+      "title": "印度照明线索公开背调（不发信）",
+      "ownerBotId": "patrol",
+      "ownerName": "超级茉莉-巡逻官",
+      "status": "完成",
+      "dueAt": "2026-11-13T23:30:00+08:00",
+      "note": "见 bots/管理中枢/巡逻官/deliverables/2026-11-13/公开背调-RS-ENTERPRISES与R-and-SONS.md"
+    },
+    {
+      "id": "t-1113-cta-faq",
+      "title": "Formore CTA 与产品页 FAQPage 改稿方案（不上线）",
+      "ownerBotId": "patrol",
+      "ownerName": "超级茉莉-巡逻官",
+      "status": "完成",
+      "dueAt": "2026-11-13T23:30:00+08:00",
+      "note": "方案已写，需用户批准后才能改站点或发布"
+    },
+    {
+      "id": "t-1113-xhs-leads",
+      "title": "小红书建站线索分层与跟进草稿（不对外联系）",
+      "ownerBotId": "patrol",
+      "ownerName": "超级茉莉-巡逻官",
+      "status": "完成",
+      "dueAt": "2026-11-13T23:30:00+08:00",
+      "note": "76 条未处理已分层，草稿只存在巡逻官交付目录"
+    },
+    {
+      "id": "t-1113-schedule",
+      "title": "补 11-13 日程并核对 11-12 用户任务（不替用户勾掉）",
+      "ownerBotId": "patrol",
+      "ownerName": "超级茉莉-巡逻官",
+      "status": "完成",
+      "dueAt": "2026-11-13T23:30:00+08:00",
+      "note": "见同目录《日程与11-12任务状态核对》；昨日五项仍待用户确认"
+    },
+    {
+      "id": "t-1113-user-1112-pointer",
+      "title": "请确认 11-12 五项个人任务是否已完成或需改期",
+      "ownerBotId": "user",
+      "ownerName": "花生",
+      "status": "待办",
+      "dueAt": "2026-11-13T23:59:00+08:00",
+      "note": "五项在 2026-11-12.json 中仍为待办，本次未改状态。核对说明见巡逻官交付目录"
+    },
+    {
+      "id": "t-1113-outreach-hold",
+      "title": "待批准的对外开发信与即时消息（不自行发送）",
+      "ownerBotId": "user",
+      "ownerName": "花生",
+      "status": "待办",
+      "dueAt": "2026-11-13T23:59:00+08:00",
+      "note": "草稿已在相应 Bot 交付物中，待用户批准后再发"
+    }
+  ],
+  "schedule": [
+    {
+      "id": "s-1113-patrol-push",
+      "title": "推进不对外事项：背调、改稿方案、线索分层、补日程",
+      "startAt": "2026-11-13T22:50:00+08:00",
+      "endAt": "2026-11-13T23:30:00+08:00",
+      "who": "超级茉莉-巡逻官",
+      "kind": "focus"
+    }
+  ],
+  "meta": {
+    "hasEmailSummary": false,
+    "hasDailyReport": true,
+    "dailyReportSource": "bots/管理中枢/总结助手/deliverables/日报-2026-11-13.md"
+  }
+}
