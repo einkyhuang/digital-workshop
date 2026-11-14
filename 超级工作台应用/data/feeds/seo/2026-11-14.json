@@ -3,16 +3,16 @@
   "feedId": "seo",
   "date": "2026-11-14",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-14T09:40:00+08:00",
+  "updatedAt": "2026-11-14T09:36:38+08:00",
   "botId": "seo",
   "botName": "搜搜-SEO专家",
-  "summary": "Formore Lighting：今日新简报 Hotel Lighting Design: A B2B Buyer's Guide（hotel lighting design，P2，US vol 30，KD 8），已发墨墨写稿、画眉出 3 张配图，未发布。日检 warn（无 PSI key），无新严重问题。昨日 retail-lighting-design-guide 抽检 200，schema 齐全。",
+  "summary": "Formore Lighting：今日发布 Hotel Lighting Design: A B2B Buyer's Guide（线上 200，canonical 与 prerender 正常，Article + FAQPage(5) + BreadcrumbList，列表与 sitemap / sitemap-insights 已收录；3 张配图 200；CIE 224:2017 使用官方 CIE 页面；category Design；标题无多余双引号；CTA 标题正确，正文仍为模板默认路灯文案）；日检 warn（无 PSI key），无新严重问题。昨日 retail-lighting-design-guide 抽检 200，schema 齐全。",
   "articles": [
     {
       "id": "hotel-lighting-design-guide",
       "title": "Hotel Lighting Design: A B2B Buyer's Guide",
       "url": "https://www.formorelightings.com/insights/hotel-lighting-design-guide",
-      "status": "brief",
+      "status": "published",
       "primaryKeyword": "hotel lighting design",
       "secondaryKeywords": [
         "led downlight manufacturer",
@@ -21,7 +21,9 @@
         "human centric lighting",
         "cri 90 led"
       ],
-      "notes": "简报：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-14-hotel-lighting-design.md（commit a782587）。线上地址尚未上线（404，符合预期），等待成稿与配图后审稿。"
+      "notes": "简报路径：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-14-hotel-lighting-design.md（commit a782587）。发布前上午记录（非当前状态）：计划地址当时尚未上线（404，当时符合预期），简报已发墨墨与画眉，成稿与配图当时仍待交付。当前已上线：文章 HTTP 200，canonical 正确，prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap / sitemap-insights 已收录；3 张配图 HTTP 200（hotel-lighting-design-lobby-layered.webp 75066 bytes、hotel-lighting-design-guest-room-scenes.webp 32050 bytes、hotel-lighting-design-facade-arrival.webp 85566 bytes）；CIE 224:2017 使用官方 CIE 页面；EN 12464-1 与 IES 仅写名称；ENERGY STAR 与 DLC 外链 200；category Design；标题为 Hotel Lighting Design: A B2B Buyer's Guide，无多余双引号；CTA 标题 Ready to Specify Your Project? 正确，正文为模板注入的路灯默认文案（road class, sun hours, pole height, and target autonomy），与成稿 CTA 不一致，模板未改。site PR #8 squash 62bb33ee67664efc2ab7d72dadb1d539a28712f2",
+      "publishedAt": "2026-11-14T09:36:38+08:00",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/hotel-lighting-design-lobby-layered.webp"
     },
     {
       "id": "retail-lighting-design-guide",
@@ -34,7 +36,7 @@
         "magnetic track lighting",
         "track light system supplier"
       ],
-      "notes": "昨日上线；今日上午抽检 200，canonical 正确，Article + FAQPage(5) + BreadcrumbList；sitemap-insights 29 条已收录。",
+      "notes": "昨日经 PR #7 上线（e7ec9913dd23e73c69b0e5cd93c8a630a733c76f）；今日上午抽检 200，canonical 正确，Article + FAQPage(5) + BreadcrumbList；当时 sitemap-insights 29 条已收录（上线前篇数，非当前）。",
       "publishedAt": "2026-11-13T23:08:43+08:00",
       "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/retail-lighting-design-boutique-track-accent.webp"
     }
@@ -56,7 +58,26 @@
       "priority": "medium"
     }
   ],
-  "images": [],
+  "images": [
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/hotel-lighting-design-lobby-layered.webp",
+      "alt": "Upscale hotel lobby and reception area featuring layered warm downlights, integrated cove strip lighting, and modern decorative pendants, with no people or text visible.",
+      "ofArticleId": "hotel-lighting-design-guide",
+      "notes": "hero: hotel-lighting-design-lobby-layered.webp (1600x900); live HTTP 200 image/webp 75066 bytes"
+    },
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/hotel-lighting-design-guest-room-scenes.webp",
+      "alt": "Modern hotel guest room at evening featuring bedside reading lights, recessed ceiling downlights, and a headboard cove light dimmed to a warm scene, with no people or text visible.",
+      "ofArticleId": "hotel-lighting-design-guide",
+      "notes": "inline: hotel-lighting-design-guest-room-scenes.webp (1200x800); live HTTP 200 image/webp 32050 bytes"
+    },
+    {
+      "url": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/hotel-lighting-design-facade-arrival.webp",
+      "alt": "Hotel entrance and drop-off area at dusk illuminated by architectural wall washers, up/down outdoor sconces, and minimalist garden bollards, with no people or text visible.",
+      "ofArticleId": "hotel-lighting-design-guide",
+      "notes": "inline: hotel-lighting-design-facade-arrival.webp (1200x800); live HTTP 200 image/webp 85566 bytes"
+    }
+  ],
   "checks": [
     {
       "id": "seo-daily",
@@ -68,19 +89,25 @@
       "id": "live-spot-check",
       "name": "核心页面与昨日文章抽检",
       "status": "pass",
-      "detail": "/, /robots.txt, /sitemap.xml, /sitemap-index.xml, /sitemap-insights.xml, /llms.txt, /insights, /products, /contact, /oem-odm, /solutions, /sourcing 均为 200；retail-lighting-design-guide 200，title/canonical 正确，Article + FAQPage(5) + BreadcrumbList；sitemap-insights.xml 29 条。"
+      "detail": "发布前上午日检（今日文章上线前，非当前 sitemap 篇数）：/, /robots.txt, /sitemap.xml, /sitemap-index.xml, /sitemap-insights.xml, /llms.txt, /insights, /products, /contact, /oem-odm, /solutions, /sourcing 均为 200；retail-lighting-design-guide 200，title/canonical 正确，Article + FAQPage(5) + BreadcrumbList；当时 sitemap-insights.xml 29 条。当前线上 sitemap 与 sitemap-insights、insights 列表已收录 hotel-lighting-design-guide。"
     },
     {
       "id": "internal-links",
       "name": "新简报内链核验",
       "status": "pass",
-      "detail": "简报第 5 节全部站内 URL 及 CIE 224:2017 官方页均 curl 200"
+      "detail": "简报第 5 节全部站内 URL 及 CIE 224:2017 官方页均 curl 200（发布前核验，现已随文章上线再次确认）"
     },
     {
       "id": "pending-drafts",
       "name": "待发布稿件检查",
       "status": "pass",
-      "detail": "无待审成稿；最新成稿 2026-11-13 已上线。"
+      "detail": "发布前上午检查（非当前状态）：当时工作台尚无待审成稿，最新已上线稿件为 2026-11-13。随后成稿已审并上线，见 live-validation。"
+    },
+    {
+      "id": "live-validation",
+      "name": "今日 hotel-lighting-design-guide 上线校验",
+      "status": "pass",
+      "detail": "文章与 3 张配图 HTTP 200（75066 / 32050 / 85566 bytes）；canonical 正确；prerender；Article + FAQPage(5) + BreadcrumbList；insights 列表与 sitemap / sitemap-insights 已收录；category Design；CIE 224:2017 官方页面出现在正文；标题 Hotel Lighting Design: A B2B Buyer's Guide，无多余双引号。CTA 标题 Ready to Specify Your Project? 正确，正文为模板默认路灯文案（Tell us your road class, sun hours, pole height, and target autonomy — or browse matching models and request a sample.），已记录为发现项，模板未改。"
     }
   ],
   "issues": [
@@ -110,12 +137,13 @@
       "detail": "需用户同意后再改布局模板"
     }
   ],
-  "tomorrow": "等墨墨成稿与画眉配图，审稿通过后按流程发布 hotel-lighting-design-guide；排期 30 天计划已基本用完，后续候选：led panel light manufacturer、factory audit lighting china、commercial lighting suppliers。",
+  "tomorrow": "CTA 模板默认路灯文案为已知问题，需单独改布局增强器（站点改动需预览与用户确认）。排期 30 天计划已基本用完，后续候选：led panel light manufacturer、factory audit lighting china、commercial lighting suppliers。",
   "items": [
     {
-      "type": "brief",
+      "type": "publish",
       "title": "Hotel Lighting Design: A B2B Buyer's Guide",
-      "status": "brief"
+      "url": "https://www.formorelightings.com/insights/hotel-lighting-design-guide",
+      "status": "live"
     }
   ]
 }

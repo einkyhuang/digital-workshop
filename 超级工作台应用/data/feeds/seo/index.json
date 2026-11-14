@@ -2,12 +2,12 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-14T01:17:57+00:00",
+  "updatedAt": "2026-11-14T01:36:38+00:00",
   "dates": [
     {
       "date": "2026-11-14",
       "file": "2026-11-14.json",
-      "summary": "Formore Lighting：今日新简报 Hotel Lighting Design: A B2B Buyer's Guide（hotel lighting design，P2，US vol 30，KD 8），已发墨墨写稿、画眉出 3 张配图，未发布。日检 warn（无 PSI key），无新严重问题。昨日 retail-lighting-design-guide 抽检 200，schema 齐全。",
+      "summary": "Formore Lighting：今日发布 Hotel Lighting Design: A B2B Buyer's Guide（线上 200，canonical 与 prerender 正常，Article + FAQPage(5) + BreadcrumbList，列表与 sitemap / sitemap-insights 已收录；3 张配图 200；CIE 224:2017 使用官方 CIE 页面；category Design；标题无多余双引号；CTA 标题正确，正文仍为模板默认路灯文案）；日检 warn（无 PSI key），无新严重问题。昨日 retail-lighting-design-guide 抽检 200，schema 齐全。",
       "articleCount": 2,
       "issueCount": 5
     },
