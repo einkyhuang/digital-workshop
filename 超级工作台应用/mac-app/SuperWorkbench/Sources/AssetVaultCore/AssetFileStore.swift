@@ -8,6 +8,8 @@ public protocol AssetSecretStoring: AnyObject {
     func upsert(id: String, secrets: AssetSecrets) throws
     func delete(id: String) throws
     func contains(id: String) -> Bool
+    /// Which secret fields are non-empty. Implementations must not hand the secret strings to the caller.
+    func flags(id: String) -> AssetSecretFlags
 }
 
 public final class MemoryAssetSecretStore: AssetSecretStoring {
@@ -25,6 +27,10 @@ public final class MemoryAssetSecretStore: AssetSecretStoring {
 
     public func contains(id: String) -> Bool {
         items[id]?.isEmpty == false
+    }
+
+    public func flags(id: String) -> AssetSecretFlags {
+        items[id]?.flags ?? .none
     }
 }
 
@@ -68,6 +74,14 @@ public final class KeychainAssetSecretStore: AssetSecretStoring {
         var query = baseQuery(id)
         query[kSecMatchLimit as String] = kSecMatchLimitOne
         return SecItemCopyMatching(query as CFDictionary, nil) == errSecSuccess
+    }
+
+    /// Field presence only. The decoded secret is dropped before return.
+    public func flags(id: String) -> AssetSecretFlags {
+        if let loaded = try? load(id: id) {
+            return loaded.flags
+        }
+        return AssetSecretFlags(hasPassword: false, hasApiKey: false, hasAny: contains(id: id))
     }
 
     private func baseQuery(_ id: String) -> [String: Any] {
@@ -154,7 +168,7 @@ public final class AssetFileStore {
                     try secrets.upsert(id: id, secrets: merged)
                     var account = draft.account
                     account.id = id
-                    account.hasSecret = !merged.isEmpty
+                    applyFlags(merged.flags, to: &account)
                     try writeUnlocked(account)
                     accounts.append(account)
                     continue
@@ -167,7 +181,7 @@ public final class AssetFileStore {
             guard id == filenameId else { continue }
             var account = draft.account
             account.id = id
-            account.hasSecret = secrets.contains(id: id)
+            applyFlags(secrets.flags(id: id), to: &account)
             accounts.append(account)
         }
         accounts.sort { $0.updatedAt > $1.updatedAt }
@@ -181,7 +195,7 @@ public final class AssetFileStore {
         let merged = draft.patch.apply(to: existing)
         try secrets.upsert(id: draft.account.id, secrets: merged)
         draft.account.updatedAt = AssetVault.isoNow(now)
-        draft.account.hasSecret = !merged.isEmpty
+        applyFlags(merged.flags, to: &draft.account)
         try writeUnlocked(draft.account)
         return draft.account
     }
@@ -195,6 +209,12 @@ public final class AssetFileStore {
         }
         try secrets.delete(id: id)
         return removed
+    }
+
+    private func applyFlags(_ flags: AssetSecretFlags, to account: inout AssetAccount) {
+        account.hasPassword = flags.hasPassword
+        account.hasApiKey = flags.hasApiKey
+        account.hasSecret = flags.hasAny
     }
 
     private func writeUnlocked(_ account: AssetAccount) throws {
