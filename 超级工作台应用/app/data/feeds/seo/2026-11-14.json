@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-11-14",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-14T09:40:00+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "Formore Lighting：今日新简报 Hotel Lighting Design: A B2B Buyer's Guide（hotel lighting design，P2，US vol 30，KD 8），已发墨墨写稿、画眉出 3 张配图，未发布。日检 warn（无 PSI key），无新严重问题。昨日 retail-lighting-design-guide 抽检 200，schema 齐全。",
+  "articles": [
+    {
+      "id": "hotel-lighting-design-guide",
+      "title": "Hotel Lighting Design: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/hotel-lighting-design-guide",
+      "status": "brief",
+      "primaryKeyword": "hotel lighting design",
+      "secondaryKeywords": [
+        "led downlight manufacturer",
+        "led downlight oem",
+        "architectural led lighting",
+        "human centric lighting",
+        "cri 90 led"
+      ],
+      "notes": "简报：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-14-hotel-lighting-design.md（commit a782587）。线上地址尚未上线（404，符合预期），等待成稿与配图后审稿。"
+    },
+    {
+      "id": "retail-lighting-design-guide",
+      "title": "Retail Lighting Design: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/retail-lighting-design-guide",
+      "status": "published",
+      "primaryKeyword": "retail lighting design",
+      "secondaryKeywords": [
+        "commercial track light",
+        "magnetic track lighting",
+        "track light system supplier"
+      ],
+      "notes": "昨日上线；今日上午抽检 200，canonical 正确，Article + FAQPage(5) + BreadcrumbList；sitemap-insights 29 条已收录。",
+      "publishedAt": "2026-11-13T23:08:43+08:00",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/retail-lighting-design-boutique-track-accent.webp"
+    }
+  ],
+  "keywords": [
+    {
+      "term": "hotel lighting design",
+      "intent": "informational",
+      "priority": "medium"
+    },
+    {
+      "term": "led downlight manufacturer",
+      "intent": "commercial",
+      "priority": "medium"
+    },
+    {
+      "term": "led downlight oem",
+      "intent": "commercial",
+      "priority": "medium"
+    }
+  ],
+  "images": [],
+  "checks": [
+    {
+      "id": "seo-daily",
+      "name": "npm run seo:daily",
+      "status": "warn",
+      "detail": "运行成功并写出 reports/seo/2026-11-14.md；缺 PSI_API_KEY 性能跳过；四月任务映射过期（老问题）"
+    },
+    {
+      "id": "live-spot-check",
+      "name": "核心页面与昨日文章抽检",
+      "status": "pass",
+      "detail": "/, /robots.txt, /sitemap.xml, /sitemap-index.xml, /sitemap-insights.xml, /llms.txt, /insights, /products, /contact, /oem-odm, /solutions, /sourcing 均为 200；retail-lighting-design-guide 200，title/canonical 正确，Article + FAQPage(5) + BreadcrumbList；sitemap-insights.xml 29 条。"
+    },
+    {
+      "id": "internal-links",
+      "name": "新简报内链核验",
+      "status": "pass",
+      "detail": "简报第 5 节全部站内 URL 及 CIE 224:2017 官方页均 curl 200"
+    },
+    {
+      "id": "pending-drafts",
+      "name": "待发布稿件检查",
+      "status": "pass",
+      "detail": "无待审成稿；最新成稿 2026-11-13 已上线。"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "low",
+      "title": "PSI_API_KEY 未配置",
+      "detail": "日检拿不到性能和 Core Web Vitals 分数"
+    },
+    {
+      "severity": "low",
+      "title": "日检任务映射过期",
+      "detail": "daily-seo-check.mjs 仍按四月排期"
+    },
+    {
+      "severity": "low",
+      "title": "Organization sameAs 为空",
+      "detail": "等有真实主页 URL 再补"
+    },
+    {
+      "severity": "low",
+      "title": "产品页缺 FAQPage",
+      "detail": "批量补齐需用户批准，未开 PR"
+    },
+    {
+      "severity": "low",
+      "title": "Insight CTA 正文为模板默认路灯文案",
+      "detail": "需用户同意后再改布局模板"
+    }
+  ],
+  "tomorrow": "等墨墨成稿与画眉配图，审稿通过后按流程发布 hotel-lighting-design-guide；排期 30 天计划已基本用完，后续候选：led panel light manufacturer、factory audit lighting china、commercial lighting suppliers。",
+  "items": [
+    {
+      "type": "brief",
+      "title": "Hotel Lighting Design: A B2B Buyer's Guide",
+      "status": "brief"
+    }
+  ]
+}
