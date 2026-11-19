@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-11-19",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-19T08:59:22+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "Formore Lighting：30 天排期 Day21（Office + UGR 审稿）两文均已上线，改选词库最高量未成文词 commercial lighting suppliers（P2，US vol 260）；已写简报 commercial-lighting-suppliers-guide，待墨墨成稿与画眉 3 张 WebP。日检 warn（无 PSI key），无新严重问题。11-14 文章 hotel-lighting-design-guide 抽检 200，schema 齐全。今日无发布。",
+  "articles": [
+    {
+      "id": "commercial-lighting-suppliers-guide",
+      "title": "Commercial Lighting Suppliers: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/commercial-lighting-suppliers-guide",
+      "status": "briefed",
+      "primaryKeyword": "commercial lighting suppliers",
+      "secondaryKeywords": [
+        "commercial led lighting",
+        "led lighting manufacturer",
+        "china lighting factory",
+        "lighting sourcing agent in china",
+        "factory audit lighting china"
+      ],
+      "notes": "简报路径：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-19-commercial-lighting-suppliers.md。计划地址 /insights/commercial-lighting-suppliers-guide（今日 404，尚未上线，符合预期）；待墨墨英文稿与画眉 3 张 WebP。排期 Day21 原任务已完成（Office、UGR 均已上线），改选词库最高量未成文词。外部模型不可用，简报由搜搜按模板撰写。内链与权威来源页已 curl 核验 200。"
+    },
+    {
+      "id": "hotel-lighting-design-guide",
+      "title": "Hotel Lighting Design: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/hotel-lighting-design-guide",
+      "status": "published",
+      "primaryKeyword": "hotel lighting design",
+      "secondaryKeywords": [
+        "led downlight manufacturer",
+        "led downlight oem",
+        "architectural led lighting"
+      ],
+      "notes": "11-14 已上线（PR #8，62bb33ee67664efc2ab7d72dadb1d539a28712f2）；今日抽检 200，canonical 正确，Article + FAQPage + BreadcrumbList；sitemap-insights 30 条已收录。",
+      "publishedAt": "2026-11-14T09:36:38+08:00",
+      "image": "https://www.formorelightings.com/insights%20image/insights%20feature%20images/hotel-lighting-design-lobby-layered.webp"
+    }
+  ],
+  "keywords": [
+    {
+      "term": "commercial lighting suppliers",
+      "intent": "commercial",
+      "priority": "high"
+    },
+    {
+      "term": "china lighting factory",
+      "intent": "informational",
+      "priority": "medium"
+    },
+    {
+      "term": "factory audit lighting china",
+      "intent": "informational",
+      "priority": "medium"
+    }
+  ],
+  "images": [
+    {
+      "alt": "Professional commercial lighting showroom sample wall displaying recessed downlights, surface panels, track heads, and a linear suspended fixture in an organized grid, with no people or text visible.",
+      "ofArticleId": "commercial-lighting-suppliers-guide",
+      "notes": "hero planned: commercial-lighting-suppliers-sample-wall.webp (1600x900); 待画眉交付"
+    },
+    {
+      "alt": "Lighting photometric workbench with a commercial downlight and panel light beside laboratory measurement instruments, with no people or text visible.",
+      "ofArticleId": "commercial-lighting-suppliers-guide",
+      "notes": "inline planned: commercial-lighting-suppliers-photometric-bench.webp (1200x800); 待画眉交付"
+    },
+    {
+      "alt": "Clean export packing area with sealed cartons of commercial LED fixtures and one open foam-fitted carton, with no people or text visible.",
+      "ofArticleId": "commercial-lighting-suppliers-guide",
+      "notes": "inline planned: commercial-lighting-suppliers-export-packing.webp (1200x800); 待画眉交付"
+    }
+  ],
+  "checks": [
+    {
+      "id": "seo-daily",
+      "name": "npm run seo:daily",
+      "status": "warn",
+      "detail": "运行成功并写出 reports/seo/2026-11-19.md；缺 PSI_API_KEY 性能跳过；四月任务映射过期（老问题）"
+    },
+    {
+      "id": "live-spot-check",
+      "name": "核心页面与已上线文章抽检",
+      "status": "pass",
+      "detail": "/, /robots.txt, /sitemap.xml, /sitemap-index.xml, /sitemap-insights.xml, /llms.txt, /insights, /products, /contact, /oem-odm, /solutions, /sourcing 均为 200；hotel-lighting-design-guide 200，title/canonical 正确，prerender，Article + FAQPage + BreadcrumbList；sitemap-insights.xml 30 条。"
+    },
+    {
+      "id": "internal-links",
+      "name": "新简报内链核验",
+      "status": "pass",
+      "detail": "简报第 5 节全部站内 URL 及 UL 1598、IEC 60598-1、DLC、ENERGY STAR 官方页均 curl 200；目标 slug 当前 404，符合预期。"
+    },
+    {
+      "id": "pending-drafts",
+      "name": "待发布稿件检查",
+      "status": "pass",
+      "detail": "无待审成稿；最新已上线稿件为 2026-11-14 hotel-lighting-design-guide。今日仅出简报，不发布。"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "low",
+      "title": "PSI_API_KEY 未配置",
+      "detail": "日检拿不到性能和 Core Web Vitals 分数"
+    },
+    {
+      "severity": "low",
+      "title": "日检任务映射过期",
+      "detail": "daily-seo-check.mjs 仍按四月排期"
+    },
+    {
+      "severity": "low",
+      "title": "Organization sameAs 为空",
+      "detail": "等有真实主页 URL 再补"
+    },
+    {
+      "severity": "low",
+      "title": "产品页缺 FAQPage",
+      "detail": "批量补齐需用户批准，未开 PR"
+    },
+    {
+      "severity": "low",
+      "title": "Insight CTA 正文为模板默认路灯文案",
+      "detail": "需用户同意后再改布局模板"
+    }
+  ],
+  "tomorrow": "等待墨墨成稿与画眉 3 张 WebP 后审稿；通过则按既有自动发布许可校验并上线。下一批候选：led panel light manufacturer、factory audit lighting china、led downlight manufacturer。",
+  "items": [
+    {
+      "type": "brief",
+      "title": "Commercial Lighting Suppliers: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/commercial-lighting-suppliers-guide",
+      "status": "briefed"
+    }
+  ]
+}

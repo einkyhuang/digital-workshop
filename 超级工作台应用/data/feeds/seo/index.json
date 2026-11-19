@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-14T01:36:38+00:00",
+  "updatedAt": "2026-11-19T00:59:31+00:00",
   "dates": [
+    {
+      "date": "2026-11-19",
+      "file": "2026-11-19.json",
+      "summary": "Formore Lighting：30 天排期 Day21（Office + UGR 审稿）两文均已上线，改选词库最高量未成文词 commercial lighting suppliers（P2，US vol 260）；已写简报 commercial-lighting-suppliers-guide，待墨墨成稿与画眉 3 张 WebP。日检 warn（无 PSI key），无新严重问题。11-14 文章 hotel-lighting-design-guide 抽检 200，schema 齐全。今日无发布。",
+      "articleCount": 2,
+      "issueCount": 5
+    },
     {
       "date": "2026-11-14",
       "file": "2026-11-14.json",
