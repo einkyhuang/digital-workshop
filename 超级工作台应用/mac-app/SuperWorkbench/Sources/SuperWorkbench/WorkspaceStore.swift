@@ -839,20 +839,20 @@ final class WorkspaceStore: ObservableObject {
 
     func loadWorkbenches() {
         let url = repoRoot.appendingPathComponent("超级工作台应用/data/workbenches.json")
+        let bundled = Bundle.main.url(forResource: "workbenches", withExtension: "json")
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self else { return }
-            var list: [WorkbenchConfig] = []
             var defaultId = "general"
-            if let raw = try? Data(contentsOf: url),
-               let doc = try? JSONDecoder().decode(WorkbenchesFile.self, from: raw) {
-                list = doc.workbenches
+            var decoded: [WorkbenchConfig]?
+            for candidate in [url, bundled].compactMap({ $0 }) {
+                guard let raw = try? Data(contentsOf: candidate),
+                      let doc = try? JSONDecoder().decode(WorkbenchesFile.self, from: raw),
+                      !doc.workbenches.isEmpty else { continue }
+                decoded = doc.workbenches
                 if let d = doc.defaultId { defaultId = d }
+                break
             }
-            if list.isEmpty {
-                list = [
-                    WorkbenchConfig(id: "general", name: "超级工作台（综合）", shortName: "综合", icon: "square.grid.2x2", description: nil, botGroupIds: nil, modules: SidebarSection.allCases.map(\.moduleId), data: nil, summaryHints: nil)
-                ]
-            }
+            let list = WorkbenchCatalog.resolved(decoded)
             let saved = UserDefaults.standard.string(forKey: "sw.activeWorkbenchId")
             let active = list.contains(where: { $0.id == saved }) ? (saved ?? defaultId) : defaultId
             // trade index (public counts)
@@ -1202,4 +1202,51 @@ final class WorkspaceStore: ObservableObject {
         selectedCalendarDate = ymd
     }
 
+}
+
+/// Not isolated to the main actor so launch can resolve workbenches off the main thread.
+/// The names are string literals so a release binary still contains 外贸工作台 and 资产管理.
+enum WorkbenchCatalog {
+    static func resolved(_ decoded: [WorkbenchConfig]?) -> [WorkbenchConfig] {
+        var list = decoded ?? []
+        if list.isEmpty { list = fallback }
+        if !list.contains(where: { $0.id == "general" }) {
+            list.insert(fallback[0], at: 0)
+        }
+        if !list.contains(where: { $0.id == "trade" }) {
+            list.append(fallback[1])
+        }
+        return list.map { wb in
+            var copy = wb
+            if !copy.modules.contains("assets") {
+                copy.modules.append("assets")
+            }
+            return copy
+        }
+    }
+
+    static let fallback: [WorkbenchConfig] = [
+        WorkbenchConfig(
+            id: "general",
+            name: "超级工作台",
+            shortName: "超级工作台",
+            icon: "square.grid.2x2",
+            description: nil,
+            botGroupIds: nil,
+            modules: ["overview", "roster", "tasks", "scheduleCenter", "dailySummary", "dailySeo", "rooms", "routines", "projects", "hiring", "rules", "assets"],
+            data: nil,
+            summaryHints: nil
+        ),
+        WorkbenchConfig(
+            id: "trade",
+            name: "外贸工作台",
+            shortName: "外贸工作台",
+            icon: "globe",
+            description: nil,
+            botGroupIds: ["服装外贸", "外贸营销", "照明外贸"],
+            modules: ["overview", "roster", "tasks", "tradeLeads", "crmCustomers", "tradePipeline", "tradeQuotes", "scheduleCenter", "dailySummary", "rooms", "assets"],
+            data: nil,
+            summaryHints: WorkbenchSummaryHints(showWebsiteProjects: false, showEmail: true, showTradeCounts: true)
+        ),
+    ]
 }

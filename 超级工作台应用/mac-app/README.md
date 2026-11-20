@@ -20,6 +20,9 @@
 平台账号的档案在本机 `data/private/资产管理/`，密码在 macOS 钥匙串。构建和安全说明见 `超级工作台应用/docs/asset-vault.md`。
 
 ## 从源码构建
+
+完整步骤、和 2026-11-12 那份约 9.9MB 桌面二进制的对照，写在 `超级工作台应用/docs/asset-vault.md` 的「完整本地编译」。`./build.sh` 只写 `mac-app/超级工作台.app`，拒绝 `--desktop`，也不会覆盖桌面上的 App。
+
 ```bash
 cd 超级工作台应用/mac-app/SuperWorkbench
 ./build.sh
