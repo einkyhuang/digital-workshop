@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-19T00:59:31+00:00",
+  "updatedAt": "2026-11-20T00:54:20+00:00",
   "dates": [
+    {
+      "date": "2026-11-20",
+      "file": "2026-11-20.json",
+      "summary": "Formore Lighting：30 天排期 Day22（architectural LED lighting）已上线，改选 led panel light manufacturer（P2，US vol 20）；已写简报 led-panel-light-manufacturer-guide，待墨墨成稿与画眉 3 张 WebP。11-19 成稿已到，配图仍缺（qwen-image 403），今日无发布。日检 warn（无 PSI key），无新严重问题。",
+      "articleCount": 2,
+      "issueCount": 6
+    },
     {
       "date": "2026-11-19",
       "file": "2026-11-19.json",
