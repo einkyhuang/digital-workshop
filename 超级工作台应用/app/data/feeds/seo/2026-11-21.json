@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-11-21",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-21T08:56:30+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "排期 Day23 原任务已完成（commercial-led-lighting-guide 已上线，commercial-lighting-suppliers-guide 成稿待配图）；已写简报 led-lighting-manufacturer-china-guide（P1，US vol 140），待墨墨成稿与画眉 3 张 WebP。11-19 与 11-20 成稿已到，配图仍缺（qwen-image 403），今日无发布。日检 warn（无 PSI key），无新严重问题。",
+  "articles": [
+    {
+      "id": "led-lighting-manufacturer-china-guide",
+      "title": "LED Lighting Manufacturer China: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-lighting-manufacturer-china-guide",
+      "status": "briefed",
+      "primaryKeyword": "led lighting manufacturer china",
+      "secondaryKeywords": [
+        "china lighting factory",
+        "oem led lighting manufacturer",
+        "odm lighting manufacturer",
+        "lighting oem odm",
+        "led lighting manufacturer"
+      ],
+      "notes": "简报路径：bots/网站项目/Super-SEO-Hub/deliverables/formorelightings/briefs/2026-11-21-led-lighting-manufacturer-china.md。计划地址 /insights/led-lighting-manufacturer-china-guide（今日 404，尚未上线，符合预期）；待墨墨英文稿与画眉 3 张 WebP。排期 Day23 原任务已完成，改选词库剩余最高量级词。外部模型不可用，简报由搜搜按模板撰写。内链与权威来源页已 curl 核验 200。Category 使用 Technical。"
+    },
+    {
+      "id": "led-panel-light-manufacturer-guide",
+      "title": "LED Panel Light Manufacturer: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-panel-light-manufacturer-guide",
+      "status": "draft",
+      "primaryKeyword": "led panel light manufacturer",
+      "secondaryKeywords": [
+        "led lighting manufacturer china",
+        "oem led lighting manufacturer",
+        "office lighting design",
+        "ugr office lighting",
+        "cri 90 led"
+      ],
+      "notes": "墨墨成稿已交（bots/内容营销/主笔/deliverables/formore-articles/2026-11-20-led-panel-light-manufacturer-guide.md，commit b6ec3f8，约 2350 词）。frontmatter category 为 Sourcing，审稿时需改为 Technical。配图仍未到：design-drafts/2026-11-20-led-panel-light-manufacturer/ 不存在；qwen-image 今日复测仍 403 Unpurchased，用户尚未授权 gemini-image。合审与发布等待配图。目标 URL 今日仍 404。"
+    },
+    {
+      "id": "commercial-lighting-suppliers-guide",
+      "title": "Commercial Lighting Suppliers: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/commercial-lighting-suppliers-guide",
+      "status": "draft",
+      "primaryKeyword": "commercial lighting suppliers",
+      "secondaryKeywords": [
+        "commercial led lighting",
+        "led lighting manufacturer",
+        "china lighting factory",
+        "lighting sourcing agent in china",
+        "factory audit lighting china"
+      ],
+      "notes": "墨墨成稿已交（bots/内容营销/主笔/deliverables/formore-articles/2026-11-19-commercial-lighting-suppliers-guide.md，commit cd2581e，约 2287 词，category Technical）。配图仍未到：design-drafts/2026-11-19-commercial-lighting-suppliers/ 不存在；qwen-image 今日复测仍 403 Unpurchased。合审与发布等待配图。目标 URL 今日仍 404。"
+    }
+  ],
+  "keywords": [
+    {
+      "term": "led lighting manufacturer china",
+      "intent": "commercial",
+      "priority": "high"
+    },
+    {
+      "term": "china lighting factory",
+      "intent": "informational",
+      "priority": "medium"
+    },
+    {
+      "term": "oem led lighting manufacturer",
+      "intent": "commercial",
+      "priority": "medium"
+    }
+  ],
+  "images": [
+    {
+      "alt": "Clean, modern luminaire production hall with commercial LED fixtures on organized factory racks, with no people or text visible.",
+      "ofArticleId": "led-lighting-manufacturer-china-guide",
+      "notes": "hero planned: led-lighting-manufacturer-china-factory-floor.webp (1600x900); 待画眉交付"
+    },
+    {
+      "alt": "Lighting quality-control laboratory with LED luminaires on a test rack beside photometric instruments, with no people or text visible.",
+      "ofArticleId": "led-lighting-manufacturer-china-guide",
+      "notes": "inline planned: led-lighting-manufacturer-china-qc-lab.webp (1200x800); 待画眉交付"
+    },
+    {
+      "alt": "Clean export packing area with sealed cartons of commercial LED fixtures and one open foam-fitted carton, with no people or text visible.",
+      "ofArticleId": "led-lighting-manufacturer-china-guide",
+      "notes": "inline planned: led-lighting-manufacturer-china-export-docs.webp (1200x800); 待画眉交付"
+    }
+  ],
+  "checks": [
+    {
+      "id": "seo-daily",
+      "name": "npm run seo:daily",
+      "status": "warn",
+      "detail": "运行成功并写出 reports/seo/2026-11-21.md；缺 PSI_API_KEY 性能跳过；四月任务映射过期（老问题）"
+    },
+    {
+      "id": "live-spot-check",
+      "name": "核心页面与已上线文章抽检",
+      "status": "pass",
+      "detail": "/, /robots.txt, /sitemap.xml, /sitemap-index.xml, /sitemap-insights.xml, /llms.txt, /insights, /products, /contact, /oem-odm, /solutions, /sourcing 均为 200；hotel-lighting-design-guide 200，title/canonical 正确，Article + FAQPage + BreadcrumbList；sitemap-insights.xml 仍为 30 条。"
+    },
+    {
+      "id": "internal-links",
+      "name": "新简报内链核验",
+      "status": "pass",
+      "detail": "简报第 5 节全部站内 URL 及 IEC 60598-1、UL 1598、CE marking、ISO 9001:2015、DLC、ENERGY STAR、Incoterms 2020 官方页均 curl 200；目标 slug 当前 404，符合预期。"
+    },
+    {
+      "id": "pending-drafts",
+      "name": "待发布稿件检查",
+      "status": "warn",
+      "detail": "11-19 commercial-lighting-suppliers-guide 与 11-20 led-panel-light-manufacturer-guide 成稿已到，各缺 3 张 WebP（qwen-image 403 Unpurchased，gemini-image 待授权），今日不发布。11-20 草稿 category 为 Sourcing，审稿时需改为 Technical。"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "low",
+      "title": "PSI_API_KEY 未配置",
+      "detail": "日检拿不到性能和 Core Web Vitals 分数"
+    },
+    {
+      "severity": "low",
+      "title": "日检任务映射过期",
+      "detail": "daily-seo-check.mjs 仍按四月排期"
+    },
+    {
+      "severity": "low",
+      "title": "Organization sameAs 为空",
+      "detail": "等有真实主页 URL 再补"
+    },
+    {
+      "severity": "low",
+      "title": "产品页缺 FAQPage",
+      "detail": "批量补齐需用户批准，未开 PR"
+    },
+    {
+      "severity": "low",
+      "title": "Insight CTA 正文为模板默认路灯文案",
+      "detail": "需用户同意后再改布局模板"
+    },
+    {
+      "severity": "low",
+      "title": "11-19 与 11-20 成稿配图受阻",
+      "detail": "两篇成稿已交，qwen-image 仍 403 Unpurchased，用户尚未授权 gemini-image，暂缓发布"
+    }
+  ],
+  "tomorrow": "若 11-19 或 11-20 的 WebP 交付，审稿通过后按既有自动发布许可校验并上线（11-20 需把 category 从 Sourcing 改为 Technical）。同时等待今日 led-lighting-manufacturer-china-guide 的墨墨成稿与画眉配图。下一批候选：factory audit lighting china、led downlight manufacturer。",
+  "items": [
+    {
+      "type": "brief",
+      "title": "LED Lighting Manufacturer China: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-lighting-manufacturer-china-guide",
+      "status": "briefed"
+    },
+    {
+      "type": "draft",
+      "title": "LED Panel Light Manufacturer: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-panel-light-manufacturer-guide",
+      "status": "draft"
+    },
+    {
+      "type": "draft",
+      "title": "Commercial Lighting Suppliers: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/commercial-lighting-suppliers-guide",
+      "status": "draft"
+    }
+  ]
+}

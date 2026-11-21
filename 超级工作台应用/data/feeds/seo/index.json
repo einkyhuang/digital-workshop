@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-20T00:54:20+00:00",
+  "updatedAt": "2026-11-21T00:57:03+00:00",
   "dates": [
+    {
+      "date": "2026-11-21",
+      "file": "2026-11-21.json",
+      "summary": "排期 Day23 原任务已完成（commercial-led-lighting-guide 已上线，commercial-lighting-suppliers-guide 成稿待配图）；已写简报 led-lighting-manufacturer-china-guide（P1，US vol 140），待墨墨成稿与画眉 3 张 WebP。11-19 与 11-20 成稿已到，配图仍缺（qwen-image 403），今日无发布。日检 warn（无 PSI key），无新严重问题。",
+      "articleCount": 3,
+      "issueCount": 6
+    },
     {
       "date": "2026-11-20",
       "file": "2026-11-20.json",
