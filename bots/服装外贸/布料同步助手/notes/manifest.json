@@ -6,9 +6,9 @@
  "mac_real_path": "/Users/ky/Library/Containers/com.tencent.WeWorkMac/Data/WeDrive/广州展发纺织/印花产品图库/印花产品图库",
  "note": "Desktop item is an alias to the 企业微信 Mac app's own WeDrive sync folder; 企业微信 keeps it in sync. Compared by path+size+mtime against that folder; no files downloaded or written into the WeCom directory.",
  "baseline_at": "2026-10-30 09:15 Asia/Shanghai",
- "last_synced_at": "2026-11-19 09:26 Asia/Shanghai",
- "file_count": 2914,
- "total_bytes": 9431845702,
+ "last_synced_at": "2026-11-22 09:25 Asia/Shanghai",
+ "file_count": 2916,
+ "total_bytes": 9441040917,
  "folders": {
   "100D四面弹克重：110gsm": 1233,
   "30S纯涤纱": 1,
@@ -54,7 +54,8 @@
   "高捻雪纺克重：70gsm": 2,
   "单丝斜纹麻": 2,
   "挑花绉": 2,
-  "高密弹力缎": 2
+  "高密弹力缎": 2,
+  "全棉府绸": 2
  },
  "files": [
   {
@@ -14626,6 +14627,16 @@
    "path": "锦棉竹节克重：120gsm/yc锦棉竹节261113999 85%粘胶(人棉),15%锦纶(尼龙).jpg",
    "size": 373827,
    "mtime": "2026-11-16 16:43:28"
+  },
+  {
+   "path": "全棉府绸/vm-path-test.txt",
+   "size": 32,
+   "mtime": "2026-11-21 09:52:19"
+  },
+  {
+   "path": "全棉府绸/yc全棉府绸261013377 100%棉.jpg",
+   "size": 9195183,
+   "mtime": "2026-11-21 09:52:39"
   }
  ]
 }
