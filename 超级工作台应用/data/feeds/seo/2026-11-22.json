@@ -1,0 +1,171 @@
+{
+  "version": 1,
+  "feedId": "seo",
+  "date": "2026-11-22",
+  "timezone": "Asia/Shanghai",
+  "updatedAt": "2026-11-22T09:00:00+08:00",
+  "botId": "seo",
+  "botName": "搜搜-SEO专家",
+  "summary": "排期 Day24 原任务已完成（architectural-led-lighting-guide 与 commercial-led-lighting-guide 均已上线）；已写简报 led-downlight-manufacturer-guide（P2，US vol 20），待墨墨成稿与画眉 3 张 WebP。昨日 china manufacturer 简报经覆盖核对后不再成文。11-19 与 11-20 成稿已到，配图仍缺（qwen-image 403），今日无发布。日检 warn（无 PSI key），无新严重问题。",
+  "articles": [
+    {
+      "id": "led-downlight-manufacturer-guide",
+      "title": "LED Downlight Manufacturer: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-downlight-manufacturer-guide",
+      "status": "briefed",
+      "primaryKeyword": "led downlight manufacturer",
+      "secondaryKeywords": [
+        "led downlight oem",
+        "oem led lighting manufacturer",
+        "hotel lighting design",
+        "retail lighting design",
+        "beam angle lighting",
+        "cri 90 led"
+      ],
+      "notes": "简报已写：deliverables/formorelightings/briefs/2026-11-22-led-downlight-manufacturer.md。Category 为 Technical。将发给墨墨成稿、画眉配 3 张 WebP。目标 URL 今日仍 404。"
+    },
+    {
+      "id": "led-panel-light-manufacturer-guide",
+      "title": "LED Panel Light Manufacturer: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-panel-light-manufacturer-guide",
+      "status": "draft",
+      "primaryKeyword": "led panel light manufacturer",
+      "secondaryKeywords": [
+        "led lighting manufacturer china",
+        "oem led lighting manufacturer",
+        "office lighting design",
+        "ugr office lighting",
+        "cri 90 led"
+      ],
+      "notes": "墨墨成稿已交（bots/内容营销/主笔/deliverables/formore-articles/2026-11-20-led-panel-light-manufacturer-guide.md，commit b6ec3f8，约 2350 词）。frontmatter category 为 Sourcing，审稿时需改为 Technical。配图仍未到：design-drafts/2026-11-20-led-panel-light-manufacturer/ 不存在；qwen-image 今日复测仍 403 Unpurchased，用户尚未授权 gemini-image。合审与发布等待配图。目标 URL 今日仍 404。"
+    },
+    {
+      "id": "commercial-lighting-suppliers-guide",
+      "title": "Commercial Lighting Suppliers: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/commercial-lighting-suppliers-guide",
+      "status": "draft",
+      "primaryKeyword": "commercial lighting suppliers",
+      "secondaryKeywords": [
+        "commercial led lighting",
+        "led lighting manufacturer",
+        "china lighting factory",
+        "lighting sourcing agent in china",
+        "factory audit lighting china"
+      ],
+      "notes": "墨墨成稿已交（bots/内容营销/主笔/deliverables/formore-articles/2026-11-19-commercial-lighting-suppliers-guide.md，commit cd2581e，约 2287 词，category Technical）。配图仍未到：design-drafts/2026-11-19-commercial-lighting-suppliers/ 不存在；qwen-image 今日复测仍 403 Unpurchased。合审与发布等待配图。目标 URL 今日仍 404。"
+    }
+  ],
+  "keywords": [
+    {
+      "term": "led downlight manufacturer",
+      "intent": "informational",
+      "priority": "medium"
+    },
+    {
+      "term": "led downlight oem",
+      "intent": "commercial",
+      "priority": "medium"
+    },
+    {
+      "term": "oem led lighting manufacturer",
+      "intent": "commercial",
+      "priority": "medium"
+    }
+  ],
+  "images": [
+    {
+      "alt": "Modern hotel lobby ceiling of recessed LED downlights providing even, well-controlled illumination, with no people or text visible.",
+      "ofArticleId": "led-downlight-manufacturer-guide",
+      "notes": "hero planned: led-downlight-manufacturer-hotel-ceiling.webp (1600x900); 待画眉交付"
+    },
+    {
+      "alt": "Clean commercial ceiling with a recessed general downlight, an adjustable gimbal downlight, and a cylindrical surface-mounted downlight, with no people or text visible.",
+      "ofArticleId": "led-downlight-manufacturer-guide",
+      "notes": "inline planned: led-downlight-types-recessed-surface.webp (1200x800); 待画眉交付"
+    },
+    {
+      "alt": "Lighting photometric workbench with LED downlights on a rack beside laboratory measurement instruments, with no people or text visible.",
+      "ofArticleId": "led-downlight-manufacturer-guide",
+      "notes": "inline planned: led-downlight-photometric-qc.webp (1200x800); 待画眉交付"
+    }
+  ],
+  "checks": [
+    {
+      "id": "seo-daily",
+      "name": "npm run seo:daily",
+      "status": "warn",
+      "detail": "运行成功并写出 reports/seo/2026-11-22.md；缺 PSI_API_KEY 性能跳过；四月任务映射过期（老问题）。与昨日报告相比仅日期变化。"
+    },
+    {
+      "id": "live-spot-check",
+      "name": "核心页面与已上线文章抽检",
+      "status": "pass",
+      "detail": "/, /robots.txt, /sitemap.xml, /sitemap-index.xml, /sitemap-insights.xml, /llms.txt, /insights, /products, /contact, /oem-odm, /solutions, /sourcing 均为 200；hotel-lighting-design-guide 200，canonical 正确，Article + FAQPage + BreadcrumbList；sitemap-insights.xml 仍为 30 条。"
+    },
+    {
+      "id": "internal-links",
+      "name": "新简报内链核验",
+      "status": "pass",
+      "detail": "简报第 5 节全部站内 URL 及 IEC 60598-1、UL 1598、IEC 60529、CIE ISO/CIE 8995-1、DLC、ENERGY STAR、Incoterms 2020 官方页均 curl 200；目标 slug 当前 404，符合预期。"
+    },
+    {
+      "id": "pending-drafts",
+      "name": "待发布稿件检查",
+      "status": "warn",
+      "detail": "11-19 commercial-lighting-suppliers-guide 与 11-20 led-panel-light-manufacturer-guide 成稿已到，各缺 3 张 WebP（qwen-image 403 Unpurchased，gemini-image 待授权），今日不发布。11-20 草稿 category 为 Sourcing，审稿时需改为 Technical。昨日 china manufacturer 简报已取消新建，未收到该稿。"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "low",
+      "title": "PSI_API_KEY 未配置",
+      "detail": "日检拿不到性能和 Core Web Vitals 分数"
+    },
+    {
+      "severity": "low",
+      "title": "日检任务映射过期",
+      "detail": "daily-seo-check.mjs 仍按四月排期"
+    },
+    {
+      "severity": "low",
+      "title": "Organization sameAs 为空",
+      "detail": "等有真实主页 URL 再补"
+    },
+    {
+      "severity": "low",
+      "title": "产品页缺 FAQPage",
+      "detail": "批量补齐需用户批准，未开 PR"
+    },
+    {
+      "severity": "low",
+      "title": "Insight CTA 正文为模板默认路灯文案",
+      "detail": "需用户同意后再改布局模板"
+    },
+    {
+      "severity": "low",
+      "title": "11-19 与 11-20 成稿配图受阻",
+      "detail": "两篇成稿已交，qwen-image 仍 403 Unpurchased，用户尚未授权 gemini-image，暂缓发布"
+    }
+  ],
+  "tomorrow": "若 11-19 或 11-20 的 WebP 交付，审稿通过后按既有自动发布许可校验并上线（11-20 需把 category 从 Sourcing 改为 Technical）。同时等待今日 led-downlight-manufacturer-guide 的墨墨成稿与画眉配图。factory audit lighting china 需先做与已上线 manufacturer / sourcing 页的覆盖核对再出简报；不要再写 led-lighting-manufacturer-china-guide。",
+  "items": [
+    {
+      "type": "brief",
+      "title": "LED Downlight Manufacturer: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-downlight-manufacturer-guide",
+      "status": "briefed"
+    },
+    {
+      "type": "draft",
+      "title": "LED Panel Light Manufacturer: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/led-panel-light-manufacturer-guide",
+      "status": "draft"
+    },
+    {
+      "type": "draft",
+      "title": "Commercial Lighting Suppliers: A B2B Buyer's Guide",
+      "url": "https://www.formorelightings.com/insights/commercial-lighting-suppliers-guide",
+      "status": "draft"
+    }
+  ]
+}

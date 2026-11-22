@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-21T00:57:03+00:00",
+  "updatedAt": "2026-11-22T01:00:10+00:00",
   "dates": [
+    {
+      "date": "2026-11-22",
+      "file": "2026-11-22.json",
+      "summary": "排期 Day24 原任务已完成（architectural-led-lighting-guide 与 commercial-led-lighting-guide 均已上线）；已写简报 led-downlight-manufacturer-guide（P2，US vol 20），待墨墨成稿与画眉 3 张 WebP。昨日 china manufacturer 简报经覆盖核对后不再成文。11-19 与 11-20 成稿已到，配图仍缺（qwen-image 403），今日无发布。日检 warn（无 PSI key），无新严重问题。",
+      "articleCount": 3,
+      "issueCount": 6
+    },
     {
       "date": "2026-11-21",
       "file": "2026-11-21.json",
