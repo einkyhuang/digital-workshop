@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-22T01:00:10+00:00",
+  "updatedAt": "2026-11-23T00:57:49+00:00",
   "dates": [
+    {
+      "date": "2026-11-23",
+      "file": "2026-11-23.json",
+      "summary": "排期 Day25 原任务已完成（retail 与 hotel 设计指南均已上线）；覆盖核对后已写简报 factory-audit-lighting-china-guide（验厂过程与报告，Category Technical），待墨墨成稿与画眉 3 张 WebP。11-22 downlight 成稿已到（PR #7），与 11-19、11-20 一样仍缺配图，今日无发布。日检 warn（无 PSI key），无新严重问题。",
+      "articleCount": 4,
+      "issueCount": 6
+    },
     {
       "date": "2026-11-22",
       "file": "2026-11-22.json",
