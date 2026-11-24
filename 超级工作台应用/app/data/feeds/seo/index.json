@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-23T00:57:49+00:00",
+  "updatedAt": "2026-11-24T00:54:55+00:00",
   "dates": [
+    {
+      "date": "2026-11-24",
+      "file": "2026-11-24.json",
+      "summary": "排期 Day26 原任务已完成（HCL 与 beam angle 指南均已上线）。按周计划不写新简报。墨墨四篇成稿已齐（含 11-23 验厂稿 PR #8），均仍缺配图，今日无发布。日检 warn（无 PSI key），无新严重问题。",
+      "articleCount": 4,
+      "issueCount": 6
+    },
     {
       "date": "2026-11-23",
       "file": "2026-11-23.json",
