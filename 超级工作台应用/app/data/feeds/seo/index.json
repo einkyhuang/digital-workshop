@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-24T00:54:55+00:00",
+  "updatedAt": "2026-11-25T00:57:50+00:00",
   "dates": [
+    {
+      "date": "2026-11-25",
+      "file": "2026-11-25.json",
+      "summary": "排期 Day27 原审稿任务对应的 Retail/Hotel 与 HCL/Beam 均已上线，抽检通过。按周计划不写新简报。墨墨四篇成稿仍齐，均缺配图，今日无发布。日检 warn（无 PSI key），无新严重问题。",
+      "articleCount": 4,
+      "issueCount": 6
+    },
     {
       "date": "2026-11-24",
       "file": "2026-11-24.json",
