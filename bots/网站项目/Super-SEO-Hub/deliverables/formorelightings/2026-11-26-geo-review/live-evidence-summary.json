@@ -1,0 +1,2032 @@
+{
+  "fetchedAt": "2026-11-26T08:50:59+08:00",
+  "method": "Python urllib, Accept-Encoding gzip, first-byte HTML only, no JS, no PSI/CWV",
+  "summary": {
+    "insight_count": 30,
+    "insights_200": 30,
+    "insights_with_article": 30,
+    "insights_with_faqpage": 15,
+    "insights_faq_zero": [
+      "/insights/2026-lighting-trends",
+      "/insights/beam-angle-guide-for-commercial-lighting",
+      "/insights/beam-angle-secrets",
+      "/insights/color-temperature-guide",
+      "/insights/cri-explained",
+      "/insights/dimming-guide",
+      "/insights/future-marketing",
+      "/insights/how-to-source-led-lights-from-china",
+      "/insights/led-terminology-guide",
+      "/insights/lumens-vs-watts",
+      "/insights/minimalism",
+      "/insights/navigating-shenzhen",
+      "/insights/outdoor-lighting",
+      "/insights/understanding-cri",
+      "/insights/what-is-cri-in-lighting"
+    ],
+    "insights_bluf_likely": 0,
+    "insights_bluf_fail": [
+      {
+        "path": "/insights/2026-lighting-trends",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/3000k-vs-4000k-led",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/architectural-led-lighting-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/beam-angle-guide-for-commercial-lighting",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/beam-angle-secrets",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Lighting"
+      },
+      {
+        "path": "/insights/color-temperature-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Lighting"
+      },
+      {
+        "path": "/insights/commercial-led-lighting-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/commercial-track-light-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/cri-explained",
+        "words": 2,
+        "soft": false,
+        "first": "Sarah Chen"
+      },
+      {
+        "path": "/insights/dimming-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Engineering Team"
+      },
+      {
+        "path": "/insights/future-marketing",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/hotel-lighting-design-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/how-to-source-led-lights-from-china",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/human-centric-lighting-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/led-flood-light-manufacturer-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/led-lighting-manufacturer-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/led-linear-light-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/led-terminology-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Engineering Team"
+      },
+      {
+        "path": "/insights/lumens-vs-watts",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Lighting"
+      },
+      {
+        "path": "/insights/magnetic-track-lighting-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/minimalism",
+        "words": 2,
+        "soft": false,
+        "first": "David Miller"
+      },
+      {
+        "path": "/insights/navigating-shenzhen",
+        "words": 2,
+        "soft": false,
+        "first": "Sourcing Team"
+      },
+      {
+        "path": "/insights/oem-vs-odm-lighting-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/office-lighting-design-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/outdoor-lighting",
+        "words": 2,
+        "soft": false,
+        "first": "Alex Rivera"
+      },
+      {
+        "path": "/insights/retail-lighting-design-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/solar-street-light-manufacturer-guide",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/ugr-office-lighting-explained",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      },
+      {
+        "path": "/insights/understanding-cri",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Lighting"
+      },
+      {
+        "path": "/insights/what-is-cri-in-lighting",
+        "words": 2,
+        "soft": false,
+        "first": "Formore Research"
+      }
+    ],
+    "insights_with_table_or_list": 30,
+    "insights_cta_boilerplate": [
+      "/insights/3000k-vs-4000k-led",
+      "/insights/architectural-led-lighting-guide",
+      "/insights/commercial-led-lighting-guide",
+      "/insights/commercial-track-light-guide",
+      "/insights/hotel-lighting-design-guide",
+      "/insights/human-centric-lighting-guide",
+      "/insights/led-flood-light-manufacturer-guide",
+      "/insights/led-lighting-manufacturer-guide",
+      "/insights/led-linear-light-guide",
+      "/insights/magnetic-track-lighting-guide",
+      "/insights/oem-vs-odm-lighting-guide",
+      "/insights/office-lighting-design-guide",
+      "/insights/retail-lighting-design-guide",
+      "/insights/solar-street-light-manufacturer-guide",
+      "/insights/ugr-office-lighting-explained"
+    ],
+    "product_count": 93,
+    "products_200": 93,
+    "products_with_faqpage": 0,
+    "products_with_product": 86,
+    "product_shells": [
+      {
+        "path": "/products/battery",
+        "decoded_len": 31954,
+        "title": "",
+        "h1": [],
+        "canonical": "",
+        "schema": []
+      },
+      {
+        "path": "/products/cable",
+        "decoded_len": 31954,
+        "title": "",
+        "h1": [],
+        "canonical": "",
+        "schema": []
+      },
+      {
+        "path": "/products/connector",
+        "decoded_len": 31954,
+        "title": "",
+        "h1": [],
+        "canonical": "",
+        "schema": []
+      },
+      {
+        "path": "/products/inverter",
+        "decoded_len": 31954,
+        "title": "",
+        "h1": [],
+        "canonical": "",
+        "schema": []
+      },
+      {
+        "path": "/products/mounting-support",
+        "decoded_len": 31954,
+        "title": "",
+        "h1": [],
+        "canonical": "",
+        "schema": []
+      },
+      {
+        "path": "/products/solar-panel",
+        "decoded_len": 31954,
+        "title": "",
+        "h1": [],
+        "canonical": "",
+        "schema": []
+      },
+      {
+        "path": "/products/toolkits",
+        "decoded_len": 31954,
+        "title": "",
+        "h1": [],
+        "canonical": "",
+        "schema": []
+      }
+    ],
+    "pending_status": {
+      "commercial-lighting-suppliers-guide": 404,
+      "led-panel-light-manufacturer-guide": 404,
+      "led-downlight-manufacturer-guide": 404,
+      "factory-audit-lighting-china-guide": 404
+    },
+    "home_sameAs": null,
+    "home_org_keys": [
+      "@context",
+      "@type",
+      "name",
+      "url",
+      "logo",
+      "email",
+      "telephone",
+      "address"
+    ],
+    "home_schema": [
+      "BreadcrumbList",
+      "Organization",
+      "WebSite"
+    ],
+    "faq_page_faq_count": 10,
+    "faq_page_schema": [
+      "BreadcrumbList",
+      "FAQPage"
+    ]
+  },
+  "core_special": {
+    "/robots.txt": "User-agent: *\nAllow: /\n\nSitemap: https://www.formorelightings.com/sitemap-index.xml\n",
+    "/llms.txt": "# Formore Lighting\n> Architectural LED lighting manufacturer and OEM/ODM sourcing partner based in China.\n\n## Core Business\n- Architectural LED lighting (linear, track, downlight, panel, flood, solar)\n- OEM / ODM manufacturing for lighting brands and project specifiers\n- China sourcing partner: factory audit, sampling, QC, consolidation\n\n## Key Pages\n- https://www.formorelightings.com/\n- https://www.formorelightings.com/about\n- https://www.formorelightings.com/contact\n- https://www.formorelightings.com/products\n- https://www.formorelightings.com/cases\n- https://www.formorelightings.com/insights\n- https://www.formorelightings.com/sourcing\n- https://www.formorelightings.com/oem-odm\n- https://www.formorelightings.com/faq\n- https://www.formorelightings.com/privacy\n- https://www.formorelightings.com/terms\n\n## Insights\n- https://www.formorelightings.com/insights\n\n## Contact\n- Sourcing & OEM inquiries: https://www.formorelightings.com/contact\n- Email: info@formorelightings.com\n",
+    "/llms-full.txt": {
+      "status": 404
+    }
+  },
+  "core_pages": {
+    "/": {
+      "status": 200,
+      "decoded_len": 103870,
+      "title": "Architectural LED Lighting Manufacturer | Formore",
+      "canonical": "https://www.formorelightings.com",
+      "h1": [
+        "Architectural LED Lighting Manufacturer &amp; Sourcing Partner"
+      ],
+      "schema_type_set": [
+        "BreadcrumbList",
+        "Organization",
+        "WebSite"
+      ],
+      "faq_schema_count": 0,
+      "organization": {
+        "name": "Formore Lighting",
+        "url": "https://www.formorelightings.com",
+        "sameAs": null,
+        "logo": true,
+        "email": true,
+        "telephone": true,
+        "address": true,
+        "keys": [
+          "@context",
+          "@type",
+          "name",
+          "url",
+          "logo",
+          "email",
+          "telephone",
+          "address"
+        ]
+      }
+    },
+    "/insights": {
+      "status": 200,
+      "decoded_len": 57510,
+      "title": "Insights | Formore",
+      "canonical": "https://www.formorelightings.com/insights",
+      "h1": [
+        "Light, Design &amp; Innovation."
+      ],
+      "schema_type_set": [
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "organization": null
+    },
+    "/products": {
+      "status": 200,
+      "decoded_len": 115424,
+      "title": "Commercial LED Lighting Products &amp; OEM Supply | Formore",
+      "canonical": "https://www.formorelightings.com/products",
+      "h1": [
+        "Commercial LED Lighting Products"
+      ],
+      "schema_type_set": [
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "organization": null
+    },
+    "/contact": {
+      "status": 200,
+      "decoded_len": 42974,
+      "title": "Contact Us | Formore",
+      "canonical": "https://www.formorelightings.com/contact",
+      "h1": [
+        "Get in Touch"
+      ],
+      "schema_type_set": [
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "organization": null
+    },
+    "/oem-odm": {
+      "status": 200,
+      "decoded_len": 48816,
+      "title": "OEM &amp; ODM LED Lighting Manufacturer in China | Formore",
+      "canonical": "https://www.formorelightings.com/oem-odm",
+      "h1": [
+        "Your Brand. Our Excellence."
+      ],
+      "schema_type_set": [
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "organization": null
+    },
+    "/solutions": {
+      "status": 200,
+      "decoded_len": 57640,
+      "title": "Commercial, Retail &amp; Hotel Lighting Solutions | Formore",
+      "canonical": "https://www.formorelightings.com/solutions",
+      "h1": [
+        "Comprehensive Energy &amp; Lighting"
+      ],
+      "schema_type_set": [
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "organization": null
+    },
+    "/sourcing": {
+      "status": 200,
+      "decoded_len": 75192,
+      "title": "China Lighting Sourcing Agent &amp; Factory Audit Support | Formore",
+      "canonical": "https://www.formorelightings.com/sourcing",
+      "h1": [
+        "Your Eyes in the Factory. Global Standards."
+      ],
+      "schema_type_set": [
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "organization": null
+    },
+    "/faq": {
+      "status": 200,
+      "decoded_len": 53197,
+      "title": "FAQ | Formore",
+      "canonical": "https://www.formorelightings.com/faq",
+      "h1": [
+        "Frequently Asked Questions"
+      ],
+      "schema_type_set": [
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 10,
+      "organization": null
+    },
+    "/about": {
+      "status": 200,
+      "decoded_len": 67993,
+      "title": "About Us | Formore",
+      "canonical": "https://www.formorelightings.com/about",
+      "h1": [
+        "Engineering Pure Light."
+      ],
+      "schema_type_set": [
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "organization": null
+    },
+    "/privacy": {
+      "status": 200,
+      "decoded_len": 36397,
+      "title": null,
+      "canonical": null,
+      "h1": null,
+      "schema_type_set": null,
+      "faq_schema_count": null,
+      "organization": null
+    },
+    "/terms": {
+      "status": 200,
+      "decoded_len": 36049,
+      "title": null,
+      "canonical": null,
+      "h1": null,
+      "schema_type_set": null,
+      "faq_schema_count": null,
+      "organization": null
+    },
+    "/cases": {
+      "status": 200,
+      "decoded_len": 54725,
+      "title": null,
+      "canonical": null,
+      "h1": null,
+      "schema_type_set": null,
+      "faq_schema_count": null,
+      "organization": null
+    }
+  },
+  "sitemaps": {
+    "/sitemap.xml": {
+      "status": 200,
+      "loc_count": 154
+    },
+    "/sitemap-index.xml": {
+      "status": 200,
+      "loc_count": 4
+    },
+    "/sitemap-insights.xml": {
+      "status": 200,
+      "loc_count": 30
+    },
+    "/sitemap": {
+      "status": 200,
+      "loc_count": 0
+    },
+    "/sitemap-pages.xml": {
+      "status": 200,
+      "loc_count": 25
+    },
+    "/sitemap-products.xml": {
+      "status": 200,
+      "loc_count": 93
+    },
+    "/sitemap-cases.xml": {
+      "status": 200,
+      "loc_count": 6
+    }
+  },
+  "insights": [
+    {
+      "path": "/insights/2026-lighting-trends",
+      "status": 200,
+      "title": "2026 Lighting Trends: The Great Divide Between Art &amp; Utility | Formore",
+      "canonical": "https://www.formorelightings.com/insights/2026-lighting-trends",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "2026 Lighting Trends: The Great Divide Between Art & Utility",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2025-12-17T00:00:00.000Z",
+        "dateModified": "2025-12-17T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 0,
+      "uls": 12,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/2026-lighting-trends",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 10,
+        "words": 27,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": true,
+        "text": "\"The market is dividing: Designers are chasing 'imperfect art' and 'natural vibes', while hardcore users are demanding 'Repairability' and 'Stability'. Here is what you need to know.\""
+      }
+    },
+    {
+      "path": "/insights/3000k-vs-4000k-led",
+      "status": 200,
+      "title": "3000K vs 4000K LED: Which to Choose | Formore",
+      "canonical": "https://www.formorelightings.com/insights/3000k-vs-4000k-led",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "3000K vs 4000K LED: Which to Choose",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-11-06T00:00:00.000Z",
+        "dateModified": "2026-11-06T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 1,
+      "uls": 13,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/3000k-vs-4000k-led",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 18,
+        "words": 50,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "Choosing between 3000K and 4000K LED lighting shapes how a commercial space feels and performs. Warm 3000K suits hospitality and retail ambiance; neutral 4000K supports focus in offices and task areas. This guide compares both for B2B decisions and points to the broader color temperature guide for full Kelvin context."
+      }
+    },
+    {
+      "path": "/insights/architectural-led-lighting-guide",
+      "status": 200,
+      "title": "Architectural LED Lighting: B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/architectural-led-lighting-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "Architectural LED Lighting: B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-11-09T00:00:00.000Z",
+        "dateModified": "2026-11-09T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 2,
+      "uls": 12,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/architectural-led-lighting-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 22,
+        "words": 57,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "Architectural LED lighting uses fixtures to reveal a building's form, materials, and circulation rather than only filling a space with light. Buyers should choose fixture types by application (facade, landscape, interior accent), then lock beam angle, CCT, CRI, IP rating, and glare control in the specification before asking an architectural lighting supplier for samples and photometric files."
+      }
+    },
+    {
+      "path": "/insights/beam-angle-guide-for-commercial-lighting",
+      "status": 200,
+      "title": "Beam Angle Guide for Commercial Lighting | Formore",
+      "canonical": "https://www.formorelightings.com/insights/beam-angle-guide-for-commercial-lighting",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "Beam Angle Guide for Commercial Lighting",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-04-13T00:00:00.000Z",
+        "dateModified": "2026-04-13T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 1,
+      "uls": 14,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/beam-angle-guide-for-commercial-lighting",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 10,
+        "words": 27,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": true,
+        "text": "\"A good fixture with the wrong beam angle still produces a bad result. In commercial lighting, beam control is not a detail. It is the visual strategy.\""
+      }
+    },
+    {
+      "path": "/insights/beam-angle-secrets",
+      "status": 200,
+      "title": "The Secret to &#x27;Hotel Luxury&#x27;: Mastering Beam Angles | Formore",
+      "canonical": "https://www.formorelightings.com/insights/beam-angle-secrets",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "The Secret to 'Hotel Luxury': Mastering Beam Angles",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Lighting"
+        },
+        "datePublished": "2023-12-21T00:00:00.000Z",
+        "dateModified": "2023-12-21T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 1,
+      "uls": 12,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/beam-angle-secrets",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 4,
+        "words": 20,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": false,
+        "text": "\"Why does your home feel flat while luxury hotels feel dramatic and cozy? The answer is in the beam angle.\""
+      }
+    },
+    {
+      "path": "/insights/color-temperature-guide",
+      "status": 200,
+      "title": "The Ultimate Color Temperature Guide: 2700K vs 3000K vs 4000K | Formore",
+      "canonical": "https://www.formorelightings.com/insights/color-temperature-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "The Ultimate Color Temperature Guide: 2700K vs 3000K vs 4000K",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Lighting"
+        },
+        "datePublished": "2023-12-19T00:00:00.000Z",
+        "dateModified": "2023-12-19T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 0,
+      "uls": 17,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/color-temperature-guide",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 21,
+        "words": 29,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": true,
+        "text": "\"Choosing the wrong color temperature can make your home look like a hospital or a dungeon. A comprehensive deep dive into Kelvin values, circadian science, and professional lighting standards.\""
+      }
+    },
+    {
+      "path": "/insights/commercial-led-lighting-guide",
+      "status": 200,
+      "title": "Commercial LED Lighting: A B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/commercial-led-lighting-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "Commercial LED Lighting: A B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-11-05T00:00:00.000Z",
+        "dateModified": "2026-11-05T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 1,
+      "uls": 13,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/commercial-led-lighting-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 19,
+        "words": 48,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "Specifying commercial LED lighting requires balancing photometric performance, energy efficiency, and lifecycle costs. This guide helps B2B buyers navigate fixture types for offices, retail, and warehouses, decode critical specs like UGR and L70, and understand the certifications needed to source reliable commercial LED lighting from a qualified manufacturer."
+      }
+    },
+    {
+      "path": "/insights/commercial-track-light-guide",
+      "status": 200,
+      "title": "Commercial Track Light: B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/commercial-track-light-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "Commercial Track Light: B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-11-07T00:00:00.000Z",
+        "dateModified": "2026-11-07T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 1,
+      "uls": 14,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/commercial-track-light-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 18,
+        "words": 57,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "A commercial track light is a modular accent and general lighting system for retail and commercial interiors. Buyers choose among traditional track, magnetic track, or recessed slot systems based on flexibility, aesthetics, and installation constraints. This guide helps B2B buyers specify, compare, and source the right commercial track lighting without reinventing a full magnetic-track deep dive."
+      }
+    },
+    {
+      "path": "/insights/cri-explained",
+      "status": 200,
+      "title": "Why High CRI Matters for Hotels | Formore",
+      "canonical": "https://www.formorelightings.com/insights/cri-explained",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "Why High CRI Matters for Hotels",
+        "author": {
+          "@type": "Organization",
+          "name": "Sarah Chen"
+        },
+        "datePublished": "2023-11-20T00:00:00.000Z",
+        "dateModified": "2023-11-20T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 0,
+      "uls": 11,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/cri-explained",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 2,
+        "words": 16,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": false,
+        "text": "\"Your guests want to look good in the mirror. Don't let low CRI ruin their stay.\""
+      }
+    },
+    {
+      "path": "/insights/dimming-guide",
+      "status": 200,
+      "title": "Understanding DALI-2 vs 0-10V Dimming | Formore",
+      "canonical": "https://www.formorelightings.com/insights/dimming-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "Understanding DALI-2 vs 0-10V Dimming",
+        "author": {
+          "@type": "Organization",
+          "name": "Engineering Team"
+        },
+        "datePublished": "2024-01-10T00:00:00.000Z",
+        "dateModified": "2024-01-10T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 0,
+      "uls": 13,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/dimming-guide",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 8,
+        "words": 28,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": true,
+        "text": "\"The driver is the heart of the LED. Choosing the wrong dimming protocol is the #1 cause of flickering, buzzing, and project failures. Here is the engineering breakdown.\""
+      }
+    },
+    {
+      "path": "/insights/future-marketing",
+      "status": 200,
+      "title": "The Future of Human-Centric Lighting in Workplace Design | Formore",
+      "canonical": "https://www.formorelightings.com/insights/future-marketing",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "The Future of Human-Centric Lighting in Workplace Design",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2025-10-12T00:00:00.000Z",
+        "dateModified": "2025-10-12T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 1,
+      "uls": 13,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/future-marketing",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 9,
+        "words": 29,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": true,
+        "text": "\"Light is not just for vision anymore. It is a biological drug. Learn how Human Centric Lighting (HCL) is reshaping the modern workplace by syncing with our internal clock.\""
+      }
+    },
+    {
+      "path": "/insights/hotel-lighting-design-guide",
+      "status": 200,
+      "title": "Hotel Lighting Design: A B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/hotel-lighting-design-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "Hotel Lighting Design: A B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-11-14T00:00:00.000Z",
+        "dateModified": "2026-11-14T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 2,
+      "uls": 15,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/hotel-lighting-design-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 21,
+        "words": 46,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "Hotel lighting design is a layered specification process that balances guest comfort, brand identity, and operational efficiency. It defines ambient, accent, and task lighting across distinct zones, ties each layer to strict color quality and glare metrics, and establishes fixture schedules for consistent multi-property rollouts."
+      }
+    },
+    {
+      "path": "/insights/how-to-source-led-lights-from-china",
+      "status": 200,
+      "title": "How to Source LED Lights from China | Formore",
+      "canonical": "https://www.formorelightings.com/insights/how-to-source-led-lights-from-china",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "How to Source LED Lights from China",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-04-13T00:00:00.000Z",
+        "dateModified": "2026-04-13T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 1,
+      "uls": 15,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/how-to-source-led-lights-from-china",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 13,
+        "words": 31,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": true,
+        "text": "\"Sourcing LED lights from China is not mainly about finding the cheapest quote. It is about finding the supplier that can hold quality, communication, and delivery when the order becomes real.\""
+      }
+    },
+    {
+      "path": "/insights/human-centric-lighting-guide",
+      "status": 200,
+      "title": "Human Centric Lighting: A B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/human-centric-lighting-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "Human Centric Lighting: A B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-11-11T00:00:00.000Z",
+        "dateModified": "2026-11-11T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 2,
+      "uls": 11,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/human-centric-lighting-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 23,
+        "words": 50,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "Human centric lighting is designed for both visual performance and the non-visual, circadian effects of light. Buyers should define the application and occupied hours first, then lock illuminance as a project target, CCT, CRI, glare control, and control strategy, and ask for spectral or melanopic data before approving samples."
+      }
+    },
+    {
+      "path": "/insights/led-flood-light-manufacturer-guide",
+      "status": 200,
+      "title": "LED Flood Light Manufacturer: B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/led-flood-light-manufacturer-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "LED Flood Light Manufacturer: B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-11-10T00:00:00.000Z",
+        "dateModified": "2026-11-10T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 2,
+      "uls": 12,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/led-flood-light-manufacturer-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 28,
+        "words": 55,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "An LED flood light manufacturer builds high-output fixtures for sports fields, yards, facades, and industrial sites, where beam control, thermal design, and ingress protection decide whether a project succeeds. Buyers should define the application first, then lock beam angle, CCT, IP/IK rating, surge protection, and driver choice before requesting samples and photometric files."
+      }
+    },
+    {
+      "path": "/insights/led-lighting-manufacturer-guide",
+      "status": 200,
+      "title": "LED Lighting Manufacturer: B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/led-lighting-manufacturer-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "LED Lighting Manufacturer: B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-11-08T00:00:00.000Z",
+        "dateModified": "2026-11-08T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 1,
+      "uls": 15,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/led-lighting-manufacturer-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 18,
+        "words": 63,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "An LED lighting manufacturer designs, builds, and tests fixtures in its own factory rather than only brokering catalog products. B2B buyers should verify production lines, quality gates, certifications, and photometric files, then decide whether a catalog, OEM, or ODM path fits the project. This guide shows how to evaluate a manufacturer without repeating a full China-sourcing or OEM-versus-ODM deep dive."
+      }
+    },
+    {
+      "path": "/insights/led-linear-light-guide",
+      "status": 200,
+      "title": "LED Linear Light: A B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/led-linear-light-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "LED Linear Light: A B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-11-01T00:00:00.000Z",
+        "dateModified": "2026-11-01T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 1,
+      "uls": 13,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/led-linear-light-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 12,
+        "words": 49,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "LED linear lights combine aluminum extrusions, LED boards, and diffusers into versatile continuous lighting systems. Choosing the right supplier requires verifying driver quality, photometric data, lumen maintenance, and clear OEM/ODM terms. Compare technical specifications and safety certifications, not just marketing claims, before committing to a commercial purchase order."
+      }
+    },
+    {
+      "path": "/insights/led-terminology-guide",
+      "status": 200,
+      "title": "The Ultimate Guide to LED Terminology: From Lumens to UGR | Formore",
+      "canonical": "https://www.formorelightings.com/insights/led-terminology-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "The Ultimate Guide to LED Terminology: From Lumens to UGR",
+        "author": {
+          "@type": "Organization",
+          "name": "Engineering Team"
+        },
+        "datePublished": "2025-12-17T00:00:00.000Z",
+        "dateModified": "2025-12-17T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 0,
+      "uls": 17,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/led-terminology-guide",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 5,
+        "words": 24,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": false,
+        "text": "\"Confused by lighting specs? We break down every key parameter you need to know, from basic photometry to advanced color quality and optical design.\""
+      }
+    },
+    {
+      "path": "/insights/lumens-vs-watts",
+      "status": 200,
+      "title": "Lumens vs. Watts: The Truth About LED Brightness | Formore",
+      "canonical": "https://www.formorelightings.com/insights/lumens-vs-watts",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "Lumens vs. Watts: The Truth About LED Brightness",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Lighting"
+        },
+        "datePublished": "2023-12-18T00:00:00.000Z",
+        "dateModified": "2023-12-18T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 0,
+      "uls": 13,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/lumens-vs-watts",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 7,
+        "words": 26,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": true,
+        "text": "\"Stop looking at watts. Learn why lumens are the only metric that matters for LED brightness and how to stop buying bulbs that are too dim.\""
+      }
+    },
+    {
+      "path": "/insights/magnetic-track-lighting-guide",
+      "status": 200,
+      "title": "Magnetic Track Lighting: A B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/magnetic-track-lighting-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "Magnetic Track Lighting: A B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-10-31T00:00:00.000Z",
+        "dateModified": "2026-10-31T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 2,
+      "uls": 15,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/magnetic-track-lighting-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 15,
+        "words": 54,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "Magnetic track lighting is a low-voltage DC system — commonly 48V — where track, driver, and magnetic modules combine into one flexible platform. Choosing a supplier comes down to verified driver quality, honest photometric data, module and track compatibility, and clear OEM/ODM terms. Compare specs, not marketing, before you commit to a purchase order."
+      }
+    },
+    {
+      "path": "/insights/minimalism",
+      "status": 200,
+      "title": "Minimalism in Retail Lighting: Less is More | Formore",
+      "canonical": "https://www.formorelightings.com/insights/minimalism",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "Minimalism in Retail Lighting: Less is More",
+        "author": {
+          "@type": "Organization",
+          "name": "David Miller"
+        },
+        "datePublished": "2024-02-28T00:00:00.000Z",
+        "dateModified": "2024-02-28T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 0,
+      "uls": 12,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/minimalism",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 4,
+        "words": 30,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": true,
+        "text": "\"The highest compliment for a lighting designer is when customers say 'Wow, this store looks great' but can't point to a single fixture. The light should be felt, not seen.\""
+      }
+    },
+    {
+      "path": "/insights/navigating-shenzhen",
+      "status": 200,
+      "title": "Navigating the Shenzhen LED Market: A Buyer&#x27;s Handbook | Formore",
+      "canonical": "https://www.formorelightings.com/insights/navigating-shenzhen",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "Navigating the Shenzhen LED Market: A Buyer's Handbook",
+        "author": {
+          "@type": "Organization",
+          "name": "Sourcing Team"
+        },
+        "datePublished": "2025-09-28T00:00:00.000Z",
+        "dateModified": "2025-09-28T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 0,
+      "uls": 12,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/navigating-shenzhen",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 5,
+        "words": 31,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": true,
+        "text": "\"Shenzhen is the hardware capital of the world, but for lighting buyers, it's a minefield. Here is how to distinguish original manufacturers from trading companies and find the true specialized factories.\""
+      }
+    },
+    {
+      "path": "/insights/oem-vs-odm-lighting-guide",
+      "status": 200,
+      "title": "OEM vs ODM Lighting: A B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/oem-vs-odm-lighting-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "OEM vs ODM Lighting: A B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-11-04T00:00:00.000Z",
+        "dateModified": "2026-11-04T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 1,
+      "uls": 12,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/oem-vs-odm-lighting-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 17,
+        "words": 51,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "Choosing between OEM and ODM manufacturing defines your control over design, IP, and tooling in commercial LED lighting. Understanding these models, securing mold ownership, and enforcing strict quality workflows are essential for brand owners and importers. Compare technical capabilities and legal protections, not just unit costs, before committing to a supplier."
+      }
+    },
+    {
+      "path": "/insights/office-lighting-design-guide",
+      "status": 200,
+      "title": "Office Lighting Design: A B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/office-lighting-design-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "Office Lighting Design: A B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-11-12T00:00:00.000Z",
+        "dateModified": "2026-11-12T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 2,
+      "uls": 11,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/office-lighting-design-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 30,
+        "words": 50,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "Office lighting design is a zoning and specification process, not the purchase of a single fixture. It maps tasks and zones across a floor plate, layers ambient, task, and circulation light, then ties each layer to metrics, controls, and fixture schedules that a B2B buyer can hold a supplier to."
+      }
+    },
+    {
+      "path": "/insights/outdoor-lighting",
+      "status": 200,
+      "title": "Mastering Outdoor Landscape Lighting | Formore",
+      "canonical": "https://www.formorelightings.com/insights/outdoor-lighting",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "Mastering Outdoor Landscape Lighting",
+        "author": {
+          "@type": "Organization",
+          "name": "Alex Rivera"
+        },
+        "datePublished": "2023-12-05T00:00:00.000Z",
+        "dateModified": "2023-12-05T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 0,
+      "uls": 11,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/outdoor-lighting",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 2,
+        "words": 12,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": false,
+        "text": "\"Safety meets aesthetics. How to light a path without blinding the walker.\""
+      }
+    },
+    {
+      "path": "/insights/retail-lighting-design-guide",
+      "status": 200,
+      "title": "Retail Lighting Design: A B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/retail-lighting-design-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "Retail Lighting Design: A B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-11-13T00:00:00.000Z",
+        "dateModified": "2026-11-13T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 2,
+      "uls": 11,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/retail-lighting-design-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 28,
+        "words": 43,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "Retail lighting design is a merchandising and specification process, not just a fixture purchase. It layers ambient, accent, and display light across store zones, ties each layer to visual comfort and color quality metrics, and defines fixture schedules for consistent multi-store rollouts."
+      }
+    },
+    {
+      "path": "/insights/solar-street-light-manufacturer-guide",
+      "status": 200,
+      "title": "Solar Street Light Manufacturer: B2B Buyer&#x27;s Guide | Formore",
+      "canonical": "https://www.formorelightings.com/insights/solar-street-light-manufacturer-guide",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 5,
+      "article": {
+        "type": "Article",
+        "headline": "Solar Street Light Manufacturer: B2B Buyer's Guide",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-10-30T00:00:00.000Z",
+        "dateModified": "2026-10-30T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 3,
+      "uls": 14,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/solar-street-light-manufacturer-guide",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 19,
+        "words": 58,
+        "soft": false,
+        "bluf_strict": true,
+        "bluf_present": true,
+        "text": "Choosing a solar street light manufacturer comes down to four things: verified factory capability, certified components (IEC 62133 batteries, IEC 60598 luminaires, IEC 61215 panels), honest specification data, and a warranty you can enforce. Compare all-in-one vs split systems against real site conditions, then confirm test reports, MOQ, and lead time before committing to a supplier."
+      }
+    },
+    {
+      "path": "/insights/ugr-office-lighting-explained",
+      "status": 200,
+      "title": "What Is UGR in Office Lighting? | Formore",
+      "canonical": "https://www.formorelightings.com/insights/ugr-office-lighting-explained",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList",
+        "FAQPage"
+      ],
+      "faq_schema_count": 3,
+      "article": {
+        "type": "Article",
+        "headline": "What Is UGR in Office Lighting?",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-10-30T00:00:00.000Z",
+        "dateModified": "2026-10-30T00:00:00.000Z"
+      },
+      "tables": 1,
+      "ols": 2,
+      "uls": 11,
+      "cta_streetlight_boilerplate": true,
+      "bluf": {
+        "path": "/insights/ugr-office-lighting-explained",
+        "is_new": true,
+        "ac_found": true,
+        "p_in_ac": 11,
+        "words": 25,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": true,
+        "text": "UGR is one of the fastest ways to tell whether an office luminaire will feel comfortable or harsh once it is installed above real desks."
+      }
+    },
+    {
+      "path": "/insights/understanding-cri",
+      "status": 200,
+      "title": "Why Your Clothes Look Wrong: Understanding CRI | Formore",
+      "canonical": "https://www.formorelightings.com/insights/understanding-cri",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "Why Your Clothes Look Wrong: Understanding CRI",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Lighting"
+        },
+        "datePublished": "2023-12-20T00:00:00.000Z",
+        "dateModified": "2023-12-20T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 0,
+      "uls": 13,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/understanding-cri",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 4,
+        "words": 26,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": true,
+        "text": "\"Is your navy blue shirt looking black? It's not your eyes, it's low CRI. Discover why high CRI is the secret weapon of high-end lighting.\""
+      }
+    },
+    {
+      "path": "/insights/what-is-cri-in-lighting",
+      "status": 200,
+      "title": "What Is CRI in Lighting? A Practical Guide for Buyers and Designers | Formore",
+      "canonical": "https://www.formorelightings.com/insights/what-is-cri-in-lighting",
+      "schema_type_set": [
+        "Article",
+        "BreadcrumbList"
+      ],
+      "faq_schema_count": 0,
+      "article": {
+        "type": "Article",
+        "headline": "What Is CRI in Lighting? A Practical Guide for Buyers and Designers",
+        "author": {
+          "@type": "Organization",
+          "name": "Formore Research"
+        },
+        "datePublished": "2026-04-13T00:00:00.000Z",
+        "dateModified": "2026-04-13T00:00:00.000Z"
+      },
+      "tables": 0,
+      "ols": 1,
+      "uls": 14,
+      "cta_streetlight_boilerplate": false,
+      "bluf": {
+        "path": "/insights/what-is-cri-in-lighting",
+        "is_new": false,
+        "ac_found": true,
+        "p_in_ac": 12,
+        "words": 25,
+        "soft": false,
+        "bluf_strict": false,
+        "bluf_present": true,
+        "text": "\"If a product looks dull, a face looks gray, or a retail display feels lifeless, the problem may not be brightness. It may be CRI.\""
+      }
+    }
+  ],
+  "product_shells": [
+    {
+      "path": "/products/battery",
+      "decoded_len": 31954,
+      "title": "",
+      "h1": [],
+      "canonical": "",
+      "schema": []
+    },
+    {
+      "path": "/products/cable",
+      "decoded_len": 31954,
+      "title": "",
+      "h1": [],
+      "canonical": "",
+      "schema": []
+    },
+    {
+      "path": "/products/connector",
+      "decoded_len": 31954,
+      "title": "",
+      "h1": [],
+      "canonical": "",
+      "schema": []
+    },
+    {
+      "path": "/products/inverter",
+      "decoded_len": 31954,
+      "title": "",
+      "h1": [],
+      "canonical": "",
+      "schema": []
+    },
+    {
+      "path": "/products/mounting-support",
+      "decoded_len": 31954,
+      "title": "",
+      "h1": [],
+      "canonical": "",
+      "schema": []
+    },
+    {
+      "path": "/products/solar-panel",
+      "decoded_len": 31954,
+      "title": "",
+      "h1": [],
+      "canonical": "",
+      "schema": []
+    },
+    {
+      "path": "/products/toolkits",
+      "decoded_len": 31954,
+      "title": "",
+      "h1": [],
+      "canonical": "",
+      "schema": []
+    }
+  ],
+  "products_counts": {
+    "count": 93,
+    "http_200": 93,
+    "with_product_schema": 86,
+    "with_faqpage": 0
+  },
+  "pending": {
+    "commercial-lighting-suppliers-guide": 404,
+    "led-panel-light-manufacturer-guide": 404,
+    "led-downlight-manufacturer-guide": 404,
+    "factory-audit-lighting-china-guide": 404
+  },
+  "bluf": {
+    "/insights/2026-lighting-trends": {
+      "path": "/insights/2026-lighting-trends",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 10,
+      "words": 27,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": true,
+      "text": "\"The market is dividing: Designers are chasing 'imperfect art' and 'natural vibes', while hardcore users are demanding 'Repairability' and 'Stability'. Here is what you need to know.\""
+    },
+    "/insights/3000k-vs-4000k-led": {
+      "path": "/insights/3000k-vs-4000k-led",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 18,
+      "words": 50,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "Choosing between 3000K and 4000K LED lighting shapes how a commercial space feels and performs. Warm 3000K suits hospitality and retail ambiance; neutral 4000K supports focus in offices and task areas. This guide compares both for B2B decisions and points to the broader color temperature guide for full Kelvin context."
+    },
+    "/insights/architectural-led-lighting-guide": {
+      "path": "/insights/architectural-led-lighting-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 22,
+      "words": 57,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "Architectural LED lighting uses fixtures to reveal a building's form, materials, and circulation rather than only filling a space with light. Buyers should choose fixture types by application (facade, landscape, interior accent), then lock beam angle, CCT, CRI, IP rating, and glare control in the specification before asking an architectural lighting supplier for samples and photometric files."
+    },
+    "/insights/beam-angle-guide-for-commercial-lighting": {
+      "path": "/insights/beam-angle-guide-for-commercial-lighting",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 10,
+      "words": 27,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": true,
+      "text": "\"A good fixture with the wrong beam angle still produces a bad result. In commercial lighting, beam control is not a detail. It is the visual strategy.\""
+    },
+    "/insights/beam-angle-secrets": {
+      "path": "/insights/beam-angle-secrets",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 4,
+      "words": 20,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": false,
+      "text": "\"Why does your home feel flat while luxury hotels feel dramatic and cozy? The answer is in the beam angle.\""
+    },
+    "/insights/color-temperature-guide": {
+      "path": "/insights/color-temperature-guide",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 21,
+      "words": 29,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": true,
+      "text": "\"Choosing the wrong color temperature can make your home look like a hospital or a dungeon. A comprehensive deep dive into Kelvin values, circadian science, and professional lighting standards.\""
+    },
+    "/insights/commercial-led-lighting-guide": {
+      "path": "/insights/commercial-led-lighting-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 19,
+      "words": 48,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "Specifying commercial LED lighting requires balancing photometric performance, energy efficiency, and lifecycle costs. This guide helps B2B buyers navigate fixture types for offices, retail, and warehouses, decode critical specs like UGR and L70, and understand the certifications needed to source reliable commercial LED lighting from a qualified manufacturer."
+    },
+    "/insights/commercial-track-light-guide": {
+      "path": "/insights/commercial-track-light-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 18,
+      "words": 57,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "A commercial track light is a modular accent and general lighting system for retail and commercial interiors. Buyers choose among traditional track, magnetic track, or recessed slot systems based on flexibility, aesthetics, and installation constraints. This guide helps B2B buyers specify, compare, and source the right commercial track lighting without reinventing a full magnetic-track deep dive."
+    },
+    "/insights/cri-explained": {
+      "path": "/insights/cri-explained",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 2,
+      "words": 16,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": false,
+      "text": "\"Your guests want to look good in the mirror. Don't let low CRI ruin their stay.\""
+    },
+    "/insights/dimming-guide": {
+      "path": "/insights/dimming-guide",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 8,
+      "words": 28,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": true,
+      "text": "\"The driver is the heart of the LED. Choosing the wrong dimming protocol is the #1 cause of flickering, buzzing, and project failures. Here is the engineering breakdown.\""
+    },
+    "/insights/future-marketing": {
+      "path": "/insights/future-marketing",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 9,
+      "words": 29,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": true,
+      "text": "\"Light is not just for vision anymore. It is a biological drug. Learn how Human Centric Lighting (HCL) is reshaping the modern workplace by syncing with our internal clock.\""
+    },
+    "/insights/hotel-lighting-design-guide": {
+      "path": "/insights/hotel-lighting-design-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 21,
+      "words": 46,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "Hotel lighting design is a layered specification process that balances guest comfort, brand identity, and operational efficiency. It defines ambient, accent, and task lighting across distinct zones, ties each layer to strict color quality and glare metrics, and establishes fixture schedules for consistent multi-property rollouts."
+    },
+    "/insights/how-to-source-led-lights-from-china": {
+      "path": "/insights/how-to-source-led-lights-from-china",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 13,
+      "words": 31,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": true,
+      "text": "\"Sourcing LED lights from China is not mainly about finding the cheapest quote. It is about finding the supplier that can hold quality, communication, and delivery when the order becomes real.\""
+    },
+    "/insights/human-centric-lighting-guide": {
+      "path": "/insights/human-centric-lighting-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 23,
+      "words": 50,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "Human centric lighting is designed for both visual performance and the non-visual, circadian effects of light. Buyers should define the application and occupied hours first, then lock illuminance as a project target, CCT, CRI, glare control, and control strategy, and ask for spectral or melanopic data before approving samples."
+    },
+    "/insights/led-flood-light-manufacturer-guide": {
+      "path": "/insights/led-flood-light-manufacturer-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 28,
+      "words": 55,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "An LED flood light manufacturer builds high-output fixtures for sports fields, yards, facades, and industrial sites, where beam control, thermal design, and ingress protection decide whether a project succeeds. Buyers should define the application first, then lock beam angle, CCT, IP/IK rating, surge protection, and driver choice before requesting samples and photometric files."
+    },
+    "/insights/led-lighting-manufacturer-guide": {
+      "path": "/insights/led-lighting-manufacturer-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 18,
+      "words": 63,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "An LED lighting manufacturer designs, builds, and tests fixtures in its own factory rather than only brokering catalog products. B2B buyers should verify production lines, quality gates, certifications, and photometric files, then decide whether a catalog, OEM, or ODM path fits the project. This guide shows how to evaluate a manufacturer without repeating a full China-sourcing or OEM-versus-ODM deep dive."
+    },
+    "/insights/led-linear-light-guide": {
+      "path": "/insights/led-linear-light-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 12,
+      "words": 49,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "LED linear lights combine aluminum extrusions, LED boards, and diffusers into versatile continuous lighting systems. Choosing the right supplier requires verifying driver quality, photometric data, lumen maintenance, and clear OEM/ODM terms. Compare technical specifications and safety certifications, not just marketing claims, before committing to a commercial purchase order."
+    },
+    "/insights/led-terminology-guide": {
+      "path": "/insights/led-terminology-guide",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 5,
+      "words": 24,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": false,
+      "text": "\"Confused by lighting specs? We break down every key parameter you need to know, from basic photometry to advanced color quality and optical design.\""
+    },
+    "/insights/lumens-vs-watts": {
+      "path": "/insights/lumens-vs-watts",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 7,
+      "words": 26,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": true,
+      "text": "\"Stop looking at watts. Learn why lumens are the only metric that matters for LED brightness and how to stop buying bulbs that are too dim.\""
+    },
+    "/insights/magnetic-track-lighting-guide": {
+      "path": "/insights/magnetic-track-lighting-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 15,
+      "words": 54,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "Magnetic track lighting is a low-voltage DC system — commonly 48V — where track, driver, and magnetic modules combine into one flexible platform. Choosing a supplier comes down to verified driver quality, honest photometric data, module and track compatibility, and clear OEM/ODM terms. Compare specs, not marketing, before you commit to a purchase order."
+    },
+    "/insights/minimalism": {
+      "path": "/insights/minimalism",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 4,
+      "words": 30,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": true,
+      "text": "\"The highest compliment for a lighting designer is when customers say 'Wow, this store looks great' but can't point to a single fixture. The light should be felt, not seen.\""
+    },
+    "/insights/navigating-shenzhen": {
+      "path": "/insights/navigating-shenzhen",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 5,
+      "words": 31,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": true,
+      "text": "\"Shenzhen is the hardware capital of the world, but for lighting buyers, it's a minefield. Here is how to distinguish original manufacturers from trading companies and find the true specialized factories.\""
+    },
+    "/insights/oem-vs-odm-lighting-guide": {
+      "path": "/insights/oem-vs-odm-lighting-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 17,
+      "words": 51,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "Choosing between OEM and ODM manufacturing defines your control over design, IP, and tooling in commercial LED lighting. Understanding these models, securing mold ownership, and enforcing strict quality workflows are essential for brand owners and importers. Compare technical capabilities and legal protections, not just unit costs, before committing to a supplier."
+    },
+    "/insights/office-lighting-design-guide": {
+      "path": "/insights/office-lighting-design-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 30,
+      "words": 50,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "Office lighting design is a zoning and specification process, not the purchase of a single fixture. It maps tasks and zones across a floor plate, layers ambient, task, and circulation light, then ties each layer to metrics, controls, and fixture schedules that a B2B buyer can hold a supplier to."
+    },
+    "/insights/outdoor-lighting": {
+      "path": "/insights/outdoor-lighting",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 2,
+      "words": 12,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": false,
+      "text": "\"Safety meets aesthetics. How to light a path without blinding the walker.\""
+    },
+    "/insights/retail-lighting-design-guide": {
+      "path": "/insights/retail-lighting-design-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 28,
+      "words": 43,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "Retail lighting design is a merchandising and specification process, not just a fixture purchase. It layers ambient, accent, and display light across store zones, ties each layer to visual comfort and color quality metrics, and defines fixture schedules for consistent multi-store rollouts."
+    },
+    "/insights/solar-street-light-manufacturer-guide": {
+      "path": "/insights/solar-street-light-manufacturer-guide",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 19,
+      "words": 58,
+      "soft": false,
+      "bluf_strict": true,
+      "bluf_present": true,
+      "text": "Choosing a solar street light manufacturer comes down to four things: verified factory capability, certified components (IEC 62133 batteries, IEC 60598 luminaires, IEC 61215 panels), honest specification data, and a warranty you can enforce. Compare all-in-one vs split systems against real site conditions, then confirm test reports, MOQ, and lead time before committing to a supplier."
+    },
+    "/insights/ugr-office-lighting-explained": {
+      "path": "/insights/ugr-office-lighting-explained",
+      "is_new": true,
+      "ac_found": true,
+      "p_in_ac": 11,
+      "words": 25,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": true,
+      "text": "UGR is one of the fastest ways to tell whether an office luminaire will feel comfortable or harsh once it is installed above real desks."
+    },
+    "/insights/understanding-cri": {
+      "path": "/insights/understanding-cri",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 4,
+      "words": 26,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": true,
+      "text": "\"Is your navy blue shirt looking black? It's not your eyes, it's low CRI. Discover why high CRI is the secret weapon of high-end lighting.\""
+    },
+    "/insights/what-is-cri-in-lighting": {
+      "path": "/insights/what-is-cri-in-lighting",
+      "is_new": false,
+      "ac_found": true,
+      "p_in_ac": 12,
+      "words": 25,
+      "soft": false,
+      "bluf_strict": false,
+      "bluf_present": true,
+      "text": "\"If a product looks dull, a face looks gray, or a retail display feels lifeless, the problem may not be brightness. It may be CRI.\""
+    }
+  }
+}

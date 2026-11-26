@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-25T00:57:50+00:00",
+  "updatedAt": "2026-11-26T01:01:20+00:00",
   "dates": [
+    {
+      "date": "2026-11-26",
+      "file": "2026-11-26.json",
+      "summary": "排期 Day28 完成全站 GEO 只读复核（FAQPage/sameAs/llms.txt/BLUF），不能声称已达内部口径 85 分；无新严重问题。按周计划不写新简报。墨墨四篇成稿仍齐、均缺配图，今日无发布。日检 warn（无 PSI key）。",
+      "articleCount": 4,
+      "issueCount": 7
+    },
     {
       "date": "2026-11-25",
       "file": "2026-11-25.json",

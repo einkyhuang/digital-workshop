@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formore Lighting 全站 GEO 复核报告（2026-11-26，Day 28）</title>
+<meta name="description" content="对 https://www.formorelightings.com 的 Day 28 只读 GEO 复核：FAQPage、sameAs、llms.txt、BLUF 抽检。不编造 Core Web Vitals，不把不可复现的脚本分数写成趋势。">
+<style>
+:root{--bg:#f8fafc;--card:#fff;--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--hero:#1e1b4b;--hero2:#312e81;}
+*{box-sizing:border-box}
+body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.65}
+a{color:#3730a3}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+.hero{background:linear-gradient(160deg,var(--hero),var(--hero2) 55%,#1e3a8a);color:#fff;padding:48px 0 40px;margin-bottom:28px}
+.kicker{letter-spacing:.12em;text-transform:uppercase;font-size:12px;opacity:.8;margin:0 0 10px}
+.hero h1{font-size:clamp(26px,4vw,40px);line-height:1.2;margin:0 0 12px;font-weight:720}
+.hero p{margin:0;max-width:860px;color:#e0e7ff;font-size:15.5px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.meta span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:4px 10px;font-size:12px}
+.scores{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:-48px 0 28px;position:relative}
+.score{background:var(--card);border-radius:18px;padding:20px 18px 16px;box-shadow:0 12px 30px rgba(15,23,42,.08);border:1px solid var(--line)}
+.score b{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.dial{font-size:28px;font-weight:800;margin:8px 0 2px;letter-spacing:-.03em}
+.score p{margin:0;font-size:13px;color:var(--muted)}
+.note{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:14px 16px;margin:0 0 24px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 22px 16px;margin:0 0 18px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.card h2{margin:0 0 12px;font-size:20px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:0 0 8px}
+th,td{border-bottom:1px solid var(--line);text-align:left;padding:8px 8px;vertical-align:top}
+th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#64748b;background:#f8fafc}
+.pill{display:inline-block;border-radius:999px;padding:1px 8px;font-size:11px;font-weight:700}
+.ok{background:#ecfdf5;color:#047857}
+.bad{background:#fef2f2;color:#b91c1c}
+.p1{background:#fff7ed;color:#c2410c}
+.p2{background:#eff6ff;color:#1d4ed8}
+ul,ol{margin:0 0 8px;padding-left:1.2em}
+li{margin:0 0 6px;color:#1e293b}
+.muted{color:var(--muted);font-size:13.5px}
+.footer{margin:28px 0 0;color:#64748b;font-size:12.5px}
+@media (max-width:860px){.scores{grid-template-columns:1fr}table{display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<p class="kicker">Formore Lighting · Day 28 · 只读复核</p>
+<h1>全站 GEO 复核报告（2026-11-26）</h1>
+<p>对照 10-30 内部口径 GEO 71.5 与「30 天到 85」目标。今日未改站点、未发布文章。方法：线上首包 HTML 抓取，不执行 JavaScript。</p>
+<div class="meta"><span>https://www.formorelightings.com</span><span>Asia/Shanghai</span><span>sitemap-insights：30</span><span>无新 P0/P1</span></div>
+</div></header>
+<div class="wrap">
+<section class="scores">
+<div class="score"><b>llms.txt</b><div class="dial">通过</div><p>200，内容与站点一致；/solutions 未列入 Key Pages（可选）</p></div>
+<div class="score"><b>sameAs</b><div class="dial">未通过</div><p>首页 Organization 仍无 sameAs（已知 P1）</p></div>
+<div class="score"><b>85 分目标</b><div class="dial">未宣称达到</div><p>不另估不可复核的综合分；按清单验收</p></div>
+</section>
+<p class="note">没有 PSI_API_KEY，本报告不给出任何 LCP / INP / CLS 或性能分数。也不把 10-30 的 71.5 与 11-23 脚本的 72.0 写成升降趋势（方法不可直接复现）。</p>
+<section class="card"><h2>1. 结论</h2>
+<p><strong>不能声称已达到内部口径 GEO 85。</strong> 10-30 之后最实质的进步仍在文章层：15 篇日更集群 Insights 普遍具备 Article + FAQPage + 直接开篇结论（BLUF）+ 列表/表格；/llms.txt 与 /faq 的 FAQPage（10 问）保持可用。挡住验收的仍是 11-23 已记录、今日复测未变的缺口：</p>
+<ul>
+<li>Organization 没有 sameAs（须先有可验证的对外档案 URL）。</li>
+<li>Insights 30 篇中仍有 15 篇没有 FAQPage（多为旧文，含 CRI 与 beam angle）。</li>
+<li>86 个正常产品页均无 FAQPage；另有 7 个空壳短 slug 无 title / H1 / canonical / JSON-LD。</li>
+<li>新集群文章末尾仍有路灯 CTA 套话（road class / sun hours / pole height）。</li>
+<li>没有可引用的 Core Web Vitals 数据。</li>
+</ul>
+<p class="muted">相对 11-23 / 11-25：无新的 P0/P1，无新增线上文章。四篇待发稿仍缺配图。</p>
+</section>
+<section class="card"><h2>2. 核心页面与抓取</h2>
+<p>以下地址今日均为 HTTP 200（除非另注）：首页、robots、各 sitemap、llms.txt、insights、products、contact、oem-odm、solutions、sourcing、faq、about、privacy、terms、cases、download。</p>
+<ul>
+<li>/llms-full.txt：404（可选增强，非严重问题）。</li>
+<li>待发布 4 个 slug 仍为 404（符合预期）：commercial-lighting-suppliers-guide、led-panel-light-manufacturer-guide、led-downlight-manufacturer-guide、factory-audit-lighting-china-guide。</li>
+<li>Sitemap：index 4 个子文件；pages 25；insights <strong>30</strong>；products 93；cases 6；汇总 sitemap.xml 154，与分表之和一致。</li>
+<li>robots.txt 为全站放行并指向 sitemap-index，未单独限制 AI 爬虫。</li>
+<li>页脚 Privacy Policy / Terms of Service 仍是无 href 的 button；两个页面本身 200 且已进 sitemap 与 llms.txt（已知 P2）。</li>
+</ul>
+</section>
+<section class="card"><h2>3. GEO 专项清单</h2>
+<h3>3.1 llms.txt — 通过（有一处可选缺口）</h3>
+<p>200，纯文本，定位与 Key Pages 正确（首页、about、contact、products、cases、insights、sourcing、oem-odm、faq、privacy、terms）。计划中的 /solutions 枢纽未写入 Key Pages，视为可选补强，不升为新的严重问题。</p>
+<h3>3.2 sameAs — 未通过（已知 P1）</h3>
+<p>首页 Organization + WebSite + BreadcrumbList。Organization 有 name / url / logo / email / telephone / address，无 sameAs。在用户确认真实档案 URL 之前不应写入。今日未改站点。</p>
+<h3>3.3 FAQPage 抽检 — 未达到「10 页全部通过」</h3>
+<table><thead><tr><th>抽检页</th><th>结果</th><th>说明</th></tr></thead><tbody>
+<tr><td>/faq</td><td><span class="pill ok">通过</span></td><td>FAQPage，10 条 Question</td></tr>
+<tr><td>/insights/hotel-lighting-design-guide</td><td><span class="pill ok">通过</span></td><td>Article + FAQPage(5) + BreadcrumbList</td></tr>
+<tr><td>/insights/retail-lighting-design-guide</td><td><span class="pill ok">通过</span></td><td>FAQPage(5)</td></tr>
+<tr><td>/insights/human-centric-lighting-guide</td><td><span class="pill ok">通过</span></td><td>FAQPage(5)</td></tr>
+<tr><td>/insights/led-lighting-manufacturer-guide</td><td><span class="pill ok">通过</span></td><td>FAQPage(5)</td></tr>
+<tr><td>/insights/3000k-vs-4000k-led</td><td><span class="pill ok">通过</span></td><td>FAQPage(5)</td></tr>
+<tr><td>/insights/what-is-cri-in-lighting</td><td><span class="pill bad">未通过</span></td><td>可见 FAQ，无 FAQPage schema</td></tr>
+<tr><td>/insights/beam-angle-guide-for-commercial-lighting</td><td><span class="pill bad">未通过</span></td><td>仅 Article + BreadcrumbList</td></tr>
+<tr><td>/insights/how-to-source-led-lights-from-china</td><td><span class="pill bad">未通过</span></td><td>仅 Article + BreadcrumbList</td></tr>
+<tr><td>/products/linear-bar-office-suspended-light</td><td><span class="pill bad">未通过</span></td><td>有可见问答与 Product schema，无 FAQPage</td></tr>
+</tbody></table>
+<p>全量：Insights 30/30 为 200，均有 Article、BreadcrumbList 与 datePublished；<strong>15/30</strong> 有 FAQPage（14 篇 5 问，UGR 3 问），另 15 篇旧文没有。产品 93/93 为 200；86 个有 Product schema，0 个有 FAQPage；7 个空壳短 slug 依旧（约 31954 字节，无 title / H1 / canonical / JSON-LD）：solar-panel、inverter、battery、mounting-support、cable、connector、toolkits。</p>
+<h3>3.4 BLUF — 新集群文章具备直接开篇结论</h3>
+<p>从每篇文章正文区取第一条实质段落（跳过 byline、目录和全站页头套话）。<strong>15/15</strong> 篇日更集群文章都有直接开篇结论；其中 14/15 词数在 43–63。UGR 文首段为 25 词，仍是定义式结论，但短于 40–60 词目标。旧文 4 篇首段不足 25 词，更偏口号。</p>
+<h3>3.5 列表 / 表格 — 通过</h3>
+<p>30/30 篇 Insights 至少有 1 个列表；12/30 有表格（几乎都在日更集群稿）。按「每篇至少 1 表或 1 列表」通过。</p>
+<h3>3.6 权威引用与 CWV</h3>
+<p>今日未逐条复测标准外链，不声称全部外链 200。日检四个页面的 PSI 均因缺少密钥而跳过，不给性能分数。</p>
+</section>
+<section class="card"><h2>4. 建议（均须批准，今日不动站点）</h2>
+<ol>
+<li><span class="pill p1">P1</span> 处理或从 sitemap 移除 7 个空壳产品 URL。</li>
+<li><span class="pill p1">P1</span> 在有核实 URL 的前提下补 Organization sameAs。</li>
+<li><span class="pill p2">P2</span> 产品页与旧 Insights（优先 CRI、beam angle、China sourcing）补 FAQPage；页脚改为可抓取链接；去掉非路灯文的路灯 CTA 套话；处理过长 Title；配置 PSI 密钥。</li>
+<li>可选：llms.txt 补上 /solutions；视需要增加 /llms-full.txt。</li>
+</ol>
+<p>内容侧：四篇成稿仍待配图，无图不发布，不新开第五篇，不复活已取消的 led-lighting-manufacturer-china-guide。11-20 合审须把 category 从 Sourcing 改为 Technical。</p>
+</section>
+<p class="footer">搜搜-SEO专家 · 2026-11-26 · 证据文件 live-evidence-summary.json · 同步 Markdown：formorelightings-geo-review.md</p>
+</div></body></html>
