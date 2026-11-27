@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-26T01:01:20+00:00",
+  "updatedAt": "2026-11-27T01:01:31+00:00",
   "dates": [
+    {
+      "date": "2026-11-27",
+      "file": "2026-11-27.json",
+      "summary": "排期 Day29 只整理客座/协会/媒体目标清单与引荐域台账 v2，未经同意未外发。Serpstat 摘要为 3 个引荐域 / DR 10，但活跃列表中有 4 条低质量目录链接，不能计为优质净增。四篇成稿仍缺配图，无新简报、无发布。日检 warn（无 PSI key），无新 P0/P1 站点问题。",
+      "articleCount": 4,
+      "issueCount": 7
+    },
     {
       "date": "2026-11-26",
       "file": "2026-11-26.json",
