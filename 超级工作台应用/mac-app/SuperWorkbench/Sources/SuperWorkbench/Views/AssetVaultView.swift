@@ -28,7 +28,8 @@ final class AssetVaultModel: ObservableObject {
     @Published var accounts: [AssetAccount] = []
     @Published var query = ""
     @Published var category = "全部"
-    @Published var status = "密码只在钥匙串里。显示或复制需要 Touch ID 或开机密码。"
+    @Published var status = "密码和 API 以圆点显示。复制前需要 Touch ID 或开机密码，复制后仍保持隐藏。"
+    @Published var copiedKey = ""
     @Published var editor: AssetEditorSession?
     @Published var pendingDelete: AssetAccount?
     @Published var importing = false
@@ -37,10 +38,10 @@ final class AssetVaultModel: ObservableObject {
     private let keychain = KeychainAssetSecretStore()
     private let clipboard = AssetClipboard()
     private var configured = false
+    private var copyToken = 0
 
-    var categoryChoices: [String] {
-        let extras = Set(accounts.map(\.category)).subtracting(AssetVaultCatalog.categories)
-        return ["全部"] + AssetVaultCatalog.categories + extras.sorted()
+    var categoryChoices: [AssetCategoryTab] {
+        AssetVault.categoryTabs(accounts)
     }
 
     var filtered: [AssetAccount] {
@@ -59,6 +60,7 @@ final class AssetVaultModel: ObservableObject {
         guard let fileStore else { return }
         do {
             accounts = try fileStore.list(secrets: keychain)
+            if !categoryChoices.contains(where: { $0.name == category }) { category = "全部" }
         } catch {
             status = "读取档案失败"
         }
@@ -130,8 +132,58 @@ final class AssetVaultModel: ObservableObject {
             status = "没有可复制的密码"
             return
         }
-        clipboard.copy(text)
-        status = "已复制。约 45 秒后，如果剪贴板仍是这条密码，会自动清除。"
+        clipboard.copySecret(text)
+        status = "已复制。约 45 秒后，如果剪贴板仍是这条内容，会自动清除。"
+    }
+
+    func copyField(_ field: AssetCopyField, from account: AssetAccount) async {
+        if field.secret {
+            await copySecretField(field, from: account)
+            return
+        }
+        let text = AssetVault.copyText(for: field)
+        guard !text.isEmpty else { return }
+        clipboard.copyPublic(text)
+        flashCopied(account.id, field.id)
+        status = "已复制"
+    }
+
+    private func copySecretField(_ field: AssetCopyField, from account: AssetAccount) async {
+        let ok = await DeviceOwnerAuth.confirm(reason: "复制「\(account.platform)」的\(field.label)")
+        guard ok else {
+            status = "未通过设备验证，没有复制"
+            return
+        }
+        guard AssetVault.isValidId(account.id) else {
+            status = "没有可复制的内容"
+            return
+        }
+        let loaded = (try? keychain.load(id: account.id)) ?? .empty
+        let secret: String
+        switch field.id {
+        case "password": secret = loaded.password
+        case "apiKey": secret = loaded.apiKey
+        default:
+            status = "没有可复制的内容"
+            return
+        }
+        guard !secret.isEmpty else {
+            status = "没有可复制的内容"
+            return
+        }
+        clipboard.copySecret(secret)
+        flashCopied(account.id, field.id)
+        status = "已复制。约 45 秒后，如果剪贴板仍是这条内容，会自动清除。"
+    }
+
+    private func flashCopied(_ id: String, _ field: String) {
+        copyToken += 1
+        let token = copyToken
+        copiedKey = "\(id)|\(field)"
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_600_000_000)
+            if token == self.copyToken { self.copiedKey = "" }
+        }
     }
 
     func importCSV(_ text: String) {
@@ -162,7 +214,16 @@ private final class AssetClipboard {
     private var expected = ""
     private var changeCount = 0
 
-    func copy(_ text: String) {
+    func copyPublic(_ text: String) {
+        timer?.invalidate()
+        timer = nil
+        expected = ""
+        let board = NSPasteboard.general
+        board.clearContents()
+        board.setString(text, forType: .string)
+    }
+
+    func copySecret(_ text: String) {
         let board = NSPasteboard.general
         board.clearContents()
         board.setString(text, forType: .string)
@@ -189,20 +250,22 @@ struct AssetVaultView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             header
+            categoryPills
             if model.filtered.isEmpty {
                 Text(model.accounts.isEmpty ? "还没有账号。点「新建」添加，或从 CSV 导入。密码不会出现在仓库里。" : "没有符合筛选的账号。")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(SWTheme.textSecondary)
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .swCard()
             } else {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 10) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 280), spacing: 14)], spacing: 14) {
                         ForEach(model.filtered) { account in
-                            row(account)
+                            card(account)
                         }
                     }
+                    .padding(.bottom, 8)
                 }
             }
             Spacer(minLength: 0)
@@ -248,13 +311,14 @@ struct AssetVaultView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
+            if store.activeWorkbenchId == "trade" {
+                Text("资产管理")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(SWTheme.text)
+            }
             HStack(spacing: 8) {
-                TextField("搜索平台、用户名、备注、标签", text: $model.query)
+                TextField("搜索平台、账号、邮箱、备注、标签", text: $model.query)
                     .textFieldStyle(.roundedBorder)
-                Picker("分类", selection: $model.category) {
-                    ForEach(model.categoryChoices, id: \.self) { Text($0).tag($0) }
-                }
-                .frame(width: 140)
                 Button("新建") { model.startNew() }
                     .buttonStyle(.borderedProminent)
                 Button("导入 CSV") { model.importing = true }
@@ -262,63 +326,176 @@ struct AssetVaultView: View {
             }
             Text(model.status)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(SWTheme.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
 
-    private func row(_ account: AssetAccount) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(account.platform).font(.headline)
+    private var categoryPills: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(model.categoryChoices) { tab in
+                    let selected = model.category == tab.name
+                    Button {
+                        model.category = tab.name
+                    } label: {
+                        HStack(spacing: 6) {
+                            Text(tab.name)
+                            Text("\(tab.count)")
+                                .font(.system(size: 11, weight: .semibold))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 1)
+                                .background(selected ? Color.white.opacity(0.18) : Color.black.opacity(0.06))
+                                .clipShape(Capsule())
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .font(.system(size: 13, weight: selected ? .semibold : .regular))
+                    .foregroundStyle(selected ? Color.white : SWTheme.text)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(selected ? SWTheme.accent : Color.white)
+                    .clipShape(Capsule())
+                    .overlay(Capsule().stroke(selected ? Color.clear : SWTheme.border, lineWidth: 1))
+                }
+            }
+            .padding(.vertical, 2)
+        }
+    }
+
+    private func card(_ account: AssetAccount) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(account.platform)
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(SWTheme.text)
+                    .lineLimit(2)
+                Spacer(minLength: 8)
                 Text(account.category)
-                    .font(.caption.weight(.semibold))
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(SWTheme.textSecondary)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
-                    .background(Color.black.opacity(0.06))
+                    .background(Color.black.opacity(0.05))
                     .clipShape(Capsule())
-                if account.hasSecret {
-                    Text("钥匙串")
-                        .font(.caption.weight(.semibold))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.green.opacity(0.12))
-                        .clipShape(Capsule())
-                }
-                Spacer()
-                Text(account.twoFactorLabel).font(.caption).foregroundStyle(.secondary)
             }
-            HStack(spacing: 12) {
-                if !account.username.isEmpty {
-                    Text(account.username).font(.subheadline)
+            if account.hasSecret || account.twoFactor != "none" {
+                HStack(spacing: 6) {
+                    if account.hasSecret {
+                        Label("钥匙串", systemImage: "lock")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(Color(red: 0.08, green: 0.45, blue: 0.28))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(Color(red: 0.86, green: 0.95, blue: 0.88))
+                            .clipShape(Capsule())
+                    }
+                    if account.twoFactor != "none" {
+                        Text(account.twoFactorLabel)
+                            .font(.caption)
+                            .foregroundStyle(SWTheme.textSecondary)
+                    }
                 }
-                if !account.loginURL.isEmpty {
-                    Button("打开登录页") { model.openLogin(account) }
-                        .buttonStyle(.borderless)
+            }
+            VStack(spacing: 6) {
+                ForEach(AssetVault.cardFields(for: account)) { field in
+                    copyRow(field, account: account)
                 }
             }
             if !account.company.isEmpty || !account.brand.isEmpty {
                 Text([account.company, account.brand].filter { !$0.isEmpty }.joined(separator: " · "))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(SWTheme.textSecondary)
             }
             if !account.tags.isEmpty {
                 Text(account.tags.joined(separator: "  "))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(SWTheme.textMuted)
             }
             if !account.notes.isEmpty {
-                Text(account.notes).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                Text(account.notes)
+                    .font(.caption)
+                    .foregroundStyle(SWTheme.textSecondary)
+                    .lineLimit(2)
             }
-            HStack {
+            HStack(spacing: 12) {
                 Button("编辑") { model.editor = AssetEditorSession(account: account) }
+                    .buttonStyle(.borderless)
                 Button("删除") { model.pendingDelete = account }
+                    .buttonStyle(.borderless)
                 Spacer()
-                Text(account.updatedAt).font(.caption2).foregroundStyle(.tertiary)
+                Text(account.updatedAt)
+                    .font(.caption2)
+                    .foregroundStyle(SWTheme.textMuted)
+                    .lineLimit(1)
             }
         }
-        .padding(14)
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .swCard()
+        .shadow(color: Color.black.opacity(0.05), radius: 10, y: 4)
+    }
+
+    private func copyRow(_ field: AssetCopyField, account: AssetAccount) -> some View {
+        let copied = model.copiedKey == "\(account.id)|\(field.id)"
+        return HStack(spacing: 8) {
+            Button {
+                Task { await model.copyField(field, from: account) }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: symbol(for: field))
+                        .font(.system(size: 13, weight: .regular))
+                        .foregroundStyle(SWTheme.textSecondary)
+                        .frame(width: 16)
+                    Text(field.label)
+                        .font(.system(size: 12))
+                        .foregroundStyle(SWTheme.textSecondary)
+                        .frame(width: 64, alignment: .leading)
+                    Text(field.secret ? "••••••••" : field.value)
+                        .font(.system(size: 13, design: field.secret ? .monospaced : .default))
+                        .foregroundStyle(SWTheme.text)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                    Spacer(minLength: 4)
+                    if copied {
+                        Text("已复制")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(Color(red: 0.08, green: 0.45, blue: 0.28))
+                    } else {
+                        Image(systemName: "doc.on.doc")
+                            .font(.system(size: 12))
+                            .foregroundStyle(SWTheme.textMuted)
+                    }
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .help(field.secret ? "验证后复制，内容保持隐藏" : "点击复制")
+            if field.id == "loginURL" {
+                Button {
+                    model.openLogin(account)
+                } label: {
+                    Image(systemName: "arrow.up.right")
+                        .font(.system(size: 12, weight: .semibold))
+                }
+                .buttonStyle(.borderless)
+                .help("打开登录页")
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(Color.black.opacity(0.03))
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    private func symbol(for field: AssetCopyField) -> String {
+        switch field.icon {
+        case "envelope": return "envelope"
+        case "key": return "key"
+        case "api": return "chevron.left.forwardslash.chevron.right"
+        case "link": return "link"
+        default: return "person"
+        }
     }
 }
 
@@ -337,6 +514,7 @@ private struct AssetEditorSheet: View {
     @State private var customCategory = ""
     @State private var loginURL: String
     @State private var username: String
+    @State private var email: String
     @State private var notes: String
     @State private var twoFactor: String
     @State private var tags: String
@@ -363,6 +541,7 @@ private struct AssetEditorSheet: View {
         _customCategory = State(initialValue: AssetVaultCatalog.categories.contains(account.category) ? "" : account.category)
         _loginURL = State(initialValue: account.loginURL)
         _username = State(initialValue: account.username)
+        _email = State(initialValue: account.email)
         _notes = State(initialValue: account.notes)
         _twoFactor = State(initialValue: account.twoFactor.isEmpty ? "none" : account.twoFactor)
         _tags = State(initialValue: account.tags.joined(separator: ", "))
@@ -411,7 +590,8 @@ private struct AssetEditorSheet: View {
                 }
             }
             labeled("登录地址") { TextField("https://", text: $loginURL) }
-            labeled("用户名") { TextField("邮箱或用户名", text: $username) }
+            labeled("账号") { TextField("用户名", text: $username) }
+            labeled("邮箱") { TextField("可选", text: $email) }
             labeled("二次验证") {
                 Picker("二次验证", selection: $twoFactor) {
                     ForEach(AssetVaultCatalog.twoFactorOptions, id: \.id) { option in
@@ -489,6 +669,7 @@ private struct AssetEditorSheet: View {
         next.category = custom.isEmpty ? category : custom
         next.loginURL = loginURL
         next.username = username
+        next.email = email
         next.notes = notes
         next.twoFactor = twoFactor
         next.tags = tags.split { ",，;；".contains($0) }.map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
