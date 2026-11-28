@@ -1,0 +1,383 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Formore Lighting 30 天 SEO+GEO 复盘报告（2026-11-28，Day 30）</title><style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;background:#f8fafc;color:#0f172a;line-height:1.7}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 18px 80px}h1{font-size:clamp(22px,4vw,34px);line-height:1.25;background:linear-gradient(135deg,#064e3b,#047857);color:#fff;padding:28px 22px;border-radius:14px;margin:0 0 22px}
+h2{font-size:21px;margin:36px 0 12px;padding-bottom:6px;border-bottom:2px solid #d1fae5}h3{font-size:17px}
+.tw{overflow-x:auto;margin:12px 0;background:#fff;border:1px solid #e2e8f0;border-radius:10px}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}th{background:#f1f5f9}
+blockquote{margin:14px 0;padding:10px 16px;background:#fffbeb;border-left:4px solid #f59e0b;border-radius:6px}code{background:#eef2f7;padding:1px 5px;border-radius:4px;font-size:.9em;word-break:break-all}
+li{margin:4px 0}hr{border:0;border-top:1px solid #e2e8f0;margin:24px 0}@media(max-width:600px){th,td{font-size:13px;padding:6px}}</style></head><body><div class="wrap"><h1>Formore Lighting 30 天 SEO+GEO 复盘报告（2026-11-28，Day 30）</h1>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>项</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>站点</td>
+<td>https://www.formorelightings.com</td>
+</tr>
+<tr>
+<td>周期</td>
+<td>2026-10-30 至 2026-11-28（Asia/Shanghai）</td>
+</tr>
+<tr>
+<td>任务</td>
+<td>30 天计划 Day 30：审稿 + 复盘（全站内链终检、SEO 95 自评、KPI 复盘、下月计划）</td>
+</tr>
+<tr>
+<td>性质</td>
+<td><strong>只读复盘</strong>。今日未改站点代码/模板，未 push 站点 main，未发布文章，未外发外链清单。</td>
+</tr>
+<tr>
+<td>证据</td>
+<td>线上首包 HTML 抓取（不执行 JS），2026-11-28 08:47–08:55（Asia/Shanghai）；明细见 <code>raw/internal-link-check-2026-11-28.json</code>；日检 <code>formorelighting2.0/reports/seo/2026-11-28.md</code>（站点仓库 main 62bb33e，未提交）</td>
+</tr>
+<tr>
+<td>对照</td>
+<td>10-30 基线（内部口径 SEO 91.5 / GEO 71.5）；11-23 周报；11-26 GEO 复核；11-27 外链台账 v2</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>数据原则：只写有证据的数字。没有 PSI_API_KEY，Core Web Vitals 为 <strong>未测/无数据</strong>。11-23 脚本给出的 97.0 / 72.0 已被证明方法有误、与 10-30 不可比，本报告<strong>不采用</strong>，也<strong>不另估一个综合分</strong>。</p>
+</blockquote>
+<hr />
+<h2>1. 一句话结论</h2>
+<p>30 天内完成了 <strong>15 篇集群文章上线</strong>（超出 +12 的数量目标）和 llms.txt / FAQ 页等 GEO 基础项；但<strong>不能声称 SEO 95 或 GEO 85 已达成</strong>：今日内链终检新发现 <strong>30 条站内 404 链接</strong>（28 条在 HTML 站点地图页 /sitemap，2 条在首页），枢纽页不向下链文章，Organization 无 sameAs，旧文与产品页无 FAQPage，7 个产品空壳 URL 仍在，外链净增未达标。自 11-14 起<strong>连续 14 天无新文章上线</strong>，四篇成稿卡在配图。</p>
+<h2>2. 关键要点（带证据）</h2>
+<ol>
+<li><strong>内容：+15 篇上线，数量目标达成，翻新未见证据。</strong> sitemap-insights.xml 今日 30 条（10-30 基线 15 篇）。按页面 datePublished，15 篇发布于 2026-10-30 至 2026-11-14，15/15 带 Article + FAQPage + BreadcrumbList。计划中的「含 3 篇翻新」：旧 15 篇今日仍无 FAQPage，<strong>无翻新完成的证据</strong>。</li>
+<li><strong>内链终检：30/164 个站内链接目标为 404，新发现。</strong> 55 个来源页（首页 + 25 个页面 + 30 篇文章）共 164 个唯一站内目标，134 个 200，30 个 404，0 个跳转。28 条来自 /sitemap 页：它用 <code>slugify(article.title)</code> 拼文章 URL，而不是文章 slug（<code>pages/Sitemap.tsx</code> 第 86 行）。2 条来自首页产品预览：<code>src/data/homeProductPreviews.ts</code> 的旧 slug <code>advanced-2835-smd-led-strip</code> 和 <code>classic-ashape-led-bulb-e27b22</code>。此前报告未检出，今日定为<strong>新 P1</strong>；需用户批准后再改代码。</li>
+<li><strong>孤页：文章 0 篇；产品空壳 7 个。</strong> 30 篇文章都至少有 2 条来自其他文章的入链（最少的是 future-marketing，2 条）。但 /insights 索引页首包只链 7/30 篇，其余藏在 JS 按钮「Explore More」后面。/products、/sourcing、/oem-odm、/solutions、/cases 五个枢纽页首包链向文章数均为 <strong>0</strong>，所以「枢纽→支撑」这一段没有闭环。7 个产品空壳 URL 仅在 sitemap 中出现，站内无任何链接。</li>
+<li><strong>GEO 结构项部分完成。</strong> 新集群文章 15/30 有 FAQPage，旧文 15/30 没有（11-26 复核，今日复测相同）。/llms.txt 200（985 字节），/llms-full.txt 404。Organization 无 sameAs。产品页 86 个正常 PDP 中 0 个有 FAQPage（11-26 证据）。</li>
+<li><strong>外链：未达标。</strong> Serpstat（11-27）显示引荐域 3、DR 10（基线 2 / 8）。活跃列表中 4 条是低质量目录链接，<strong>不计入优质净增</strong>。目标为 ≥8（净增 ≥6），未达成。10 个外链目标已备好，尚未外发。</li>
+</ol>
+<h2>3. KPI 对照表</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>指标</th>
+<th>10-30 基线</th>
+<th>30 天目标</th>
+<th>2026-11-28 实测/证据</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SEO</td>
+<td>站内 SEO 健康分（内部口径）</td>
+<td>91.5</td>
+<td>95</td>
+<td><strong>未复测出可比分数</strong>（脚本 97.0 方法有误、不可比）；见 §4 清单</td>
+<td>不能声称达成</td>
+</tr>
+<tr>
+<td>GEO</td>
+<td>GEO 就绪分（内部口径）</td>
+<td>71.5</td>
+<td>85</td>
+<td><strong>未打分</strong>；11-26 清单验收：sameAs 未过、FAQPage 覆盖 15/30、CWV 无数据</td>
+<td>不能声称达成</td>
+</tr>
+<tr>
+<td>外链</td>
+<td>引荐域</td>
+<td>2</td>
+<td>≥8</td>
+<td>3（Serpstat 11-27），含低质量目录</td>
+<td>未达成</td>
+</tr>
+<tr>
+<td>外链</td>
+<td>Domain Rank</td>
+<td>8</td>
+<td>保持/提升</td>
+<td>10（Serpstat 11-27）</td>
+<td>数值上升，质量存疑</td>
+</tr>
+<tr>
+<td>内容</td>
+<td>新增/翻新 Insights</td>
+<td>15 篇</td>
+<td>+12（含 3 翻新）</td>
+<td>+15 新增（sitemap 30）；翻新 0 有证据</td>
+<td>新增达成；翻新未达成</td>
+</tr>
+<tr>
+<td>内链</td>
+<td>集群内链闭环</td>
+<td>未系统化</td>
+<td>5 簇闭环</td>
+<td>文章→商业页、文章↔文章有链接；枢纽→文章 0；30 条 404</td>
+<td>未达成</td>
+</tr>
+<tr>
+<td>技术</td>
+<td>结构化数据覆盖</td>
+<td>部分</td>
+<td>产品/文章/FAQ/Organization 全覆盖</td>
+<td>文章 Article 30/30；FAQPage 15/30；产品 Product 86/93；产品 FAQPage 0；Organization 无 sameAs</td>
+<td>未达成</td>
+</tr>
+<tr>
+<td>抓取</td>
+<td>llms.txt + robots + sitemap</td>
+<td>待建/待核</td>
+<td>100% 上线</td>
+<td>llms.txt 200、robots.txt 200（放行）、sitemap-index 4 子表、sitemap.xml 154 loc</td>
+<td>达成（llms-full.txt 404 为可选）</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>Core Web Vitals</td>
+<td>—</td>
+<td>计划要求复核</td>
+<td><strong>未测/无数据</strong>（缺 PSI_API_KEY）</td>
+<td>无法验收</td>
+</tr>
+</tbody>
+</table></div>
+<h2>4. SEO 95 自评（清单式，不打综合分）</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>检查项</th>
+<th>结果</th>
+<th>证据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>核心页 200</td>
+<td>通过</td>
+<td>/、/insights、/products、/contact、/oem-odm、/solutions、/sourcing、/faq、/about、/privacy、/terms、/cases、/sitemap 今日均为 200</td>
+</tr>
+<tr>
+<td>robots / sitemap</td>
+<td>通过</td>
+<td>robots.txt 200；sitemap-index 4 子表；insights 30、products 93、pages 25；sitemap.xml 154</td>
+</tr>
+<tr>
+<td>文章 title / H1 / canonical</td>
+<td>通过</td>
+<td>30/30 篇 200、各 1 个 H1、canonical 等于自身 URL</td>
+</tr>
+<tr>
+<td>站内断链</td>
+<td><strong>未通过（新 P1）</strong></td>
+<td>30 个 404 目标（28 个在 /sitemap，2 个在首页）</td>
+</tr>
+<tr>
+<td>空壳 / 薄页</td>
+<td><strong>未通过（已知 P1）</strong></td>
+<td>7 个产品短 slug 200、31954 字节、无 title</td>
+</tr>
+<tr>
+<td>页脚链接可抓取</td>
+<td>未通过（P2）</td>
+<td>Privacy / Terms / FAQ / Sitemap 是 button，不是链接</td>
+</tr>
+<tr>
+<td>枢纽页内链</td>
+<td>未通过</td>
+<td>五个枢纽页首包均不链文章；/insights 首包只链 7 篇</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>无数据</td>
+<td>缺 PSI_API_KEY</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>自评结论：</strong> 技术底座稳定（无全站 noindex/5xx，抓取文件齐全）。但存在新发现的站内断链、空壳 URL、枢纽内链缺口，<strong>不能认定达到内部口径 95</strong>。按清单看，修完断链和空壳后才值得重新打分。</p>
+<h2>5. 全站内链终检明细</h2>
+<p>方法：抓取首页、sitemap-pages 25 个页面、sitemap-insights 30 篇文章的首包 HTML（去重后 55 页），提取全部站内 <code>&lt;a href&gt;</code>，逐一请求并记录状态码。</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>指标</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>来源页</td>
+<td>55（全部 200）</td>
+</tr>
+<tr>
+<td>唯一站内链接目标</td>
+<td>164</td>
+</tr>
+<tr>
+<td>200</td>
+<td>134</td>
+</tr>
+<tr>
+<td>404</td>
+<td><strong>30</strong></td>
+</tr>
+<tr>
+<td>3xx 跳转</td>
+<td>0</td>
+</tr>
+<tr>
+<td>无入链的文章（孤页）</td>
+<td>0</td>
+</tr>
+<tr>
+<td>产品 sitemap 中站内有链接的</td>
+<td>86/93（缺的正是 7 个空壳）</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>404 链接来源：</strong></p>
+<ul>
+<li><strong>/sitemap（28 条）</strong>：文章链接全部按标题生成。例如 <code>/insights/hotel-lighting-design-a-b2b-buyers-guide</code>（实际是 <code>/insights/hotel-lighting-design-guide</code>）、<code>/insights/what-is-ugr-in-office-lighting</code>（实际是 <code>/insights/ugr-office-lighting-explained</code>）。/sitemap 页共列 30 篇，只有 beam-angle-guide-for-commercial-lighting 和 how-to-source-led-lights-from-china 两篇的标题恰好与 slug 一致。根因：<code>pages/Sitemap.tsx</code> 第 86 行 <code>slugify(article.title)</code>。</li>
+<li><strong>首页（2 条）</strong>：<code>/products/advanced-2835-smd-led-strip</code>（现产品 slug 为 <code>ultra-bright-2835-smd-led-strip</code>）、<code>/products/classic-ashape-led-bulb-e27b22</code>。根因：<code>src/data/homeProductPreviews.ts</code> 第 119、126 行。</li>
+</ul>
+<p><strong>集群链接：</strong></p>
+<ul>
+<li>新集群文章（15 篇）站内链向其他文章 5–19 条；链向商业页（含导航）11–19 条，说明正文里有回流商业页的链接。</li>
+<li>旧文（15 篇）链向其他文章 4–5 条；链向商业页 9 条，即只有导航。</li>
+<li>枢纽页向下链文章：首页 3 篇；/insights 7 篇；/products、/sourcing、/oem-odm、/solutions、/cases 均为 0。</li>
+</ul>
+<p><strong>修复建议（须用户批准后再改站点）：</strong></p>
+<ol>
+<li>Sitemap.tsx 改用文章真实 slug（P1，改动小）。</li>
+<li>首页产品预览的两个 slug 改为真实产品 slug，或改为从产品数据读取（P1）。</li>
+<li>7 个空壳 URL：从 sitemap 移除，或返回 404/301 到正确产品（P1）。</li>
+<li>枢纽页各加 3–6 条同簇文章链接；/insights 首包输出全部文章链接，或做分页链接（P2）。</li>
+</ol>
+<h2>6. 30 天执行回顾</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>完成</th>
+<th>未完成 / 偏差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>技术（D1/D2/D13/D28）</td>
+<td>llms.txt、FAQ 页 FAQPage、文章 Article/FAQPage/BreadcrumbList、Privacy/Terms 页面上线</td>
+<td>sameAs、产品 FAQPage、页脚链接、CWV 数据</td>
+</tr>
+<tr>
+<td>内容（D3–D27）</td>
+<td>15 篇集群文章上线（10-30 至 11-14）</td>
+<td>11-19、11-20、11-22、11-23 四篇成稿因无配图未上线；3 篇翻新未做</td>
+</tr>
+<tr>
+<td>内链（D7/D18/D30）</td>
+<td>新文章正文内链与商业页回流</td>
+<td>枢纽→文章、/insights 分组、/sitemap 断链</td>
+</tr>
+<tr>
+<td>外链（D15/D29）</td>
+<td>11-27 台账 v2 与 10 个目标</td>
+<td>D15 目录提交未执行；未外发；优质引荐域无净增证据</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>主要瓶颈：配图链路。</strong> qwen-image 今日 401；llm（qwen）401，deepseek 402。11-14 之后没有文章上线。</p>
+<h2>7. 四篇待发成稿状态（2026-11-28）</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>稿件</th>
+<th>位置</th>
+<th>配图</th>
+<th>线上</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>commercial-lighting-suppliers-guide（11-19）</td>
+<td>主笔 formore-articles，commit cd2581e</td>
+<td>未到</td>
+<td>404</td>
+</tr>
+<tr>
+<td>led-panel-light-manufacturer-guide（11-20）</td>
+<td>主笔 formore-articles，commit b6ec3f8；category 需由 Sourcing 改为 Technical</td>
+<td>未到</td>
+<td>404</td>
+</tr>
+<tr>
+<td>led-downlight-manufacturer-guide（11-22）</td>
+<td>workbench PR #7，未合并</td>
+<td>未到</td>
+<td>404</td>
+</tr>
+<tr>
+<td>factory-audit-lighting-china-guide（11-23）</td>
+<td>workbench PR #8，未合并</td>
+<td>未到</td>
+<td>404</td>
+</tr>
+</tbody>
+</table></div>
+<p>检查范围：/workspace/design-drafts/（最新目录为 11-14）、画眉 formore-articles 目录（最新为 11-06）、站点仓库、PR #7/#8 分支（各只含 1 个 md 文件）。没有一篇配图齐全，今日未跑 publish:article 校验。</p>
+<h2>8. 下月计划建议（2026-11-29 起，均需用户批准的项已标注）</h2>
+<p><strong>优先级 1：先修站点硬伤（需用户批准，建议一个小 PR）</strong></p>
+<ol>
+<li>/sitemap 页改用真实 slug，首页两个产品 slug 修正。验收：内链终检 404 = 0。</li>
+<li>7 个产品空壳 URL：从 sitemap 移除，或返回 404/301。验收：sitemap-products 全部有 title/H1/canonical。</li>
+<li>页脚 Privacy/Terms/FAQ/Sitemap 改成真实链接。</li>
+</ol>
+<p><strong>优先级 2：打通配图，清掉积压</strong></p>
+<ol>
+<li>请用户选一条配图来源：修复 DashScope 密钥/额度、给 deepseek 充值，或批准替代方案（实拍图库/设计师手作）。配图到位后，按 11-19 → 11-20 → 11-22 → 11-23 顺序合审，并按既有自动发布许可校验上线。</li>
+<li>积压清掉前不开新简报。</li>
+</ol>
+<p><strong>优先级 3：GEO 补强（需用户批准模板改动）</strong></p>
+<ol>
+<li>旧 15 篇按「可见问答 → FAQPage」翻新 3–5 篇（优先 what-is-cri-in-lighting、beam-angle-guide-for-commercial-lighting、how-to-source-led-lights-from-china）。</li>
+<li>用户提供可验证的官方档案 URL（LinkedIn/YouTube 等）后补 Organization sameAs。</li>
+<li>产品页 FAQPage 模板化；Insight CTA 路灯套话改为按主题匹配。</li>
+<li>枢纽页加同簇文章链接；/insights 首包输出全量文章链接。</li>
+</ol>
+<p><strong>优先级 4：度量与外链</strong></p>
+<ol>
+<li>配置 PSI_API_KEY，拿到 LCP/INP/CLS 实测；更新 daily-seo-check 的任务映射（仍是四月排期）。</li>
+<li>外链：用户确认后，从 11-27 台账的 3 个客座目标开始外发；每月复测 Serpstat 引荐域，低质量目录单列不计。</li>
+<li>修完优先级 1 后，用同一套清单重新做 SEO/GEO 自评，届时再判断是否达到 95/85。</li>
+</ol>
+<h2>9. 工具与日检（2026-11-28）</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>项</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/home/box/tools/llm qwen</td>
+<td>HTTP 401 Unauthorized</td>
+</tr>
+<tr>
+<td>/home/box/tools/llm deepseek</td>
+<td>HTTP 402 Payment Required</td>
+</tr>
+<tr>
+<td>/home/box/tools/qwen-image</td>
+<td>HTTP 401 Unauthorized</td>
+</tr>
+<tr>
+<td>npm run seo:daily</td>
+<td>exit 0；与 11-27 报告除日期外无差异；PSI 跳过</td>
+</tr>
+</tbody>
+</table></div>
+<h2>10. 证据清单</h2>
+<ul>
+<li><code>raw/internal-link-check-2026-11-28.json</code>：内链终检汇总（来源页、目标状态、404 列表、文章入链数、每篇 schema/canonical）。</li>
+<li><code>../2026-11-26-geo-review/</code>：GEO 清单验收与 live-evidence-summary.json。</li>
+<li><code>../2026-11-23-seo-geo-audit/</code>：周报、脚本基线，以及 97.0/72.0 不可比的说明。</li>
+<li><code>../2026-11-27-outreach/formorelightings-outreach-ledger-v2.md</code>：Serpstat 引荐域快照。</li>
+<li><code>../../../notes/daily-seo-check/2026-11-28.md</code>：当日日检与线上抽检。</li>
+</ul></div></body></html>

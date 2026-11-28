@@ -2,8 +2,15 @@
   "version": 1,
   "feedId": "seo",
   "timezone": "Asia/Shanghai",
-  "updatedAt": "2026-11-27T01:01:31+00:00",
+  "updatedAt": "2026-11-28T00:52:37+00:00",
   "dates": [
+    {
+      "date": "2026-11-28",
+      "file": "2026-11-28.json",
+      "summary": "排期 Day30：30 天复盘报告已交付（MD+HTML）。内容 +15 篇达成；SEO 95 / GEO 85 无可比实测，不能声称达成；引荐域 3（目标 8）。内链终检新发现 30 条站内 404（28 条在 /sitemap 页、2 条在首页），列为新 P1，待用户批准修复。四篇成稿仍缺配图，配图/LLM 工具 401/402，无发布。",
+      "articleCount": 4,
+      "issueCount": 10
+    },
     {
       "date": "2026-11-27",
       "file": "2026-11-27.json",

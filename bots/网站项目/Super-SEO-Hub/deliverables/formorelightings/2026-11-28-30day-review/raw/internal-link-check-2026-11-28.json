@@ -1,0 +1,560 @@
+{
+ "checkedAt": "2026-11-28 08:50 Asia/Shanghai",
+ "method": "首包 HTML（不执行 JS），python urllib，来源页=首页+sitemap-pages 25 + sitemap-insights 30（去重 55）",
+ "sources": 55,
+ "uniqueInternalTargets": 164,
+ "targets200": 134,
+ "broken": {
+  "/insights/2026-lighting-trends-the-great-divide-between-art-utility": 404,
+  "/insights/3000k-vs-4000k-led-which-to-choose": 404,
+  "/insights/architectural-led-lighting-b2b-buyers-guide": 404,
+  "/insights/commercial-led-lighting-a-b2b-buyers-guide": 404,
+  "/insights/commercial-track-light-b2b-buyers-guide": 404,
+  "/insights/hotel-lighting-design-a-b2b-buyers-guide": 404,
+  "/insights/human-centric-lighting-a-b2b-buyers-guide": 404,
+  "/insights/led-flood-light-manufacturer-b2b-buyers-guide": 404,
+  "/insights/led-lighting-manufacturer-b2b-buyers-guide": 404,
+  "/insights/led-linear-light-a-b2b-buyers-guide": 404,
+  "/insights/lumens-vs-watts-the-truth-about-led-brightness": 404,
+  "/insights/magnetic-track-lighting-a-b2b-buyers-guide": 404,
+  "/insights/mastering-outdoor-landscape-lighting": 404,
+  "/insights/minimalism-in-retail-lighting-less-is-more": 404,
+  "/insights/navigating-the-shenzhen-led-market-a-buyers-handbook": 404,
+  "/insights/oem-vs-odm-lighting-a-b2b-buyers-guide": 404,
+  "/insights/office-lighting-design-a-b2b-buyers-guide": 404,
+  "/insights/retail-lighting-design-a-b2b-buyers-guide": 404,
+  "/insights/solar-street-light-manufacturer-b2b-buyers-guide": 404,
+  "/insights/the-future-of-human-centric-lighting-in-workplace-design": 404,
+  "/insights/the-secret-to-hotel-luxury-mastering-beam-angles": 404,
+  "/insights/the-ultimate-color-temperature-guide-2700k-vs-3000k-vs-4000k": 404,
+  "/insights/the-ultimate-guide-to-led-terminology-from-lumens-to-ugr": 404,
+  "/insights/understanding-dali-2-vs-0-10v-dimming": 404,
+  "/insights/what-is-cri-in-lighting-a-practical-guide-for-buyers-and-designers": 404,
+  "/insights/what-is-ugr-in-office-lighting": 404,
+  "/insights/why-high-cri-matters-for-hotels": 404,
+  "/insights/why-your-clothes-look-wrong-understanding-cri": 404,
+  "/products/advanced-2835-smd-led-strip": 404,
+  "/products/classic-ashape-led-bulb-e27b22": 404
+ },
+ "redirects": 0,
+ "orphanInsights": [],
+ "insightInbound": {
+  "/insights/what-is-cri-in-lighting": {
+   "all": 15,
+   "from_other_insights": 15,
+   "from_insights_index": false
+  },
+  "/insights/beam-angle-guide-for-commercial-lighting": {
+   "all": 14,
+   "from_other_insights": 13,
+   "from_insights_index": false
+  },
+  "/insights/how-to-source-led-lights-from-china": {
+   "all": 13,
+   "from_other_insights": 12,
+   "from_insights_index": false
+  },
+  "/insights/2026-lighting-trends": {
+   "all": 3,
+   "from_other_insights": 2,
+   "from_insights_index": true
+  },
+  "/insights/future-marketing": {
+   "all": 2,
+   "from_other_insights": 2,
+   "from_insights_index": false
+  },
+  "/insights/navigating-shenzhen": {
+   "all": 4,
+   "from_other_insights": 4,
+   "from_insights_index": false
+  },
+  "/insights/minimalism": {
+   "all": 3,
+   "from_other_insights": 3,
+   "from_insights_index": false
+  },
+  "/insights/dimming-guide": {
+   "all": 13,
+   "from_other_insights": 13,
+   "from_insights_index": false
+  },
+  "/insights/outdoor-lighting": {
+   "all": 5,
+   "from_other_insights": 5,
+   "from_insights_index": false
+  },
+  "/insights/cri-explained": {
+   "all": 6,
+   "from_other_insights": 6,
+   "from_insights_index": false
+  },
+  "/insights/lumens-vs-watts": {
+   "all": 5,
+   "from_other_insights": 5,
+   "from_insights_index": false
+  },
+  "/insights/color-temperature-guide": {
+   "all": 12,
+   "from_other_insights": 12,
+   "from_insights_index": false
+  },
+  "/insights/understanding-cri": {
+   "all": 3,
+   "from_other_insights": 3,
+   "from_insights_index": false
+  },
+  "/insights/beam-angle-secrets": {
+   "all": 4,
+   "from_other_insights": 4,
+   "from_insights_index": false
+  },
+  "/insights/led-terminology-guide": {
+   "all": 4,
+   "from_other_insights": 4,
+   "from_insights_index": false
+  },
+  "/insights/hotel-lighting-design-guide": {
+   "all": 15,
+   "from_other_insights": 13,
+   "from_insights_index": true
+  },
+  "/insights/retail-lighting-design-guide": {
+   "all": 15,
+   "from_other_insights": 13,
+   "from_insights_index": true
+  },
+  "/insights/office-lighting-design-guide": {
+   "all": 12,
+   "from_other_insights": 10,
+   "from_insights_index": true
+  },
+  "/insights/human-centric-lighting-guide": {
+   "all": 18,
+   "from_other_insights": 17,
+   "from_insights_index": true
+  },
+  "/insights/led-flood-light-manufacturer-guide": {
+   "all": 17,
+   "from_other_insights": 16,
+   "from_insights_index": true
+  },
+  "/insights/architectural-led-lighting-guide": {
+   "all": 7,
+   "from_other_insights": 6,
+   "from_insights_index": true
+  },
+  "/insights/led-lighting-manufacturer-guide": {
+   "all": 19,
+   "from_other_insights": 19,
+   "from_insights_index": false
+  },
+  "/insights/commercial-track-light-guide": {
+   "all": 8,
+   "from_other_insights": 8,
+   "from_insights_index": false
+  },
+  "/insights/3000k-vs-4000k-led": {
+   "all": 8,
+   "from_other_insights": 8,
+   "from_insights_index": false
+  },
+  "/insights/commercial-led-lighting-guide": {
+   "all": 9,
+   "from_other_insights": 9,
+   "from_insights_index": false
+  },
+  "/insights/oem-vs-odm-lighting-guide": {
+   "all": 8,
+   "from_other_insights": 8,
+   "from_insights_index": false
+  },
+  "/insights/led-linear-light-guide": {
+   "all": 9,
+   "from_other_insights": 9,
+   "from_insights_index": false
+  },
+  "/insights/magnetic-track-lighting-guide": {
+   "all": 11,
+   "from_other_insights": 11,
+   "from_insights_index": false
+  },
+  "/insights/solar-street-light-manufacturer-guide": {
+   "all": 5,
+   "from_other_insights": 5,
+   "from_insights_index": false
+  },
+  "/insights/ugr-office-lighting-explained": {
+   "all": 12,
+   "from_other_insights": 12,
+   "from_insights_index": false
+  }
+ },
+ "insightsIndexLinksInFirstHtml": [
+  "/insights/2026-lighting-trends",
+  "/insights/architectural-led-lighting-guide",
+  "/insights/hotel-lighting-design-guide",
+  "/insights/human-centric-lighting-guide",
+  "/insights/led-flood-light-manufacturer-guide",
+  "/insights/office-lighting-design-guide",
+  "/insights/retail-lighting-design-guide"
+ ],
+ "productsLinked": 86,
+ "productsInSitemap": 93,
+ "perInsight": {
+  "/insights/what-is-cri-in-lighting": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/beam-angle-guide-for-commercial-lighting": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/how-to-source-led-lights-from-china": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/2026-lighting-trends": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 4,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/future-marketing": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 4,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/navigating-shenzhen": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/minimalism": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/dimming-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/outdoor-lighting": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/cri-explained": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/lumens-vs-watts": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/color-temperature-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/understanding-cri": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/beam-angle-secrets": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/led-terminology-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList"
+   ],
+   "toInsights": 4,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/hotel-lighting-design-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 19,
+   "toCommercialIncludingNav": 19
+  },
+  "/insights/retail-lighting-design-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 16,
+   "toCommercialIncludingNav": 18
+  },
+  "/insights/office-lighting-design-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 15,
+   "toCommercialIncludingNav": 16
+  },
+  "/insights/human-centric-lighting-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 15,
+   "toCommercialIncludingNav": 16
+  },
+  "/insights/led-flood-light-manufacturer-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 14,
+   "toCommercialIncludingNav": 13
+  },
+  "/insights/architectural-led-lighting-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 16,
+   "toCommercialIncludingNav": 17
+  },
+  "/insights/led-lighting-manufacturer-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 14,
+   "toCommercialIncludingNav": 11
+  },
+  "/insights/commercial-track-light-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 13,
+   "toCommercialIncludingNav": 13
+  },
+  "/insights/3000k-vs-4000k-led": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 16,
+   "toCommercialIncludingNav": 11
+  },
+  "/insights/commercial-led-lighting-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 15,
+   "toCommercialIncludingNav": 12
+  },
+  "/insights/oem-vs-odm-lighting-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 10,
+   "toCommercialIncludingNav": 9
+  },
+  "/insights/led-linear-light-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 10,
+   "toCommercialIncludingNav": 12
+  },
+  "/insights/magnetic-track-lighting-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 10,
+   "toCommercialIncludingNav": 11
+  },
+  "/insights/solar-street-light-manufacturer-guide": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 7,
+   "toCommercialIncludingNav": 11
+  },
+  "/insights/ugr-office-lighting-explained": {
+   "status": 200,
+   "h1": 1,
+   "canonicalOk": true,
+   "schema": [
+    "Article",
+    "BreadcrumbList",
+    "FAQPage"
+   ],
+   "toInsights": 5,
+   "toCommercialIncludingNav": 9
+  }
+ },
+ "hubsToInsights": {
+  "/": 3,
+  "/products": 0,
+  "/sourcing": 0,
+  "/oem-odm": 0,
+  "/solutions": 0,
+  "/cases": 0,
+  "/insights": 7
+ }
+}
